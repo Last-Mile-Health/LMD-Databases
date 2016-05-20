@@ -4,7 +4,10 @@ drop view if exists public_view_communityGIS;
 
 create view public_view_communityGIS as
 select
-      concat( 'Point (', c.X, ' ', c.Y, ')' ) as wkt_geom,
+
+--      concat( 'Point (', c.X, ' ', c.Y, ')' ) as wkt_geom,
+
+      c.wktGeometry                         as wkt_geom,   
       c.X                                   as X,
       c.Y                                   as Y,
       c.communityID                         as MYSQL_ID,	

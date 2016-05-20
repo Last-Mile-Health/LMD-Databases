@@ -16,7 +16,7 @@ select
           
           when  ( s.n >= 2000  ) and ( s.n <= 2199 )        then 6
           
-          when  ( s.n >= 2200  ) and ( s.n < 2599 )         then 7
+          when  ( s.n >= 2200  ) and ( s.n < 2699 )         then 7
           
           else null
           
@@ -31,7 +31,7 @@ select
           
           when  ( s.n >= 2000  ) and ( s.n <= 2199 )        then 'Rivercess 1'
           
-          when  ( s.n >= 2200  ) and ( s.n < 2599 )         then 'Rivercess 2'
+          when  ( s.n >= 2200  ) and ( s.n < 2699 )         then 'Rivercess 2'
           
           else null
           
@@ -41,7 +41,7 @@ select
       
           when  ( ( s.n >= 1      ) and ( s.n <= 1999 ) ) then 6
           
-          when  ( ( s.n >= 2000   ) and ( s.n <= 2599 ) ) then 14
+          when  ( ( s.n >= 2000   ) and ( s.n <= 2699 ) ) then 14
           
           else null
           
@@ -51,7 +51,7 @@ select
       
           when  ( ( s.n >= 1      ) and ( s.n <= 1999 ) ) then 'Grand Gedeh'
           
-          when  ( ( s.n >= 2000   ) and ( s.n <= 2599 ) ) then 'Rivercess'
+          when  ( ( s.n >= 2000   ) and ( s.n <= 2699 ) ) then 'Rivercess'
           
           else null
           

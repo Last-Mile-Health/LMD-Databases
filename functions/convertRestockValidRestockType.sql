@@ -28,7 +28,10 @@ case lower( replace( paramString, ' ', '' ) )
         set returnValue = 'partial';
         
     when 'none' then
-        set returnValue = 'none'; 
+        set returnValue = 'none';
+        
+    when '' then
+        set returnValue = null;
         
     else
         set returnValue = paramString;

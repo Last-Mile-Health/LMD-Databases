@@ -26,7 +26,10 @@ case lower( replace( paramString, ' ', '' ) )
         set returnValue = 'outOfStock';
         
     when lower( 'noModuleTraining' ) then
-        set returnValue = 'noModuleTraining'; 
+        set returnValue = 'noModuleTraining';
+        
+    when '' then
+        set returnValue = null;
         
     else
         set returnValue = paramString;

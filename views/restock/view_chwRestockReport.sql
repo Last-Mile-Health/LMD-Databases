@@ -36,6 +36,7 @@ select
       
       e.meta_autoDate,
       e.manualDate,
+      if( trim( e.manualDate ) like trim( e.meta_autoDate ), 1, 0 ) as dateMatch,
       
       e.stockOnHand_ACT25mg,
       e.restockType_ACT25mg,

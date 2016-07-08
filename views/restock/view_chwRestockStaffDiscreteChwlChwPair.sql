@@ -12,8 +12,9 @@ select
       r.chwlStatus,
       r.chwlSupervisionStatus,
       r.chwStatus, 
-      group_concat( distinct concat( if( r.chwCommunityStatus like 'active', 'Active', 'Inactive' ), ': ', r.communityAndIDList ) order by r.chwCommunityStatus separator '; '  ) as chwCommunityStatusList,
+      group_concat( distinct concat( if( r.chwCommunityStatus like 'active', '', 'Inactive' ), ': ', r.communityAndIDList ) order by r.chwCommunityStatus separator '; '  ) as chwCommunityStatusList,
       r.districtList,
+      r.healthFacilityList,
       r.healthDistrictList,
       r.countyList
       

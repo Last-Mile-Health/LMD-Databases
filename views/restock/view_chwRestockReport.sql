@@ -17,12 +17,11 @@ select
       if( ( e.chwStatus               is null ) or ( trim( e.chwStatus              ) like '' ), 'Unknown',       e.chwStatus             )        as chwStatus,
       
       -- If chwCommunityStatusList is null, there's a high likelihood that chwID is null as well, so use the restockCommuniityID instead.
-      if( ( e.chwCommunityStatusList  is null ) or ( trim( e.chwCommunityStatusList ) like '' ), if( ( e.restockCommunityID is null ) or ( trim( e.restockCommunityID ) like '' ), 'Unknown', e.restockCommunityID ), e.chwCommunityStatusList ) as chwCommunityStatusList,
-      
-      'Coming soon...'                                                                                                                              as healthFacilityList,
-      
+      if( ( e.chwCommunityStatusList  is null ) or ( trim( e.chwCommunityStatusList ) like '' ), if( ( e.restockCommunityID is null ) or ( trim( e.restockCommunityID ) like '' ), ': Unknown', e.restockCommunityID ), e.chwCommunityStatusList ) as chwCommunityStatusList,
+    
       if( ( e.districtList            is null ) or ( trim( e.districtList           ) like '' ), 'Unknown',       e.districtList          )         as districtList,
       if( ( e.healthDistrictList      is null ) or ( trim( e.healthDistrictList     ) like '' ), 'Unknown',       e.healthDistrictList    )         as healthDistrictList,
+      if( ( e.healthFacilityList      is null ) or ( trim( e.healthFacilityList     ) like '' ), 'Unknown',       e.healthFacilityList    )         as healthFacilityList,
       
       -- If countyList is null, there's a high likelihood that chwID is null as well, so use the restockChwID to figure out the county
       if( ( e.countyList is null ) or ( trim( e.countyList ) like '' ), mapStaffIDToCounty( e.restockChwID ), e.countyList  ) as countyList,

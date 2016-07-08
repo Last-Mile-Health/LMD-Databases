@@ -25,6 +25,7 @@ select
       p.chwStatus, 
       p.chwCommunityStatusList,
       p.districtList,
+      p.healthFacilityList,
       p.healthDistrictList,
       p.countyList,
       
@@ -165,6 +166,7 @@ select
       p.chwStatus, 
       p.chwCommunityStatusList,
       p.districtList,
+      p.healthFacilityList,
       p.healthDistrictList,
       p.countyList,
       

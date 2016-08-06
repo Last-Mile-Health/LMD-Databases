@@ -1,0 +1,22 @@
+CREATE TABLE `tbl_reportobjects` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `reportID` int(4) DEFAULT NULL,
+  `instIDs` varchar(45) DEFAULT NULL,
+  `displayOrder` int(3) DEFAULT NULL,
+  `roMetadata_name` varchar(100) DEFAULT NULL,
+  `roMetadata_description` longtext,
+  `roMetaData_target` varchar(45) DEFAULT NULL,
+  `roMetadata_targetFormat` varchar(45) DEFAULT NULL,
+  `roMetadata_narrative` longtext,
+  `chart_type` varchar(45) DEFAULT NULL,
+  `chart_instIDs` varchar(45) DEFAULT NULL,
+  `chart_size_x` int(4) DEFAULT NULL,
+  `chart_size_y` int(4) DEFAULT NULL,
+  `chart_timeInterval` int(3) DEFAULT NULL,
+  `chart_tickFormat` varchar(45) DEFAULT NULL,
+  `chart_legend` varchar(45) DEFAULT NULL,
+  `chart_colors` varchar(45) DEFAULT NULL,
+  `archived` int(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=113 DEFAULT CHARSET=utf8;

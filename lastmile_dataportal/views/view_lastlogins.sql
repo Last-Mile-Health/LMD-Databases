@@ -1,0 +1,1 @@
+CREATE ALGORITHM=UNDEFINED VIEW `lastmile_dataportal`.`view_lastlogins` AS select `lastmile_db`.`tbl_utility_logins`.`username` AS `username`,max(`lastmile_db`.`tbl_utility_logins`.`loginTime`) AS `lastLogin` from `lastmile_db`.`tbl_utility_logins` group by `lastmile_db`.`tbl_utility_logins`.`username` order by max(`lastmile_db`.`tbl_utility_logins`.`loginTime`) desc;

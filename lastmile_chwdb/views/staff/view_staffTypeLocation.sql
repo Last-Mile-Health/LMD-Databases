@@ -9,6 +9,7 @@ select
       staffID,
       staffName,
       
+      group_concat( distinct community                separator ', '  ) as community,
       group_concat( distinct district                 separator ', '  ) as district,
       group_concat( distinct healthFacility           separator ', '  ) as healthFacility,
       group_concat( distinct healthDistrict           separator ', '  ) as healthDistrict,
@@ -19,3 +20,4 @@ where not ( ( staffID is null ) or ( staffID like '' ) )
 group by  staffType,
           staffID,
           staffName
+;

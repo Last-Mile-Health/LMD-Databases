@@ -1,4 +1,5 @@
 use lastmile_chwdb;
+-- Note: add tables from the LMS survey.
 
 drop view if exists view_dataEntry;
 
@@ -12,8 +13,8 @@ select
       meta_DE_init                                            as dataEntryUser,
       meta_QA_init                                            as qualityAssuranceUser,
       fhwID                                                   as staffID
+      -- No communityID, left outer join view_territoryCommunityChw to fhwID
 from lastmile_db.tbl_data_fhw_sch_sickchild
-where not ( ( meta_DE_date is null ) or ( trim( meta_DE_date ) like '' ) )
 
 union all
 
@@ -27,7 +28,7 @@ select
       chwID
       
 from staging_kpiAssessmentStep1
-where not ( ( meta_DE_date is null ) or ( trim( meta_DE_date ) like '' ) )
+-- where not ( ( meta_DE_date is null ) or ( trim( meta_DE_date ) like '' ) )
 
 union all
 
@@ -39,8 +40,8 @@ select
       meta_DE_init,
       meta_QA_init,                                          
       chwID
+      -- communityID, left outer join view_territoryCommunity to communityID
 from staging_householdRegistrationStep1
-where not ( ( meta_DE_date is null ) or ( trim( meta_DE_date ) like '' ) )
 
 union all
 
@@ -52,8 +53,8 @@ select
       meta_DE_init,
       meta_QA_init,                                          
       chwID
+       -- communityID, left outer join view_territoryCommunity to communityID
 from staging_chwMonthlyServiceReportStep1
-where not ( ( meta_DE_date is null ) or ( trim( meta_DE_date ) like '' ) )
 
 union all
 
@@ -64,9 +65,9 @@ select
       meta_DE_date,
       meta_DE_init,
       meta_QA_init,                                          
-      null
+      null                                                      as staffID
+      -- unknown as district
 from staging_trainingResultsRecordStep1
-where not ( ( meta_DE_date is null ) or ( trim( meta_DE_date ) like '' ) )
 
 union all
 
@@ -77,9 +78,9 @@ select
       meta_DE_date,
       meta_DE_init,
       meta_QA_init,                                          
-      null
+      null                                                      as staffID
+      -- unknown as district
 from staging_facilitatorEvaluationRecordStep1
-where not ( ( meta_DE_date is null ) or ( trim( meta_DE_date ) like '' ) )
 
 union all
 
@@ -89,10 +90,10 @@ select
       meta_formVersion,
       meta_insertDatetime,
       meta_uploadUser,
-      null,                     -- qualityAssuranceUser is always null for odk                                        
-      chwlID                                            
+      null                                                    as qualityAssuranceUser,                                       
+      chwlID
+      -- No communityID, supervisedChwID is poorly filled, left outer join view_staffSupervisionCommunityiHstory to  chwlID
 from staging_odk_arrivalchecklog
-where not ( ( meta_insertDatetime is null ) or ( trim( meta_insertDatetime ) like '' ) )
 
 union all
 
@@ -102,10 +103,10 @@ select
       meta_formVersion,
       meta_insertDatetime,
       meta_uploadUser,
-      null,                     -- qualityAssuranceUser is always null for odk                                        
-      chwlID                                       
+      null                                                    as qualityAssuranceUser,                                   
+      chwlID
+      -- No communityID or chwID, left outer join view_staffSupervisionCommunityiHstory to  chwlID
 from staging_odk_departurechecklog
-where not ( ( meta_insertDatetime is null ) or ( trim( meta_insertDatetime ) like '' ) )
 
 union all
 
@@ -115,23 +116,23 @@ select
       meta_formVersion,
       meta_insertDatetime,
       meta_uploadUser,
-      null,                     -- qualityAssuranceUser is always null for odk                                        
-      supervisedChwID 
+      null                                                    as qualityAssuranceUser,                                        
+      supervisedChwID
+      -- CommunityID is poorly filled in, left outer join view_staffSupervisionCommunityiHstory to supervisedChwID
 from staging_odk_chwrestock
-where not ( ( meta_insertDatetime is null ) or ( trim( meta_insertDatetime ) like '' ) )
 
 union all
 
 select
       'odk'                                                   as formType,
-      'CHA Restock Archive'                                   as formName,
+      'CHA Restock'                                           as formName,
       meta_formVersion,
       meta_insertDatetime,
-      null,
-      null,                     -- qualityAssuranceUser is always null for odk                                        
-      supervisedChwID 
+      null                                                    as dataEntryUser,
+      null                                                    as qualityAssuranceUser,                                       
+      supervisedChwID
+      -- supervisedChwID is poorly filled in, left outer join view_staffSupervisionCommunityiHstory to chwlID
 from staging_odk_chwrestock_archive
-where not ( ( meta_insertDatetime is null ) or ( trim( meta_insertDatetime ) like '' ) )
 
 union all
 
@@ -140,11 +141,11 @@ select
       'CHA Supervision Report'                                as formName,
       meta_formVersion,
       meta_insertDate,
-      null,
-      null,                     -- qualityAssuranceUser is always null for odk                                        
-      supervisedCHWID 
+      null                                                    as dataEntryUser,
+      null                                                    as qualityAssuranceUser,                                        
+      supervisedCHWID
+      -- No communityID, left outer join view_territoryCommunityChw to supervisedCHWID
 from staging_odk_chwsupervisionreport
-where not ( ( meta_insertDate is null ) or ( trim( meta_insertDate ) like '' ) )
 
 union all
 
@@ -154,10 +155,37 @@ select
       meta_formVersion,
       meta_insertDatetime,
       meta_uploadUser,
-      null,                     -- qualityAssuranceUser is always null for odk                                        
+      null                                                    as qualityAssuranceUser,                                     
       chwID 
 from staging_odk_healthsurvey
-where not ( ( meta_insertDatetime is null ) or ( trim( meta_insertDatetime ) like '' ) )
+
+union all
+
+select 
+
+      'odk'                                                   as formType,
+      'Health Survey: Children'                               as formName,
+      null                                                    as meta_formVersion,
+      meta_insertDatetime,
+      meta_uploadUser,
+      null                                                    as qualityAssuranceUser,                                                             
+      chwID                                                   as staffID
+
+from staging_odk_children
+-- use linkUUID to odk health survey table to bring in form version
+
+union all
+
+select 
+      'odk'                                                   as formType,
+      'Health Survey: Vaccine'                                as formName,
+      null                                                    as meta_formVersion,
+      meta_insertDatetime,
+      meta_uploadUser,
+      null                                                    as qualityAssuranceUser,                                                             
+      chwID                                                   as staffID
+from staging_odk_vaccine
+-- use linkUUID to odk health survey table to bring in chwID for staffID and form version
 
 union all
 
@@ -167,23 +195,21 @@ select
       meta_formVersion,
       meta_insertDatetime,
       meta_uploadUser,
-      null,                     -- qualityAssuranceUser is always null for odk                                        
+      null                                                    as qualityAssuranceUser,                                       
       chwID 
 from staging_odk_routinevisit
-where not ( ( meta_insertDatetime is null ) or ( trim( meta_insertDatetime ) like '' ) )
 
 union all
 
 select
       'odk'                                                   as formType,
-      'Routine Visit Archive'                                 as formName,
+      'Routine Visit'                                         as formName,
       meta_formVersion,
       meta_insertDate,
-      null,
-      null,                     -- qualityAssuranceUser is always null for odk                                        
-      chwID 
+      null                                                    as dataEntryUser,
+      null                                                    as qualityAssuranceUser,                                        
+      chwID                                                   
 from staging_odk_routinevisit_archive
-where not ( ( meta_insertDate is null ) or ( trim( meta_insertDate ) like '' ) )
 
 union all
 
@@ -193,10 +219,9 @@ select
       meta_formVersion,
       meta_insertDatetime,
       meta_uploadUser,
-      null,                     -- qualityAssuranceUser is always null for odk                                        
+      null                                                    as qualityAssuranceUser,                                    
       chwID
 from staging_odk_sickChildForm
-where not ( ( meta_insertDatetime is null ) or ( trim( meta_insertDatetime ) like '' ) )
 
 union all
 
@@ -206,10 +231,9 @@ select
       meta_formVersion,
       meta_insertDatetime,
       meta_uploadUser,
-      null,                     -- qualityAssuranceUser is always null for odk                                        
+      null                                                    as qualityAssuranceUser,                                        
       supervisedCHWID
 from staging_odk_supervisionvisitlog
-where not ( ( meta_insertDatetime is null ) or ( trim( meta_insertDatetime ) like '' ) )
 
 union all
 
@@ -219,8 +243,7 @@ select
       meta_formVersion,
       meta_insertDatetime,
       meta_uploadUser,
-      null,                     -- qualityAssuranceUser is always null for odk                                        
+      null                                                    as qualityAssuranceUser,                                                             
       chwID
 from staging_odk_vaccinetracker
-where not ( ( meta_insertDatetime is null ) or ( trim( meta_insertDatetime ) like '' ) )
 ;

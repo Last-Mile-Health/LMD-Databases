@@ -43,10 +43,13 @@ select
       g.cha_id_list                 as registration_cha_id_list,
       g.registration_year_list,
       
+      a.position_id_list,
+      a.position_count,
+      if( a.position_id_list is null, 'N', 'Y' )              as active_position,
+      
       a.cha_id_list,
       a.cha_count,
-      
-      if( a.cha_id_list is null, 'N', 'Y' ) as active
+      if( a.cha_id_list is null, 'N', 'Y' )                   as active_cha
       
 from view_geo_community as c
     left outer join view_community_registration as g on c.community_id = g.community_id

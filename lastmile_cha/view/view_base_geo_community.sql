@@ -37,7 +37,18 @@ select
       population,
       household_total,
       
-      active,
+      active_position,
+      active_cha,
+      
+      if( active_position like 'N', 'None',
+        if( active_cha like 'N', 'No CHA',
+          if( cha_count < position_count, 'Partial', 'Full' )
+        )
+      ) as service_level,
+              
+      position_id_list,
+      position_count,
+      
       cha_id_list,
       cha_count
 

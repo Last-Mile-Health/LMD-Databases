@@ -6,5 +6,5 @@ create view view_base_geo_community_in_program as
 
 select *
 from view_base_geo_community
-where not cha_id_list is null
+where active_position like 'Y'
 ;

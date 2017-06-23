@@ -6,5 +6,5 @@ create view view_base_geo_community_remote as
 
 select *
 from view_base_geo_community
-where not health_facility_proximity like 'remote'
+where health_facility_proximity like 'remote'
 ;

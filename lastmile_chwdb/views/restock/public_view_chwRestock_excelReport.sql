@@ -6,7 +6,8 @@ create view public_view_chwRestock_excelReport as
 
 select
         r.meta_autoDate,
-        
+ 
+        -- pull meta data in from the staging table
         o.meta_dataEntry_startTime,	
         o.meta_dataEntry_endTime,	
         o.meta_dataSource,	
@@ -130,12 +131,12 @@ select
         null as restockType_chlorhexadine,	
         null as stockOutReason_chlorhexadine,	
         null as fullStock_chlorhexadine,	
-
-        null as stockOnHand_disposableGloves,	
-        null as restockType_disposableGloves,	
-        null as partialRestock_disposableGloves,	
-        null as stockOutReason_disposableGloves,	
-        null as fullStock_disposableGloves,
+        
+        r.stockOnHand_disposableGloves,	
+        r.restockType_disposableGloves,	
+        r.partialRestock_disposableGloves,	
+        r.stockOutReason_disposableGloves,	
+        r.fullStock_disposableGloves,
 	
         r.stockOnHand_plasticCup,	
         r.restockType_plasticCup,	
@@ -251,11 +252,14 @@ select
         r.partialRestock_CommunityReferralForm,	
         r.stockOutReason_CommunityReferralForm,	
 
+        -- pull meta data in from the staging table
         o.meta_lastUpdate_user,	
         o.meta_lastUpdate_datetime,	
-        o.meta_insertDatetime
+        o.meta_insertDatetime,
+        
+        r.chwRestockID
         
 from scm_chwRestock as r
-    left outer join staging_odk_chwrestock as o on r.chwRestockID = o.chwRestockID
+    left outer join staging_odk_chwrestock as o on r.chwRestockID = o.chwRestockID -- note: chwRestockID is pk for all restock tables.
 order by r.chwRestockID asc
 ;

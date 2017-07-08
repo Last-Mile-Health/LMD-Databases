@@ -9,6 +9,8 @@ select
       g1.cha_id, 
       g1.registration_year,
       
+      g1.registration_month,
+      
       g1.total_household,
       g1.total_household_member,
       

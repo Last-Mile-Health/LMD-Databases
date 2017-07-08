@@ -12,7 +12,7 @@ select
       pc.end_date                                 as position_community_end_date,
       
       trim( c.community )                         as community,
-      cast( c.household_map_count as unsigned )   as household_map_count,
+      c.household_map_count,
       
       c.community_alternate,
       c.health_facility_id                        as community_health_facility_id,

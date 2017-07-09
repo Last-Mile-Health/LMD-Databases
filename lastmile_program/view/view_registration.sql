@@ -1,3 +1,7 @@
+-- The view lastmile_program.view_registration "bubbles" registration records from previous years to the "top" of 
+-- the self-join of lastmile_program.view_registration_year.  It is record of the latest registration data for a
+-- cha_id and community_id pair.  
+
 use lastmile_program;
   
 drop view if exists view_registration;
@@ -9,7 +13,7 @@ select
       g1.cha_id, 
       g1.registration_year,
       
-      g1.registration_month,
+      g1.registration_date,
       
       g1.total_household,
       g1.total_household_member,

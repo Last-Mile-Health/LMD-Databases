@@ -15,6 +15,9 @@ select
       pr.phone_number,
       pr.phone_number_alternate, 
  
+      -- For CHA, the cha_id is the same value as the position_id.  Developers should choose one or the other depending on how
+      -- the want to use the data.  Use the cha_id for reportting or otherwise display and the position_id for tying to other records
+      -- in the database.
       pr.position_id,
       pr.position_active,
       pr.position_begin_date,
@@ -40,20 +43,79 @@ select
       pc.position_community_end_date_list,
       pc.community_id_list,
       pc.community_list,
-      pc.household_map_count
+      
+      -- Note: More work needs to be done here.  When there is a one-to-one relationship between a CHA and a community, then
+      -- we can estimate the community population by multiplying the household_map_count by 6.  However, when there is a 
+      -- many-to-one relationships between more than one CHA and a community, say New Creek (62) with 6 CHAs, we can't do that. 
+      pc.household_map_count,
+      
+      pc.total_household,
+      pc.total_household_member
          
 from view_history_person_position_cha as pr
-    left outer join ( select
-                              position_id,
-                              group_concat( position_community_begin_date   )                                        as position_community_begin_date_list,
-                              group_concat( position_community_end_date     )                                        as position_community_end_date_list,
-                              group_concat( community_id  order by cast( community_id as unsigned ) separator ', ' ) as community_id_list,
-                              group_concat( community     order by cast( community_id as unsigned ) separator ', ' ) as community_list,
-                              sum( household_map_count ) as household_map_count
+    left outer join ( 
+                      select
+                              hpc.position_id,
+                              group_concat( hpc.position_community_begin_date   )                                             as position_community_begin_date_list,
+                              group_concat( hpc.position_community_end_date     )                                             as position_community_end_date_list,
+                              group_concat( hpc.community_id  order by cast( hpc.community_id as unsigned ) separator ', ' )  as community_id_list,
+                              group_concat( hpc.community     order by cast( hpc.community_id as unsigned ) separator ', ' )  as community_list,
                               
-                      from view_history_position_community
-                      where ( position_community_begin_date  <= snapshot_date ) and ( ( position_community_end_date  is null ) or ( position_community_end_date > snapshot_date ) )
-                      group by position_id                    
+                              sum( hpc.household_map_count )  as household_map_count,                       
+                              sum( g.total_household )        as total_household,
+                              sum( g.total_household_member ) as total_household_member
+                              
+                      from view_history_position_community as hpc
+                            left outer join (                            
+                                              -- This code block is pulled directly from the view lastmile_program.view_registration.  The only difference is the
+                                              -- "where g1.registration_date <= @snapshot_date " clause at the bottom, which discards registration data 
+                                              -- from the self-join of lastmile_program.view_registration_year if it comes after the snapshot_date.
+
+                                              -- The view lastmile_program.view_registration "bubbles" registration records from previous years to the "top" of 
+                                              -- the self-join of lastmile_program.view_registration_year.  It is record of the latest registration data for a
+                                              -- cha_id and community_id pair.  Querying and conditioning on it directly would cause some records to be discarded
+                                              -- because their registration date came after the snapshot_date, even though there we older records that would have
+                                              -- matched because they were registered before the snapshot date.
+                                              -- Therefore, we need to duplicate the lastmile_program.view_registration code here and condition on the snapshot date.
+                            
+                                              select
+                                                    g1.community_id, 
+                                                    g1.cha_id, 
+                                                    g1.registration_year,
+      
+                                                    g1.registration_date,
+      
+                                                    g1.total_household,
+                                                    g1.total_household_member,
+      
+                                                    g1.total_zero_eleven_month_male,
+                                                    g1.total_zero_eleven_month_female,
+  
+                                                    g1.total_one_five_year_male,
+                                                    g1.total_one_five_year_female,
+  
+                                                    g1.total_six_fourteen_year_male,
+                                                    g1.total_six_fourteen_year_female,
+  
+                                                    g1.total_fifteen_forty_nine_year_male,
+                                                    g1.total_fifteen_forty_nine_year_female,
+  
+                                                    g1.total_fifty_plus_year_male,
+                                                    g1.total_fifty_plus_year_female
+      
+                                              from lastmile_program.view_registration_year as g1
+                                                    left outer join lastmile_program.view_registration_year as g2 on  ( trim( g1.community_id ) like trim( g2.community_id  )  ) and 
+                                                                                                                      ( trim( g1.cha_id )       like trim( g2.cha_id        )  ) and
+                                                                                                                      ( g1.registration_year    > g2.registration_year      )
+                                              where g1.registration_date <= snapshot_date 
+                                              group by trim( g1.community_id ), trim( g1.cha_id )
+                                              having count( * ) >= 1
+                                               
+                                            ) as g on ( hpc.position_id like g.cha_id ) and ( hpc.community_id like g.community_id )
+                      
+                      where ( hpc.position_community_begin_date  <= snapshot_date ) and ( ( hpc.position_community_end_date  is null ) or ( hpc.position_community_end_date > snapshot_date ) )
+                      group by hpc.position_id   
+  
                     ) as pc on pr.position_id like pc.position_id
 
 where ( pr.position_begin_date        <= snapshot_date and ( ( pr.position_end_date        is null ) or ( pr.position_end_date         > snapshot_date ) ) ) and

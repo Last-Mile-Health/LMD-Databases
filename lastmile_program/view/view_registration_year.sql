@@ -9,7 +9,7 @@ select
       trim( g.communityID )                                                     as community_id,
       trim( g.chaID )                                                           as cha_id,
       
-      max( month( trim( g.registrationDate ) ) )                                as  registration_month,
+      max( trim( g.registrationDate ) )                                         as  registration_date,
 
       sum( cast( g.1_1_A_total_number_households as unsigned ) )                as total_household,
       sum( cast( g.1_1_B_total_household_members as unsigned ) )                as total_household_member,

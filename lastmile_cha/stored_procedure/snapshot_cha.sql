@@ -5,19 +5,10 @@ drop procedure if exists snapshot_cha;
 create procedure snapshot_cha( in snapshot_date date )
 begin
 
-select
-      pr.person_id,
-      pr.cha_id,
-      
-      pr.full_name,
-      pr.birth_date,
-      pr.gender,
-      pr.phone_number,
-      pr.phone_number_alternate, 
- 
+select 
       -- For CHA, the cha_id is the same value as the position_id.  Developers should choose one or the other depending on how
-      -- the want to use the data.  Use the cha_id for reportting or otherwise display and the position_id for tying to other records
-      -- in the database.
+      -- they want to use the data.  Use the cha_id for reportting and the position_id for tying resultset to other records
+      -- internal to the the database.
       pr.position_id,
       pr.position_active,
       pr.position_begin_date,
@@ -26,6 +17,15 @@ select
       pr.position_person_active,
       pr.position_person_begin_date,
       pr.position_person_end_date,
+      
+      pr.person_id,
+      pr.cha_id,
+      
+      pr.full_name,
+      pr.birth_date,
+      pr.gender,
+      pr.phone_number,
+      pr.phone_number_alternate, 
       
       pr.reason_left,
       pr.reason_left_description,
@@ -50,9 +50,11 @@ select
       pc.household_map_count,
       
       pc.total_household,
-      pc.total_household_member
+      pc.total_household_member,
+      
+      pc.cha_count
          
-from view_history_person_position_cha as pr
+from view_history_position_person_cha as pr
     left outer join ( 
                       select
                               hpc.position_id,
@@ -63,7 +65,9 @@ from view_history_person_position_cha as pr
                               
                               sum( hpc.household_map_count )  as household_map_count,                       
                               sum( g.total_household )        as total_household,
-                              sum( g.total_household_member ) as total_household_member
+                              sum( g.total_household_member ) as total_household_member,
+                              
+                              cc.cha_count
                               
                       from view_history_position_community as hpc
                             left outer join (                            
@@ -113,13 +117,27 @@ from view_history_person_position_cha as pr
                                                
                                             ) as g on ( hpc.position_id like g.cha_id ) and ( hpc.community_id like g.community_id )
                       
+                            left outer join (
+                                              select 
+                                        
+                                                    hpcc.community_id, 
+                                                    count( * ) as cha_count
+                                              
+                                              from view_history_position_community as hpcc
+                                              where ( hpcc.position_community_begin_date  <= snapshot_date ) and ( ( hpcc.position_community_end_date  is  null ) or ( hpcc.position_community_end_date  > snapshot_date ) )
+                                              group by hpcc.community_id
+    
+                                             ) as cc on hpc.community_id = cc.community_id
+                      
                       where ( hpc.position_community_begin_date  <= snapshot_date ) and ( ( hpc.position_community_end_date  is null ) or ( hpc.position_community_end_date > snapshot_date ) )
                       group by hpc.position_id   
   
                     ) as pc on pr.position_id like pc.position_id
-
-where ( pr.position_begin_date        <= snapshot_date and ( ( pr.position_end_date        is null ) or ( pr.position_end_date         > snapshot_date ) ) ) and
-      ( pr.position_person_begin_date <= snapshot_date and ( ( pr.position_person_end_date is null ) or ( pr.position_person_end_date  > snapshot_date ) ) )
+                    
+where 
+      ( ( pr.position_begin_date <= snapshot_date ) and ( ( pr.position_end_date is null ) or ( pr.position_end_date > snapshot_date ) ) ) 
+      and 
+      ( ( pr.position_person_begin_date is null )  or  ( ( pr.position_person_begin_date <= snapshot_date ) and ( ( pr.position_person_end_date is null ) or ( pr.position_person_end_date  > snapshot_date ) ) ) )
 ;
 
 end

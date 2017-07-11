@@ -2,17 +2,17 @@ use lastmile_cha;
 
 drop procedure if exists snapshot_position_cha;
 
-/*  Returns a resultset of all CHA positions, tthe person assigned to the positions, the communities being served, 
+/*  Returns a resultset of all CHA positions, the persons assigned to the positions, the communities being served, 
  *  and the the CHA catchment populations and households.
  *
  *  Parameters
- *              snapshot_date:    Point in time of snapshot.
-                position_status:  
-                                  'FILLED'  returns all postions that had a person assigned to them on snapshot_date.
-                                  'OPEN'    returns all postions that did not have a person assigned to them on snapshot_date.
-                                  Any string or value other than 'FILLED' or 'OPEN' returns all positions, regardless of whether they
-                                  are open or filled.
- 
+ *
+ * snapshot_date:    Point in time of snapshot.
+ * position_status:  'FILLED' returns all postions that had a person assigned to them on snapshot_date.
+ *                   'OPEN'   returns all postions that did not have a person assigned to them on snapshot_date.
+ *                   'ALL'    returns all positions, regardless of whether they are open or filled.  Actually, 
+ *                            any string or value other than 'FILLED' or 'OPEN' returns all positions.
+ *
 */
 
 create procedure snapshot_position_cha( in snapshot_date date, in position_status varchar(255) )
@@ -32,9 +32,8 @@ select
       p.cohort,
       p.health_facility_id,
       p.health_facility,
-      
+    
       -- position 
-      p.job,
       -- For CHAs, the cha_id is the same value as the position_id.  Developers should choose one or the other depending on how
       -- they want to use the data.  Use the cha_id for reportting and the position_id for tying this resultset to other records
       -- internal to the the database.
@@ -60,10 +59,15 @@ select
       pc.position_community_begin_date_list,
       pc.position_community_end_date_list,
       
+      population_cha_catchment( pc.total_household_member, pc.total_household, pc.community_count, pc.household_map_count, pc.cha_count ) as population,
+      household_cha_catchment(  pc.total_household, pc.community_count, pc.household_map_count, pc.cha_count )                            as household,
+      
+      pc.total_household_member,  -- Number of household members in CHA's catchment from the registration table.
+      pc.total_household,         -- Number of households in CHA's catchment from the registration table. 
+      
       pc.community_count,         -- Number of communities in CHA's catchment.  This could be zero if the CHA does not have an entry in position_community table.
       pc.household_map_count,     -- Number of households in CHA's catchment from the community table mapping field. 
-      pc.total_household,         -- Number of households in CHA's catchment from the registration table. 
-      pc.total_household_member,  -- Number of household members in CHA's catchment from the registration table.
+
       pc.cha_count                -- Number CHAs assigned to a community
       
 from view_history_position_geo as p

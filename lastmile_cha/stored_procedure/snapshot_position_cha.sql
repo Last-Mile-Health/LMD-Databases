@@ -1,60 +1,97 @@
 use lastmile_cha;
 
-drop procedure if exists snapshot_cha;
+drop procedure if exists snapshot_position_cha;
 
-create procedure snapshot_cha( in snapshot_date date )
+/*  Returns a resultset of all CHA positions, tthe person assigned to the positions, the communities being served, 
+ *  and the the CHA catchment populations and households.
+ *
+ *  Parameters
+ *              snapshot_date:    Point in time of snapshot.
+                position_status:  
+                                  'FILLED'  returns all postions that had a person assigned to them on snapshot_date.
+                                  'OPEN'    returns all postions that did not have a person assigned to them on snapshot_date.
+                                  Any string or value other than 'FILLED' or 'OPEN' returns all positions, regardless of whether they
+                                  are open or filled.
+ 
+*/
+
+create procedure snapshot_position_cha( in snapshot_date date, in position_status varchar(255) )
 begin
 
+-- If position_status is anything other than 'FILLED' or 'OPEN' then set it to 'ALL'.
+if ( position_status is null ) or not ( ( position_status like 'FILLED' ) or ( position_status like 'OPEN' ) ) then
+
+  set position_status = 'ALL';
+  
+end if;
+
 select 
-      -- For CHA, the cha_id is the same value as the position_id.  Developers should choose one or the other depending on how
-      -- they want to use the data.  Use the cha_id for reportting and the position_id for tying resultset to other records
+      -- geography     
+      p.county,
+      p.health_district,
+      p.cohort,
+      p.health_facility_id,
+      p.health_facility,
+      
+      -- position 
+      p.job,
+      -- For CHAs, the cha_id is the same value as the position_id.  Developers should choose one or the other depending on how
+      -- they want to use the data.  Use the cha_id for reportting and the position_id for tying this resultset to other records
       -- internal to the the database.
-      pr.position_id,
-      pr.position_active,
-      pr.position_begin_date,
-      position_end_date,
+      p.position_id,
+      p.position_begin_date,
+      p.position_end_date,
       
-      pr.position_person_active,
-      pr.position_person_begin_date,
-      pr.position_person_end_date,
+      -- person/CHA
+      r.person_id,
+      r.cha_id,
+      r.full_name,
+      r.birth_date,
+      r.gender,
+      r.phone_number,
+      r.phone_number_alternate, 
+      r.position_person_begin_date,
+      r.position_person_end_date,
+      r.reason_left,
+      r.reason_left_description,
       
-      pr.person_id,
-      pr.cha_id,
-      
-      pr.full_name,
-      pr.birth_date,
-      pr.gender,
-      pr.phone_number,
-      pr.phone_number_alternate, 
-      
-      pr.reason_left,
-      pr.reason_left_description,
-      
-      pr.health_facility_id,
-      pr.health_facility,
-      
-      pr.cohort,
-      pr.health_district_id,
-      pr.health_district,
-      pr.county_id,
-      pr.county,
-      
-      pc.position_community_begin_date_list,
-      pc.position_community_end_date_list,
       pc.community_id_list,
       pc.community_list,
+      pc.position_community_begin_date_list,
+      pc.position_community_end_date_list,
       
-      -- Note: More work needs to be done here.  When there is a one-to-one relationship between a CHA and a community, then
-      -- we can estimate the community population by multiplying the household_map_count by 6.  However, when there is a 
-      -- many-to-one relationships between more than one CHA and a community, say New Creek (62) with 6 CHAs, we can't do that. 
-      pc.household_map_count,
+      pc.community_count,         -- Number of communities in CHA's catchment.  This could be zero if the CHA does not have an entry in position_community table.
+      pc.household_map_count,     -- Number of households in CHA's catchment from the community table mapping field. 
+      pc.total_household,         -- Number of households in CHA's catchment from the registration table. 
+      pc.total_household_member,  -- Number of household members in CHA's catchment from the registration table.
+      pc.cha_count                -- Number CHAs assigned to a community
       
-      pc.total_household,
-      pc.total_household_member,
+from view_history_position_geo as p
+    left outer join ( select
+                            pr.position_id,
+                            pr.person_id,
+                            pr.cha_id,
+                            pr.full_name,
+                            pr.birth_date,
+                            pr.gender,
+                            pr.phone_number,
+                            pr.phone_number_alternate, 
+     
+                            pr.position_person_begin_date,
+                            pr.position_person_end_date,
       
-      pc.cha_count
-         
-from view_history_position_person_cha as pr
+                            pr.reason_left,
+                            pr.reason_left_description
+                       
+                      from view_history_position_person_cha as pr
+                      where 
+                            ( pr.position_person_begin_date <= snapshot_date ) 
+                            and 
+                            ( ( pr.position_person_end_date is null ) or ( pr.position_end_date > snapshot_date ) ) 
+     
+                    ) as r on p.position_id like r.position_id
+ 
+ 
     left outer join ( 
                       select
                               hpc.position_id,
@@ -62,7 +99,8 @@ from view_history_position_person_cha as pr
                               group_concat( hpc.position_community_end_date     )                                             as position_community_end_date_list,
                               group_concat( hpc.community_id  order by cast( hpc.community_id as unsigned ) separator ', ' )  as community_id_list,
                               group_concat( hpc.community     order by cast( hpc.community_id as unsigned ) separator ', ' )  as community_list,
-                              
+                              sum( if(hpc.community_id is null, 0, 1 ) )                                                      as community_count,
+                                                         
                               sum( hpc.household_map_count )  as household_map_count,                       
                               sum( g.total_household )        as total_household,
                               sum( g.total_household_member ) as total_household_member,
@@ -72,7 +110,7 @@ from view_history_position_person_cha as pr
                       from view_history_position_community as hpc
                             left outer join (                            
                                               -- This code block is pulled directly from the view lastmile_program.view_registration.  The only difference is the
-                                              -- "where g1.registration_date <= @snapshot_date " clause at the bottom, which discards registration data 
+                                              -- "where g1.registration_date <= snapshot_date " clause at the bottom, which discards registration data 
                                               -- from the self-join of lastmile_program.view_registration_year if it comes after the snapshot_date.
 
                                               -- The view lastmile_program.view_registration "bubbles" registration records from previous years to the "top" of 
@@ -132,12 +170,18 @@ from view_history_position_person_cha as pr
                       where ( hpc.position_community_begin_date  <= snapshot_date ) and ( ( hpc.position_community_end_date  is null ) or ( hpc.position_community_end_date > snapshot_date ) )
                       group by hpc.position_id   
   
-                    ) as pc on pr.position_id like pc.position_id
+                    ) as pc on p.position_id like pc.position_id
                     
-where 
-      ( ( pr.position_begin_date <= snapshot_date ) and ( ( pr.position_end_date is null ) or ( pr.position_end_date > snapshot_date ) ) ) 
-      and 
-      ( ( pr.position_person_begin_date is null )  or  ( ( pr.position_person_begin_date <= snapshot_date ) and ( ( pr.position_person_end_date is null ) or ( pr.position_person_end_date  > snapshot_date ) ) ) )
+-- Conditional clause for positions active during snapshot date.                    
+where ( p.job like 'CHA' ) and ( ( p.position_begin_date <= snapshot_date ) and ( ( p.position_end_date is null ) or ( p.position_end_date > snapshot_date ) ) )
+
+and case
+        when  position_status like 'ALL'  then position_status        
+        when  not r.person_id is    null  then 'FILLED'
+        when      r.person_id is    null  then 'OPEN'
+        else position_status -- This condition can never happen.
+    end
+    like position_status 
 ;
 
 end

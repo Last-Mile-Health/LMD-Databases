@@ -99,15 +99,15 @@ from view_history_position_geo as p
     left outer join ( 
                       select
                               hpc.position_id,
-                              group_concat( hpc.position_community_begin_date   )                                             as position_community_begin_date_list,
-                              group_concat( hpc.position_community_end_date     )                                             as position_community_end_date_list,
-                              group_concat( hpc.community_id  order by cast( hpc.community_id as unsigned ) separator ', ' )  as community_id_list,
-                              group_concat( hpc.community     order by cast( hpc.community_id as unsigned ) separator ', ' )  as community_list,
-                              sum( if(hpc.community_id is null, 0, 1 ) )                                                      as community_count,
+                              group_concat( hpc.position_community_begin_date order by cast( hpc.community_id as unsigned ) separator ', ' ) as position_community_begin_date_list,
+                              group_concat( hpc.position_community_end_date   order by cast( hpc.community_id as unsigned ) separator ', ' ) as position_community_end_date_list,
+                              group_concat( hpc.community_id                  order by cast( hpc.community_id as unsigned ) separator ', ' ) as community_id_list,
+                              group_concat( hpc.community                     order by cast( hpc.community_id as unsigned ) separator ', ' ) as community_list,
+                              sum( if(hpc.community_id is null, 0, 1 ) )  as community_count,
                                                          
-                              sum( hpc.household_map_count )  as household_map_count,                       
-                              sum( g.total_household )        as total_household,
-                              sum( g.total_household_member ) as total_household_member,
+                              sum( hpc.household_map_count )              as household_map_count,                       
+                              sum( g.total_household )                    as total_household,
+                              sum( g.total_household_member )             as total_household_member,
                               
                               cc.cha_count
                               

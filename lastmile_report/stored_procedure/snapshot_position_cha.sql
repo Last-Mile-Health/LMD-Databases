@@ -1,4 +1,4 @@
-use lastmile_cha;
+use lastmile_report;
 
 drop procedure if exists snapshot_position_cha;
 
@@ -24,6 +24,13 @@ if ( position_status is null ) or not ( ( position_status like 'FILLED' ) or ( p
   set position_status = 'ALL';
   
 end if;
+
+-- MySQL does not support calling a stored procedure and storing its resultset in a cursor.  Dynamically creating a table
+-- and storing the resultset in it maybe an acceptable workaround.
+
+drop table if exists temp_snapshot_position_cha;
+
+create table temp_snapshot_position_cha as
 
 select 
       -- geography     
@@ -59,8 +66,8 @@ select
       pc.position_community_begin_date_list,
       pc.position_community_end_date_list,
       
-      population_cha_catchment( pc.total_household_member, pc.total_household, pc.community_count, pc.household_map_count, pc.cha_count ) as population,
-      household_cha_catchment(  pc.total_household, pc.community_count, pc.household_map_count, pc.cha_count )                            as household,
+      cha_catchment_population( pc.total_household_member, pc.total_household, pc.community_count, pc.household_map_count, pc.cha_count ) as population,
+      cha_catchment_household(  pc.total_household, pc.community_count, pc.household_map_count, pc.cha_count )                            as household,
       
       pc.total_household_member,  -- Number of household members in CHA's catchment from the registration table.
       pc.total_household,         -- Number of households in CHA's catchment from the registration table. 
@@ -70,7 +77,7 @@ select
 
       pc.cha_count                -- Number CHAs assigned to a community
       
-from view_history_position_geo as p
+from lastmile_cha.view_history_position_geo as p
     left outer join ( select
                             pr.position_id,
                             pr.person_id,
@@ -87,11 +94,11 @@ from view_history_position_geo as p
                             pr.reason_left,
                             pr.reason_left_description
                        
-                      from view_history_position_person_cha as pr
+                      from lastmile_cha.view_history_position_person_cha as pr
                       where 
                             ( pr.position_person_begin_date <= snapshot_date ) 
                             and 
-                            ( ( pr.position_person_end_date is null ) or ( pr.position_end_date > snapshot_date ) ) 
+                            ( ( pr.position_person_end_date is null ) or ( pr.position_person_end_date > snapshot_date ) ) 
      
                     ) as r on p.position_id like r.position_id
  
@@ -111,7 +118,7 @@ from view_history_position_geo as p
                               
                               cc.cha_count
                               
-                      from view_history_position_community as hpc
+                      from lastmile_cha.view_history_position_community as hpc
                             left outer join (                            
                                               -- This code block is pulled directly from the view lastmile_program.view_registration.  The only difference is the
                                               -- "where g1.registration_date <= snapshot_date " clause at the bottom, which discards registration data 
@@ -165,7 +172,7 @@ from view_history_position_geo as p
                                                     hpcc.community_id, 
                                                     count( * ) as cha_count
                                               
-                                              from view_history_position_community as hpcc
+                                              from lastmile_cha.view_history_position_community as hpcc
                                               where ( hpcc.position_community_begin_date  <= snapshot_date ) and ( ( hpcc.position_community_end_date  is  null ) or ( hpcc.position_community_end_date  > snapshot_date ) )
                                               group by hpcc.community_id
     
@@ -187,6 +194,8 @@ and case
     end
     like position_status 
 ;
+
+select * from temp_snapshot_position_cha;
 
 end
 ;

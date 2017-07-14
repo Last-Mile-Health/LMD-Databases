@@ -1,21 +1,9 @@
 use lastmile_report;
 
-drop procedure if exists snapshot_position_cha;
+drop procedure if exists snapshot_position_cha_data_mart;
 
-/*  Returns a resultset of all CHA positions, the persons assigned to the positions, the communities being served, 
- *  and the the CHA catchment populations and households.
- *
- *  Parameters
- *
- * snapshot_date:    Point in time of snapshot.
- * position_status:  'FILLED' returns all postions that had a person assigned to them on snapshot_date.
- *                   'OPEN'   returns all postions that did not have a person assigned to them on snapshot_date.
- *                   'ALL'    returns all positions, regardless of whether they are open or filled.  Actually, 
- *                            any string or value other than 'FILLED' or 'OPEN' returns all positions.
- *
-*/
 
-create procedure snapshot_position_cha( in snapshot_date date, in position_status varchar(255) )
+create procedure snapshot_position_cha_data_mart( in snapshot_date date, in position_status varchar(255) )
 begin
 
 -- If position_status is anything other than 'FILLED' or 'OPEN' then set it to 'ALL'.
@@ -28,11 +16,13 @@ end if;
 -- MySQL does not support calling a stored procedure and storing its resultset in a cursor.  Dynamically creating a table
 -- and storing the resultset in it maybe an acceptable workaround.
 
-drop table if exists temp_snapshot_position_cha;
 
-create table temp_snapshot_position_cha as
+
+insert into data_mart_snapshot_position_cha
 
 select 
+      position_status, snapshot_date,
+      
       -- geography     
       p.county,
       p.health_district,
@@ -194,8 +184,6 @@ and case
     end
     like position_status 
 ;
-
-select * from temp_snapshot_position_cha;
 
 end
 ;

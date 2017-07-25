@@ -17,16 +17,17 @@ select
         meta_formVersion                    as meta_form_version,
         meta_deviceID                       as meta_device_id,
         
-        manualDate                          as manual_date,
+        trim( manualDate )                  as manual_date,
 
         employeeType                        as employee_type,
         chssID                              as chss_id,
-        chssName                            as chss_name,
+        chssName                            as chss,
         jobType_Other                       as job_type_other,
         otherName                           as other_name,
         otherID                             as other_id, 
 
-        supervisedChaID                     as cha_id,
+        trim( supervisedChaID )             as cha_id,
+        trim( chaName )                     as cha,
         communityID                         as community_id,
 
         stockOnHand_ACT25mg                 as stock_on_hand_act_25_mg,
@@ -64,12 +65,13 @@ select
 
     'CHWL'                                  as employee_type,
     null                                    as chss_id,
-    null                                    as chss_name,
+    null                                    as chss,
     'CHWL'                                  as job_type_other,
     chwlName                                as other_name,
     chwlID                                  as other_id, 
 
-    supervisedChwID                         as cha_id,
+    trim( supervisedChwID )                 as cha_id,
+    null                                    as cha,
     communityID                             as community_id,
 
     stockOnHand_ACT25mg                     as stock_on_hand_act_25_mg,

@@ -25,21 +25,15 @@ if ( position_status is null ) or not ( ( position_status like 'FILLED' ) or ( p
   
 end if;
 
--- MySQL does not support calling a stored procedure and storing its resultset in a cursor.  Dynamically creating a table
--- and storing the resultset in it maybe an acceptable workaround.
+-- Apparently, MySQL does not support calling a stored procedure and storing its resultset in a cursor.  
+-- Dynamically creating a temporary table and storing the resultset in it maybe an acceptable workaround.
 
-drop table if exists temp_snapshot_position_cha;
+drop temporary table if exists faux_cursor_snapshot_position_cha;
 
-create table temp_snapshot_position_cha as
+create temporary table faux_cursor_snapshot_position_cha as
 
 select 
-      -- geography     
-      p.county,
-      p.health_district,
-      p.cohort,
-      p.health_facility_id,
-      p.health_facility,
-    
+
       -- position 
       -- For CHAs, the cha_id is the same value as the position_id.  Developers should choose one or the other depending on how
       -- they want to use the data.  Use the cha_id for reportting and the position_id for tying this resultset to other records
@@ -48,6 +42,13 @@ select
       p.position_begin_date,
       p.position_end_date,
       
+      -- geography     
+      p.county,
+      p.health_district,
+      p.cohort,
+      p.health_facility_id,
+      p.health_facility,
+        
       -- person/CHA
       r.person_id,
       r.cha_id,
@@ -66,17 +67,24 @@ select
       pc.position_community_begin_date_list,
       pc.position_community_end_date_list,
       
-      cha_catchment_population( pc.total_household_member, pc.total_household, pc.community_count, pc.household_map_count, pc.position_count ) as population,
-      cha_catchment_household(  pc.total_household, pc.community_count, pc.household_map_count, pc.position_count )                            as household,
+      cha_catchment_population( pc.total_household_member, pc.total_household, pc.position_community_count, pc.household_map_count, pc.position_count ) as population,
+      cha_catchment_household(  pc.total_household, pc.position_community_count, pc.household_map_count, pc.position_count )                            as household,
       
       pc.total_household_member,  -- Number of household members in CHA's catchment from the registration table.
       pc.total_household,         -- Number of households in CHA's catchment from the registration table. 
       
-      pc.community_count,         -- Number of communities in CHA's catchment.  This could be zero if the CHA does not have an entry in position_community table.
+      pc.position_community_count,         -- Number of communities in CHA's catchment.  This could be zero if the CHA does not have an entry in position_community table.
       pc.household_map_count,     -- Number of households in CHA's catchment from the community table mapping field. 
 
-      pc.position_count                -- Number CHAs assigned to a community
+      pc.position_count,          -- Number CHAs assigned to a community
       
+      /*  If you want to the calculate the total number of communities in some some geographical region or cohort by the number
+          of commmunities that are assigned to a positon, you have to factor in the cases where there are more than 1 positions
+          assigned to a community; otherwise, you will be "double counting" communities. 
+      
+      */    
+      if( pc.position_count > 0, pc.position_community_count/pc.position_count , 0 ) as  position_community_count_proportional 
+        
 from lastmile_cha.view_history_position_geo as p
     left outer join ( select
                             pr.position_id,
@@ -110,7 +118,7 @@ from lastmile_cha.view_history_position_geo as p
                               group_concat( hpc.position_community_end_date   order by cast( hpc.community_id as unsigned ) separator ', ' ) as position_community_end_date_list,
                               group_concat( hpc.community_id                  order by cast( hpc.community_id as unsigned ) separator ', ' ) as community_id_list,
                               group_concat( hpc.community                     order by cast( hpc.community_id as unsigned ) separator ', ' ) as community_list,
-                              sum( if(hpc.community_id is null, 0, 1 ) )  as community_count,
+                              sum( if(hpc.community_id is null, 0, 1 ) )  as position_community_count,
                                                          
                               sum( hpc.household_map_count )              as household_map_count,                       
                               sum( g.total_household )                    as total_household,
@@ -125,9 +133,9 @@ from lastmile_cha.view_history_position_geo as p
                                               -- from the self-join of lastmile_program.view_registration_year if it comes after the snapshot_date.
 
                                               -- The view lastmile_program.view_registration "bubbles" registration records from previous years to the "top" of 
-                                              -- the self-join of lastmile_program.view_registration_year.  It is record of the latest registration data for a
+                                              -- the self-join of lastmile_program.view_registration_year.  It is the record of the latest registration data for a
                                               -- cha_id and community_id pair.  Querying and conditioning on it directly would cause some records to be discarded
-                                              -- because their registration date came after the snapshot_date, even though there we older records that would have
+                                              -- because their registration dates came after the snapshot_date, even though there were older records that would have
                                               -- matched because they were registered before the snapshot date.
                                               -- Therefore, we need to duplicate the lastmile_program.view_registration code here and condition on the snapshot date.
                             
@@ -166,7 +174,7 @@ from lastmile_cha.view_history_position_geo as p
                                                
                                             ) as g on ( hpc.position_id like g.cha_id ) and ( hpc.community_id like g.community_id )
                       
-                            left outer join (
+                            left outer join (                                           
                                               select 
                                         
                                                     hpcc.community_id, 
@@ -195,7 +203,8 @@ and case
     like position_status 
 ;
 
-select * from temp_snapshot_position_cha;
+-- Use to debug this procedure.  Dump rows of temporary table.
+-- select * from faux_cursor_snapshot_position_cha;
 
 end
 ;

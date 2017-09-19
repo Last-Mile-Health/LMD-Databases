@@ -7,6 +7,6 @@ create view view_train_cha_module as
 select
       trim( ID ) as cha_id,
       group_concat( distinct module order by cast( module as unsigned ) asc separator ', ' ) as cha_module_list
-from view_train_cha
+from training_cha_all
 group by trim( ID )
 ;

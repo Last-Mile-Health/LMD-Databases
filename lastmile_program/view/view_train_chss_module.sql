@@ -5,18 +5,21 @@ drop view if exists view_train_chss_module;
 create view view_train_chss_module as 
 
 select
-      trim( ID ) as chss_id,
+      trim( t.chss_id )   as chss_id,
+      trim( t.person_id ) as person_id,
       
       replace( 
-      trim( replace( concat(  if( not ( ( M1OverallAssessment is null  ) or ( trim( M1OverallAssessment ) like '' ) ), '1', ''  ), ' ',
-                              if( not ( ( M2OverallAssessment is null  ) or ( trim( M2OverallAssessment ) like '' ) ), '2', ''  ), ' ',
-                              if( not ( ( M3OverallAssessment is null  ) or ( trim( M3OverallAssessment ) like '' ) ), '3', ''  ), ' ',
-                              if( not ( ( M4OverallAssessment is null  ) or ( trim( M4OverallAssessment ) like '' ) ), '4', ''  ), ' '
+      trim( replace( concat(  if( not ( ( t.m1_overall_assessment is null  ) or ( trim( t.m1_overall_assessment ) like '' ) ), '1', ''  ), ' ',
+                              if( not ( ( t.m2_overall_assessment is null  ) or ( trim( t.m2_overall_assessment ) like '' ) ), '2', ''  ), ' ',
+                              if( not ( ( t.m3_overall_assessment is null  ) or ( trim( t.m3_overall_assessment ) like '' ) ), '3', ''  ), ' ',
+                              if( not ( ( t.m4_overall_assessment is null  ) or ( trim( t.m4_overall_assessment ) like '' ) ), '4', ''  ), ' '
                             ), '  ', ' ' 
                     ) 
           ), 
           ' ', ', ' ) as module
           
-from lastmile_temp.chss_training
-where not ( ( ID is null ) or ( trim( ID ) like '' ) )
+from lastmile_program.view_train_chss_last as t
+where ( not ( ( t.chss_id   is null ) or ( trim( t.chss_id )    like '' ) ) ) and 
+      ( not ( ( t.person_id is null ) or ( trim( t.person_id )  like '' ) ) ) 
+      
 ;

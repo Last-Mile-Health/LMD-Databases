@@ -35,5 +35,7 @@ from view_position_chss_person as pr
     left outer join   view_history_position_last_date           as d    on pr.position_id         like d.position_id
     left outer join   view_history_position_person_first        as rf   on pr.person_id           like rf.person_id 
     left outer join   view_geo_health_facility                  as gf   on pr.health_facility_id  like gf.health_facility_id
-    left outer join   lastmile_program.view_train_chss_module   as t    on pr.person_id           like t.chss_id
+    -- Note: When we switch over to moh id for CHSSs this join will need to change to pr.position_id like t.chss_id but for now chss_id and 
+    -- person_id needs to pr.person_id
+    left outer join   lastmile_program.view_train_chss_module   as t    on ( pr.person_id like t.chss_id ) and ( pr.person_id like t.person_id )
 ;

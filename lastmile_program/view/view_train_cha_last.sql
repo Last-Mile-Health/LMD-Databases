@@ -15,7 +15,7 @@ select
       t1.begin_date,
       t1.end_date,
       
-      trim( t1.cha_id_lmh )           as cha_id_lmh,
+      trim( t1.cha_id_inserted )      as cha_id_inserted,
       
       trim( t1.participant_name )     as participant_name,
       trim( t1.participant_type )     as participant_type,

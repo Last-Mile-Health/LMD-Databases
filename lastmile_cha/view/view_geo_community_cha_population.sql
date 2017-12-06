@@ -34,6 +34,8 @@ select
       c.archived,
       c.note,
       
+      -- If a household registration has never been completed for a community estimate population from the household
+      -- mapping value in community table, six persons per household.
       if( g.total_household_member is null, c.household_map_count * 6, g.total_household_member ) as population,
       if( g.total_household is null, c.household_map_count, g.total_household )                   as household_total,
       
@@ -47,9 +49,9 @@ select
       a.position_count,
       if( a.position_id_list is null, 'N', 'Y' )              as active_position,
       
-      a.cha_id_list,
-      a.cha_count,
-      if( a.cha_id_list is null, 'N', 'Y' )                   as active_cha
+      a.person_id_list,
+      a.person_count,
+      if( a.person_id_list is null, 'N', 'Y' )                as active_cha
       
 from view_geo_community as c
     left outer join view_community_registration as g on c.community_id = g.community_id

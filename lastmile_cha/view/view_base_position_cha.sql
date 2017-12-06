@@ -43,12 +43,13 @@ select
       -- CHA Training completed
       module,
     
-      chss_position_id,
       chss_position_begin_date,
       
       chss_cha_supervision_begin_date                         as chss_supervision_begin_date,
       
-      chss_person_id                                          as chss_id,
+      chss_position_id,
+      chss_position_id                                        as chss_id,
+      chss_person_id,
       concat( chss_first_name, ' ', chss_last_name )          as chss,
       
       chss_position_person_begin_date,

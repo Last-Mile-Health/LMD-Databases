@@ -15,12 +15,13 @@ select
       health_facility,
       
       position_id,
+      position_id                           as chss_id,
       position_begin_date,
       
       position_filled,
       position_filled_last_date,
       
-      person_id                             as chss_id,
+      person_id,
       concat( first_name, ' ', last_name )  as chss,
       position_person_begin_date,
       hire_date,

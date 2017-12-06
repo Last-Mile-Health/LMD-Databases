@@ -19,7 +19,7 @@ select
       -- Likewise, for CHWLs, their person_id will be unique and diplayed as the public staff_ld
       case p.job
           when 'CHA'  then trim( pr.position_id )
-          when 'CHSS' then trim( pr.person_id )
+          when 'CHSS' then trim( pr.position_id )
           when 'CHWL' then trim( substring_index( trim( pr.person_id ), '|', 1 ) )
          
           -- case where person is in the person table but they have not been assigned a position yet. 
@@ -52,9 +52,4 @@ from view_history_position_geo      as p
     left outer join position_person as pr on trim( p.position_id )  like  trim( pr.position_id )
         left outer join person      as r  on trim( pr.person_id )   like  trim( r.person_id )
         left outer join reason_left as l  on pr.reason_left_id      =     l.reason_left_id 
-
--- from person as r
---    left outer join position_person                 as pr on trim( r.person_id )    like  trim( pr.person_id )
---        left outer join reason_left                 as l  on pr.reason_left_id      =     l.reason_left_id
---        left outer join view_history_position_geo   as p  on trim( pr.position_id ) like  p.position_id
---;
+;

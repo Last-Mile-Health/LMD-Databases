@@ -42,15 +42,15 @@ select
       
       if( active_position like 'N', 'None',
         if( active_cha like 'N', 'No CHA',
-          if( cha_count < position_count, 'Partial', 'Full' )
+          if( person_count < position_count, 'Partial', 'Full' )
         )
       ) as service_level,
               
       position_id_list,
       position_count,
       
-      cha_id_list,
-      cha_count
+      person_id_list,
+      person_count
 
 from view_geo_community_cha_population
 ;

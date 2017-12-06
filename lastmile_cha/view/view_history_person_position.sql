@@ -12,7 +12,7 @@ select
       -- Likewise, for CHWLs, their person_id will be unique and diplayed as the public staff_ld
       case p.job
           when 'CHA'  then trim( pr.position_id )
-          when 'CHSS' then trim( pr.person_id )
+          when 'CHSS' then trim( pr.position_id )
           when 'CHWL' then trim( substring_index( trim( pr.person_id ), '|', 1 ) )
          
           -- case where person is in the person table but they have not been assigned a position yet. 

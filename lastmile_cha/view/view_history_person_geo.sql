@@ -13,7 +13,7 @@ select
       case pl.job
       
           when 'CHA'  then trim( pl.position_id )
-          when 'CHSS' then trim( r.person_id )
+          when 'CHSS' then trim( pl.position_id )
           when 'CHWL' then trim( substring_index( trim( r.person_id ), '|', 1 ) )
           
           -- case where person is in the person table but they have not been assigned a position yet. 

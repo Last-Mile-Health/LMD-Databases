@@ -1,6 +1,6 @@
 use lastmile_upload;
 
-drop procedure if exists upload_schema_cha_chss_nchap_id;
+-- drop procedure if exists upload_schema_cha_chss_nchap_id;
 
 /*  
   Update every cha and chss ID in the upload tables based on the value in the _inserted field.  Compare _inserted values
@@ -11,8 +11,8 @@ drop procedure if exists upload_schema_cha_chss_nchap_id;
 
 */
 
-create procedure upload_schema_cha_chss_nchap_id()
-begin
+-- create procedure upload_schema_cha_chss_nchap_id()
+-- begin
 
 -- de_case_scenario --------------------------------------- checked!
 
@@ -425,6 +425,6 @@ where ( trim( a.chss_id_inserted ) like m.position_id ) or ( trim( a.chss_id_ins
 
 -- What about tables in the archive schema with chw and ccs IDs?
 
-end; -- end stored procedure
+-- end; -- end stored procedure
 
-call upload_schema_cha_chss_nchap_id();
+-- call upload_schema_cha_chss_nchap_id();

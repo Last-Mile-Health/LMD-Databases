@@ -6,7 +6,7 @@ use lastmile_upload;
 
 */
 
--- de_case_scenario --------------------------------------- check!
+-- de_case_scenario --------------------------------------- 
 
 update lastmile_upload.de_case_scenario
   set cha_id_inserted = trim( cha_id )
@@ -16,11 +16,11 @@ update lastmile_upload.de_case_scenario
   set chss_id_inserted = trim( chss_id )
 ;
 
--- de_chaHouseholdRegistration ---------------------------------------  check!
+-- de_chaHouseholdRegistration ---------------------------------------  
 
 -- Already added _inserted columns for this table
 
--- de_cha_monthly_service_report ---------------------------------------  check!
+-- de_cha_monthly_service_report ---------------------------------------  
 
 update lastmile_upload.de_cha_monthly_service_report
   set cha_id_inserted = trim( cha_id )
@@ -29,7 +29,7 @@ update lastmile_upload.de_cha_monthly_service_report
   set chss_id_inserted = trim( chss_id )
 ;
 
--- de_cha_status_change_form ---------------------------------------  check!
+-- de_cha_status_change_form ---------------------------------------  
 
 update lastmile_upload.de_cha_status_change_form
   set cha_id_inserted = trim( cha_id )
@@ -38,13 +38,13 @@ update lastmile_upload.de_cha_status_change_form
   set chss_id_inserted = trim( chss_id )
 ;
 
--- de_chss_commodity_distribution ---------------------------------------  check!
+-- de_chss_commodity_distribution ---------------------------------------  
 
 update lastmile_upload.de_chss_commodity_distribution
   set chss_id_inserted = trim( chss_id )
 ;
 
--- de_chss_monthly_service_report ---------------------------------------  check!
+-- de_chss_monthly_service_report ---------------------------------------  
 
 update lastmile_upload.de_chss_monthly_service_report
   set chss_id_inserted = trim( chss_id )
@@ -108,7 +108,7 @@ update lastmile_upload.de_chss_monthly_service_report
   set cha_id_14_inserted = trim( cha_id_14 )
 ;
 
--- de_direct_observation ---------------------------------------  check!
+-- de_direct_observation ---------------------------------------  
 
 update lastmile_upload.de_direct_observation
   set cha_id_inserted = trim( cha_id )
@@ -118,7 +118,7 @@ update lastmile_upload.de_direct_observation
   set chss_id_inserted = trim( chss_id )
 ;
 
--- de_register_review ---------------------------------------  check!
+-- de_register_review ---------------------------------------  
 
 update lastmile_upload.de_register_review
   set cha_id_inserted = trim( cha_id )
@@ -128,7 +128,7 @@ update lastmile_upload.de_register_review
   set chss_id_inserted = trim( chss_id )
 ;
 
--- odk_FieldArrivalLogForm ---------------------------------------  check!
+-- odk_FieldArrivalLogForm ---------------------------------------  
 
 update lastmile_upload.odk_FieldArrivalLogForm
   set cha_id_inserted = trim( SupervisedCHAID )
@@ -138,23 +138,23 @@ update lastmile_upload.odk_FieldArrivalLogForm
   set lmh_id_inserted = trim( LMHID )
 ;
 
--- odk_FieldIncidentReportForm ---------------------------------------  check!
+-- odk_FieldIncidentReportForm ---------------------------------------  
 
 update lastmile_upload.odk_FieldIncidentReportForm
   set id_number_inserted = trim( IDNumber )
 ;
 
--- odk_OSFKAPSurvey ---------------------------------------  check!
+-- odk_OSFKAPSurvey ---------------------------------------  
 
 -- There is no chss or cha id in this table.
 
--- odk_QAO_CHSSQualityAssuranceForm ---------------------------------------  check!
+-- odk_QAO_CHSSQualityAssuranceForm ---------------------------------------  
 
 update lastmile_upload.odk_QAO_CHSSQualityAssuranceForm
   set chss_id_inserted = trim( chss_id )
 ;
 
--- odk_chaRestock ---------------------------------------  check!
+-- odk_chaRestock ---------------------------------------  
 
 update lastmile_upload.odk_chaRestock
   set supervised_cha_id_inserted = trim( supervisedChaID )
@@ -168,7 +168,7 @@ update lastmile_upload.odk_chaRestock
   set chss_id_inserted = trim( chssID )
 ;
 
--- odk_communityEngagementLog ---------------------------------------  check!
+-- odk_communityEngagementLog ---------------------------------------  
 
 update lastmile_upload.odk_communityEngagementLog
   set data_collector_id_inserted = trim( data_collector_id )

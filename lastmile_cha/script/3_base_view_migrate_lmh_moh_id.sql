@@ -14,7 +14,6 @@ use lastmile_cha;
 --                        [cha_id, chss_id]_inserted columns to upload tables go here.
 -- --------------------------------------------------------------------------------------------------------------------
 
-
 alter table lastmile_upload.de_chaHouseholdRegistration
 add column cha_id_inserted varchar( 100 ) after chaID;
 
@@ -23,8 +22,6 @@ add column chss_id_inserted varchar( 100 ) after chssID;
 
 -- the lastmile_program.train_[chss, cha] tables already have their _inserted columns, so there is no need to
 -- to add them
-
-
 
 -- --------------------------------------------------------------------------------------------------------------------
 --            One shot update of all *_inserted columns for all upload tables, 
@@ -63,19 +60,21 @@ update lastmile_program.train_chss
 -- If there is no historical cha id associaed with record, then pass the orgininal chaID as the valid cha_id; 
 -- otherwise use position_id (moh id) that has been mapped.
 
+
 update lastmile_upload.de_chaHouseholdRegistration g, lastmile_cha.temp_view_base_history_moh_lmh_cha_id m
 
-    set g.chaID = if( m.cha_id_historical is null, trim( g.chaID ), m.position_id )
-
-where ( trim( g.chaID ) like m.position_id ) or ( trim( g.chaID ) like m.cha_id_historical )
+    set g.chaID = if( m.cha_id_historical is null, trim( g.cha_id_inserted ), m.position_id )
+    
+where ( trim( g.cha_id_inserted ) like m.position_id ) or ( trim( g.cha_id_inserted ) like m.cha_id_historical )
 ;
+
 
 -- CHSS lmh to moh id
 update lastmile_upload.de_chaHouseholdRegistration g, lastmile_cha.view_base_history_moh_lmh_chss_id m
 
-    set g.chssID = if( m.chss_id_historical is null, trim( g.chssID ), m.position_id )
+    set g.chssID = if( m.chss_id_historical is null, trim( g.chss_id_inserted ), m.position_id )
     
-where ( trim( g.chssID ) like m.position_id ) or ( trim( g.chssID ) like m.chss_id_historical )
+where ( trim( g.chss_id_inserted ) like m.position_id ) or ( trim( g.chss_id_inserted ) like m.chss_id_historical )
 ;
 
 -- The cha and chss training data is in the program schema.  If any new training data is brought into the database it should
@@ -85,16 +84,16 @@ where ( trim( g.chssID ) like m.position_id ) or ( trim( g.chssID ) like m.chss_
 
 update lastmile_program.train_cha t, lastmile_cha.temp_view_base_history_moh_lmh_cha_id m
 
-    set t.cha_id = if( m.cha_id_historical is null, trim( t.cha_id ), m.position_id )
+    set t.cha_id = if( m.cha_id_historical is null, trim( t.cha_id_inserted ), m.position_id )
 
-where ( trim( t.cha_id ) like m.position_id ) or ( trim( t.cha_id ) like m.cha_id_historical )
+where ( trim( t.cha_id_inserted ) like m.position_id ) or ( trim( t.cha_id_inserted ) like m.cha_id_historical )
 ;
 
 update lastmile_program.train_chss t, lastmile_cha.view_base_history_moh_lmh_chss_id as m  
 
-    set t.chss_id = if( m.chss_id_historical is null, trim( t.chss_id ), m.position_id )
+    set t.chss_id = if( m.chss_id_historical is null, trim( t.chss_id_inserted ), m.position_id )
     
-where ( trim( t.chss_id ) like m.position_id ) or ( trim( t.chss_id ) like m.chss_id_historical )
+where ( trim( t.chss_id_inserted ) like m.position_id ) or ( trim( t.chss_id_inserted ) like m.chss_id_historical )
 ;
 
 

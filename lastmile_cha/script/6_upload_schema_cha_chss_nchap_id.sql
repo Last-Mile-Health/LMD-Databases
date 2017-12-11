@@ -1,6 +1,6 @@
 use lastmile_upload;
 
--- drop procedure if exists upload_schema_cha_chss_nchap_id;
+drop procedure if exists upload_update_nchap_id;
 
 /*  
   Update every cha and chss ID in the upload tables based on the value in the _inserted field.  Compare _inserted values
@@ -11,8 +11,18 @@ use lastmile_upload;
 
 */
 
--- create procedure upload_schema_cha_chss_nchap_id()
--- begin
+create procedure upload_update_nchap_id()
+
+-- declare continue handler for sqlexception set has_error = 1;
+
+begin
+
+-- declare continue handler for sqlexception select 'error occurred';
+
+declare continue handler for sqlexception
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) 
+values ( now(), 'error occurred' );
+
 
 -- de_case_scenario --------------------------------------- checked!
 
@@ -29,6 +39,9 @@ update lastmile_upload.de_case_scenario a, lastmile_cha.view_base_history_moh_lm
     
 where ( trim( a.chss_id_inserted ) like m.position_id ) or ( trim( a.chss_id_inserted ) like m.chss_id_historical )
 ;
+
+
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'de_case_scenario' );
 
 
 -- de_chaHouseholdRegistration --------------------------------------- checked!
@@ -48,6 +61,8 @@ update lastmile_upload.de_chaHouseholdRegistration g, lastmile_cha.view_base_his
 where ( trim( g.chss_id_inserted ) like m.position_id ) or ( trim( g.chss_id_inserted ) like m.chss_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'de_chaHouseholdRegistration' );
+
 -- de_cha_monthly_service_report --------------------------------------- checked!
 
 update lastmile_upload.de_cha_monthly_service_report a, lastmile_cha.temp_view_base_history_moh_lmh_cha_id m
@@ -64,6 +79,8 @@ update lastmile_upload.de_cha_monthly_service_report a, lastmile_cha.view_base_h
     
 where ( trim( a.chss_id_inserted ) like m.position_id ) or ( trim( a.chss_id_inserted ) like m.chss_id_historical )
 ;
+
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'de_cha_monthly_service_report' );
 
 -- de_cha_status_change_form ---------------------------------------  checked!
 
@@ -82,6 +99,8 @@ update lastmile_upload.de_cha_status_change_form a, lastmile_cha.view_base_histo
 where ( trim( a.chss_id_inserted ) like m.position_id ) or ( trim( a.chss_id_inserted ) like m.chss_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'de_cha_status_change_form' );
+
 -- de_chss_commodity_distribution ---------------------------------------  checked!
 
 update lastmile_upload.de_chss_commodity_distribution a, lastmile_cha.view_base_history_moh_lmh_chss_id m
@@ -91,6 +110,7 @@ update lastmile_upload.de_chss_commodity_distribution a, lastmile_cha.view_base_
 where ( trim( a.chss_id_inserted ) like m.position_id ) or ( trim( a.chss_id_inserted ) like m.chss_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'de_chss_commodity_distribution' );
 
 -- de_chss_monthly_service_report ---------------------------------------  checked!
 
@@ -100,7 +120,6 @@ update lastmile_upload.de_chss_monthly_service_report a, lastmile_cha.view_base_
     
 where ( trim( a.chss_id_inserted ) like m.position_id ) or ( trim( a.chss_id_inserted ) like m.chss_id_historical )
 ;
-
 
 -- CHAs 1-14 go here...
 
@@ -216,6 +235,7 @@ update lastmile_upload.de_chss_monthly_service_report a, lastmile_cha.temp_view_
 where ( trim( a.cha_id_14_inserted ) like m.position_id ) or ( trim( a.cha_id_14_inserted ) like m.cha_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'de_chss_monthly_service_report' );
 
 -- de_direct_observation --------------------------------------- checked! 
 
@@ -233,6 +253,7 @@ update lastmile_upload.de_direct_observation a, lastmile_cha.view_base_history_m
 where ( trim( a.chss_id_inserted ) like m.position_id ) or ( trim( a.chss_id_inserted ) like m.chss_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'de_direct_observation' );
 
 -- de_register_review ---------------------------------------  checked!
 
@@ -250,6 +271,7 @@ update lastmile_upload.de_register_review a, lastmile_cha.view_base_history_moh_
 where ( trim( a.chss_id_inserted ) like m.position_id ) or ( trim( a.chss_id_inserted ) like m.chss_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'de_register_review' );
 
 -- odk_FieldArrivalLogForm ---------------------------------------  checked!
 
@@ -276,6 +298,8 @@ update lastmile_upload.odk_FieldArrivalLogForm a, lastmile_cha.view_base_history
 where ( trim( a.lmh_id_inserted ) like m.position_id ) or ( trim( a.lmh_id_inserted ) like m.chss_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_FieldArrivalLogForm' );
+
 
 -- odk_FieldIncidentReportForm ---------------------------------------  checked!
 
@@ -293,6 +317,7 @@ update lastmile_upload.odk_FieldIncidentReportForm a, lastmile_cha.view_base_his
 where ( trim( a.id_number_inserted ) like m.position_id ) or ( trim( a.id_number_inserted ) like m.chss_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_FieldIncidentReportForm' );
 
 -- odk_OSFKAPSurvey ---------------------------------------  checked!
 
@@ -307,6 +332,7 @@ update lastmile_upload.odk_QAO_CHSSQualityAssuranceForm a, lastmile_cha.view_bas
 where ( trim( a.chss_id_inserted ) like m.position_id ) or ( trim( a.chss_id_inserted ) like m.chss_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_QAO_CHSSQualityAssuranceForm' );
 
 -- odk_chaRestock ---------------------------------------  checked!
 
@@ -331,6 +357,7 @@ update lastmile_upload.odk_chaRestock a, lastmile_cha.view_base_history_moh_lmh_
 where ( trim( a.chss_id_inserted ) like m.position_id ) or ( trim( a.chss_id_inserted ) like m.chss_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_chaRestock' );
 
 -- odk_communityEngagementLog ---------------------------------------  
 
@@ -349,6 +376,7 @@ update lastmile_upload.odk_communityEngagementLog a, lastmile_cha.view_base_hist
 where ( trim( a.data_collector_id_inserted ) like m.position_id ) or ( trim( a.data_collector_id_inserted ) like m.chss_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_communityEngagementLog' );
 
 -- odk_osf_routine --------------------------------------- 
 
@@ -363,6 +391,7 @@ update lastmile_upload.odk_routineVisit a, lastmile_cha.temp_view_base_history_m
 where ( trim( a.cha_id_inserted ) like m.position_id ) or ( trim( a.cha_id_inserted ) like m.cha_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_routineVisit' );
 
 -- odk_sickChildForm --------------------------------------- checked!
 
@@ -373,6 +402,7 @@ update lastmile_upload.odk_sickChildForm a, lastmile_cha.temp_view_base_history_
 where ( trim( a.cha_id_inserted ) like m.position_id ) or ( trim( a.cha_id_inserted ) like m.cha_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_sickChildForm' );
 
 -- odk_supervisionVisitLog ---------------------------------------
 
@@ -404,6 +434,7 @@ update lastmile_upload.odk_supervisionVisitLog a, lastmile_cha.view_base_history
 where ( trim( a.chss_id_inserted ) like m.position_id ) or ( trim( a.chss_id_inserted ) like m.chss_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_supervisionVisitLog' );
 
 -- odk_vaccineTracker ---------------------------------------
 
@@ -422,9 +453,10 @@ update lastmile_upload.odk_vaccineTracker a, lastmile_cha.view_base_history_moh_
 where ( trim( a.chss_id_inserted ) like m.position_id ) or ( trim( a.chss_id_inserted ) like m.chss_id_historical )
 ;
 
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_vaccineTracker' );
 
 -- What about tables in the archive schema with chw and ccs IDs?
 
--- end; -- end stored procedure
+end; -- end stored procedure
 
--- call upload_schema_cha_chss_nchap_id();
+call upload_update_nchap_id();

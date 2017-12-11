@@ -27,6 +27,7 @@ add column chss_id_inserted varchar( 100 ) after chss_id;
 
 -- Already added _inserted columns for this table
 
+
 -- de_cha_monthly_service_report --------------------------------------- check!
 
 alter table lastmile_upload.de_cha_monthly_service_report
@@ -34,6 +35,8 @@ add column cha_id_inserted varchar( 100 ) after cha_id;
 
 alter table lastmile_upload.de_cha_monthly_service_report
 add column chss_id_inserted varchar( 100 ) after chss_id;
+
+
 
 -- de_cha_status_change_form --------------------------------------- check!
 
@@ -43,10 +46,13 @@ add column cha_id_inserted varchar( 100 ) after cha_id;
 alter table lastmile_upload.de_cha_status_change_form
 add column chss_id_inserted varchar( 100 ) after chss_id;
 
+
 -- de_chss_commodity_distribution --------------------------------------- check!
 
 alter table lastmile_upload.de_chss_commodity_distribution
 add column chss_id_inserted varchar( 100 ) after chss_id;
+
+
 
 -- de_chss_monthly_service_report --------------------------------------- check!
 
@@ -96,6 +102,8 @@ add column cha_id_14_inserted varchar( 100 ) after cha_id_14;
 alter table lastmile_upload.de_chss_monthly_service_report
 add column chss_id_inserted varchar( 100 ) after chss_id;
 
+
+
 -- de_direct_observation --------------------------------------- check!
 
 alter table lastmile_upload.de_direct_observation
@@ -104,6 +112,8 @@ add column cha_id_inserted varchar( 100 ) after cha_id;
 alter table lastmile_upload.de_direct_observation
 add column chss_id_inserted varchar( 100 ) after chss_id;
 
+
+
 -- de_register_review --------------------------------------- check!
 
 alter table lastmile_upload.de_register_review
@@ -111,6 +121,8 @@ add column cha_id_inserted varchar( 100 ) after cha_id;
 
 alter table lastmile_upload.de_register_review
 add column chss_id_inserted varchar( 100 ) after chss_id;
+
+
 
 -- odk_FieldArrivalLogForm --------------------------------------- check!
 
@@ -121,11 +133,15 @@ add column cha_id_inserted varchar( 100 ) after SupervisedCHAID;
 alter table lastmile_upload.odk_FieldArrivalLogForm
 add column lmh_id_inserted varchar( 100 ) after LMHID;
 
+
+
 -- odk_FieldIncidentReportForm --------------------------------------- check!
 
 -- Need to check the xform to see what could be placed in this field.
 alter table lastmile_upload.odk_FieldIncidentReportForm
 add column id_number_inserted varchar( 100 ) after IDNumber;
+
+
 
 -- odk_OSFKAPSurvey --------------------------------------- check!
 
@@ -135,6 +151,7 @@ add column id_number_inserted varchar( 100 ) after IDNumber;
 
 alter table lastmile_upload.odk_QAO_CHSSQualityAssuranceForm
 add column chss_id_inserted varchar( 100 ) after chss_id;
+
 
 -- odk_chaRestock --------------------------------------- check!
 
@@ -147,11 +164,14 @@ add column cha_id_inserted varchar( 100 ) after chaID;
 alter table lastmile_upload.odk_chaRestock
 add column chss_id_inserted varchar( 100 ) after chssID;
 
+
+
 -- odk_communityEngagementLog --------------------------------------- check!
 
 -- not sure if chss will be filling this in.  Check against both?
 alter table lastmile_upload.odk_communityEngagementLog
 add column data_collector_id_inserted varchar( 100 ) after data_collector_id;
+
 
 
 -- odk_osf_routine --------------------------------------- check!
@@ -163,10 +183,14 @@ add column data_collector_id_inserted varchar( 100 ) after data_collector_id;
 alter table lastmile_upload.odk_routineVisit
 add column cha_id_inserted varchar( 100 ) after chaID;
 
+
+
 -- odk_sickChildForm ---------------------------------------
 
 alter table lastmile_upload.odk_sickChildForm
 add column cha_id_inserted varchar( 100 ) after chwID;
+
+
 
 -- odk_supervisionVisitLog ---------------------------------------
 
@@ -184,6 +208,8 @@ add column chss_id_orig_inserted varchar( 100 ) after chssID;
 alter table lastmile_upload.odk_supervisionVisitLog
 add column chss_id_inserted varchar( 100 ) after chss_id;
 
+
+
 -- odk_vaccineTracker ---------------------------------------
 
 alter table lastmile_upload.odk_vaccineTracker
@@ -191,6 +217,8 @@ add column cha_id_inserted varchar( 100 ) after SupervisedchaID;
 
 alter table lastmile_upload.odk_vaccineTracker
 add column chss_id_inserted varchar( 100 ) after chssID;
+
+
 
 -- What about tables in the archive schema with chw and ccs IDs?
 

@@ -1,3 +1,4 @@
+-- the table and the procedure already exist.  you do not need to run this when you migrate.
 
 drop table if exists lastmile_upload.log_update_nchap_id;
 

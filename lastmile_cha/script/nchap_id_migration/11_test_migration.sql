@@ -1,4 +1,8 @@
-select
+-- cha
+
+-- 1
+select 
+      id_type,
       table_name,
       id_inserted,
       id
@@ -9,10 +13,12 @@ where ( trim( id_type ) like 'cha' ) and (  ( trim( id_inserted ) like '2001' ) 
                                             ( trim( id_inserted ) like '101'  )
                                           )
 group by table_name, id_inserted, id
-order by id_inserted asc, id asc, table_name asc
+order by id_type asc, id_inserted asc, id asc, table_name asc
 ;
 
-select
+-- 2
+select 
+      id_type,
       table_name,
       id_inserted,
       id
@@ -22,10 +28,12 @@ where ( trim( id_type ) like 'cha' ) and (  ( trim( id_inserted ) like '1'      
                                             ( trim( id_inserted ) like '206'    )
                                           )
 group by table_name, id_inserted, id
-order by id_inserted asc, id asc, table_name asc
+order by id_type asc, id_inserted asc, id asc, table_name asc
 ;
 
-select
+-- 3
+select 
+      id_type,
       table_name,
       id_inserted,
       id
@@ -35,10 +43,12 @@ where ( trim( id_type ) like 'cha' ) and (  ( trim( id_inserted ) like '84'     
                                             ( trim( id_inserted ) like '96'    )
                                           )
 group by table_name, id_inserted, id
-order by id_inserted asc, id asc, table_name asc
+order by id_type asc, id_inserted asc, id asc, table_name asc
 ;
 
-select
+-- 4
+select 
+      id_type,
       table_name,
       id_inserted,
       id
@@ -48,10 +58,12 @@ where ( trim( id_type ) like 'cha' ) and (  ( trim( id_inserted ) like '2064'   
                                             ( trim( id_inserted ) like '2164'    )
                                           )
 group by table_name, id_inserted, id
-order by id_inserted asc, id asc, table_name asc
+order by id_type asc, id_inserted asc, id asc, table_name asc
 ;
 
-select
+-- 5
+select 
+      id_type,
       table_name,
       id_inserted,
       id
@@ -62,10 +74,12 @@ where ( trim( id_type ) like 'cha' ) and (  ( trim( id_inserted ) like '10' ) or
                                             ( trim( id_inserted ) like '2017'  )
                                           )
 group by table_name, id_inserted, id
-order by id_inserted asc, id asc, table_name asc
+order by id_type asc, id_inserted asc, id asc, table_name asc
 ;
 
-select
+-- 6
+select 
+      id_type,
       table_name,
       id_inserted,
       id
@@ -76,12 +90,14 @@ where ( trim( id_type ) like 'cha' ) and (  ( trim( id_inserted ) like '98' ) or
                                             ( trim( id_inserted ) like '2600'  )
                                           )
 group by table_name, id_inserted, id
-order by id_inserted asc, id asc, table_name asc
+order by id_type asc, id_inserted asc, id asc, table_name asc
 ;
 
 -- chss --
 
-select
+-- 7
+select 
+      id_type,
       table_name,
       id_inserted,
       id
@@ -92,10 +108,11 @@ where ( trim( id_type ) like 'chss' ) and ( ( trim( id_inserted ) like '2191' ) 
                                             ( trim( id_inserted ) like '68'  )
                                           )
 group by table_name, id_inserted, id
-order by id_inserted asc, id asc, table_name asc
+order by id_type asc, id_inserted asc, id asc, table_name asc
 ;
 
-select
+select 
+      id_type,
       table_name,
       id_inserted,
       id
@@ -106,7 +123,7 @@ where ( trim( id_type ) like 'chss' ) and ( ( trim( id_inserted ) like '991' ) o
                                             ( trim( id_inserted ) like '2991'  )
                                           )
 group by table_name, id_inserted, id
-order by id_inserted asc, id asc, table_name asc
+order by id_type asc, id_inserted asc, id asc, table_name asc
 ;
 
 

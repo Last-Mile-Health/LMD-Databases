@@ -20,6 +20,7 @@ select
       position_id,
       
       position_id                                 as cha_id,   -- position_id is now the same as cha_id
+      position_id_lmh                             as cha_id_lmh,
       person_id,
       concat( first_name, ' ', last_name )        as cha,
       position_person_begin_date,

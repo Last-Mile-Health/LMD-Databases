@@ -7,6 +7,7 @@ create view view_position_cha_geo_community_person as
 select
       -- cha position fields
       p.position_id,
+      p.position_id_lmh,
       p.position_begin_date,
       
       -- cha health facility and geographical info

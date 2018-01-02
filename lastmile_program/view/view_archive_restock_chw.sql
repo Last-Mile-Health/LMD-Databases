@@ -29,7 +29,7 @@ select
     l.chwl_id, 
     l.full_name                                       as chwl,
    
-    trim( r.supervisedChwID )                         as cha_id,
+    trim( r.supervisedChwID )                         as position_id,
     null                                              as cha,
     trim( r.communityID )                             as community_id,
 

@@ -11,7 +11,7 @@ select
       a.health_facility,
       a.health_facility_id, 
       
-      a.cha_id, -- same as position_id for CHAs
+      a.position_id, -- same as position_id for CHAs
       a.cha,
       a.position_begin_date,
       a.hire_date,
@@ -63,6 +63,6 @@ select
       c.month_minus_12_person_list
       
 from lastmile_cha.view_base_position_cha as a
-    left outer join view_restock_cha_month_count c on a.cha_id like c.cha_id
+    left outer join view_restock_cha_month_count c on a.position_id like c.position_id
 order by a.county asc, a.health_district asc, a.health_facility asc, a.chss asc, a.cha asc
 ;

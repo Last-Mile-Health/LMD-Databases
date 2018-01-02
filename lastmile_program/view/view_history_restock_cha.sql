@@ -1,8 +1,8 @@
 use lastmile_program;
 
-drop view if exists view_base_restock_cha;
+drop view if exists view_history_restock_cha;
 
-create view view_base_restock_cha as 
+create view view_history_restock_cha as 
 
 select 
         'lastmile_upload'                             as source_database,
@@ -33,7 +33,7 @@ select
         o.full_name                                   as full_name_database,
         o.job                                         as job_database,
         
-        trim( s.supervisedChaID )                     as cha_id,
+        trim( s.supervisedChaID )                     as position_id,
         trim( s.chaName )                             as cha,
         trim( s.communityID )                         as community_id,
 
@@ -90,7 +90,7 @@ select
     w.chwl                        as full_name_database,
     'CHWL'                        as job_database,
    
-    w.cha_id,
+    w.position_id,
     w.cha,
     w.community_id,
 

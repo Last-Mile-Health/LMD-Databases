@@ -6,7 +6,7 @@ create view view_restock_cha_month_count as
 
 select
 
-      a.cha_id,
+      a.position_id,
       
       -- Total times the CHA was restocked in the current month
       sum( if( extract( year_month from r.manual_date ) =             extract( year_month from now() ),        1, 0 ) ) as month_current,

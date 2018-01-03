@@ -1,8 +1,8 @@
-use lastmile_program;
+use lastmile_report;
 
-drop view if exists view_archive_restock_chw;
+drop view if exists view_restock_archive_chw;
 
-create view view_archive_restock_chw as
+create view view_restock_archive_chw as
 
 select
 

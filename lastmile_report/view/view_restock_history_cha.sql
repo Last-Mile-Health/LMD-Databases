@@ -1,8 +1,8 @@
-use lastmile_program;
+use lastmile_report;
 
-drop view if exists view_history_restock_cha;
+drop view if exists view_restock_history_cha;
 
-create view view_history_restock_cha as 
+create view view_restock_history_cha as 
 
 select 
         'lastmile_upload'                             as source_database,
@@ -111,6 +111,6 @@ select
     w.stock_on_hand_microlut,
     w.stock_on_hand_safety_box 
 
-from lastmile_program.view_archive_restock_chw as w
+from lastmile_report.view_restock_archive_chw as w
     left outer join lastmile_cha.view_history_position_person_chss as b on trim( w.chss_id ) like b.chss_id
 ;

@@ -42,6 +42,6 @@ select
       group_concat( distinct if( extract( year_month from r.manual_date ) = period_add( extract( year_month from now() ), -12 ), if( not r.full_name_database is null, r.full_name_database, r.chss_database ), null ) order by r.manual_date desc separator ', ' ) as month_minus_12_person_list
 
 from lastmile_cha.view_base_position_cha as a
-    left outer join lastmile_program.view_history_restock_cha as r on a.position_id like r.position_id
+    left outer join lastmile_report.view_restock_history_cha as r on a.position_id like r.position_id
 group by a.position_id
 ;

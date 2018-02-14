@@ -7,7 +7,6 @@ create view view_base_history_position as
 select
       j.title                   as job,
       p.position_id,
-      p.position_id_lmh,
       p.begin_date,
       p.end_date,
       p.health_facility_id,

@@ -7,7 +7,7 @@ create view view_registration_year as
 select
       year( trim( g.registrationDate ) )                                        as registration_year,
       trim( g.communityID )                                                     as community_id,
-      trim( g.chaID )                                                           as cha_id,
+      trim( g.chaID )                                                           as position_id,
       
       max( trim( g.registrationDate ) )                                         as  registration_date,
 

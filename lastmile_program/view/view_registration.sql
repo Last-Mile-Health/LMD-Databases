@@ -10,7 +10,7 @@ create view view_registration as
 
 select
       g1.community_id, 
-      g1.cha_id, 
+      g1.position_id, 
       g1.registration_year,
       
       g1.registration_date,

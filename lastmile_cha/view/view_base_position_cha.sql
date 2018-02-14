@@ -18,10 +18,8 @@ select
       position_filled_last_date,
       
       position_id,
-      
-      position_id                                 as cha_id,   -- position_id is now the same as cha_id
-      position_id_lmh                             as cha_id_lmh,
       person_id,
+      
       concat( first_name, ' ', last_name )        as cha,
       position_person_begin_date,
       position_begin_date,
@@ -43,13 +41,13 @@ select
       
       -- CHA Training completed
       module,
-    
-      chss_position_begin_date,
       
+      -- Beginning of the CHSS info
+      
+      chss_position_begin_date,
       chss_cha_supervision_begin_date                         as chss_supervision_begin_date,
       
       chss_position_id,
-      chss_position_id                                        as chss_id,
       chss_person_id,
       concat( chss_first_name, ' ', chss_last_name )          as chss,
       

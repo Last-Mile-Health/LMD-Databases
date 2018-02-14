@@ -5,8 +5,8 @@ drop view if exists view_train_chss_module;
 create view view_train_chss_module as 
 
 select
-      trim( t.chss_id )   as chss_id,
-      trim( t.person_id ) as person_id,
+      t.position_id,
+      t.person_id,
       
       replace( 
       trim( replace( concat(  if( not ( ( t.m1_overall_assessment is null  ) or ( trim( t.m1_overall_assessment ) like '' ) ), '1', ''  ), ' ',
@@ -19,7 +19,6 @@ select
           ' ', ', ' ) as module
           
 from lastmile_program.view_train_chss_last as t
-where ( not ( ( t.chss_id   is null ) or ( trim( t.chss_id )    like '' ) ) ) and 
-      ( not ( ( t.person_id is null ) or ( trim( t.person_id )  like '' ) ) ) 
-      
+where ( not ( ( t.position_id is null ) or ( trim( t.position_id ) like '' ) ) ) and 
+      ( not (   t.person_id   is null ) ) 
 ;

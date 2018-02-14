@@ -12,7 +12,7 @@ select
       trim( k.county )              as county,
       h.health_district_id,
       trim( h.health_district )     as health_district,
-      trim( h.cohort )             as cohort,
+      trim( h.cohort )              as cohort,
       trim( f.health_facility_id )  as health_facility_id,
       trim( f.health_facility )     as health_facility  
 from county as k

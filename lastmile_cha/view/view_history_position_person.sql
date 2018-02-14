@@ -13,6 +13,7 @@ select
       p.position_end_date,
 
       trim( r.person_id )                                       as person_id,
+      trim( r.person_id_lmh )                                   as person_id_lmh,
       
       -- CHA IDs will now be reused as CHAs come and go, so make position_id the public staff_id
       -- CHSS IDs will still be unique so person_id will be their staff_id for now.

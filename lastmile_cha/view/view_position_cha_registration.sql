@@ -27,6 +27,6 @@ select
       
 
 from view_position_cha_id_community_id as pc
-    left outer join lastmile_program.view_registration as g on ( pc.position_id like g.cha_id ) and ( pc.community_id like g.community_id )
-group by position_id
+    left outer join lastmile_program.view_registration as g on ( pc.position_id like g.position_id ) and ( pc.community_id like g.community_id )
+group by pc.position_id
 ;

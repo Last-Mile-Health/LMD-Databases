@@ -8,14 +8,14 @@ drop view if exists view_train_cha_last;
 create view view_train_cha_last as
 
 select
-      trim( t1.cha_id    )            as cha_id,
-      trim( t1.person_id )            as person_id,
+      trim( t1.cha_id    )            as position_id,
+      t1.person_id,
       
       t1.module,
       t1.begin_date,
       t1.end_date,
       
-      trim( t1.cha_id_inserted )      as cha_id_inserted,
+      trim( t1.cha_id_inserted )      as position_id_inserted,
       
       trim( t1.participant_name )     as participant_name,
       trim( t1.participant_type )     as participant_type,
@@ -39,13 +39,13 @@ select
       trim( t1.data_entry_name )      as data_entry_name
       
 from train_cha as t1
-    left outer join train_cha as t2 on  ( trim( t1.cha_id     ) like  trim( t2.cha_id    ) )  and
-                                        ( trim( t1.person_id  ) like  trim( t2.person_id ) )  and
-                                        ( t1.module     = t2.module     )                     and
-                                        ( t1.begin_date > t2.begin_date )
+    left outer join train_cha as t2 on  ( trim( t1.cha_id ) like trim( t2.cha_id ) )  and
+                                        ( t1.person_id      = t2.person_id )          and
+                                        ( t1.module         = t2.module     )         and
+                                        ( t1.begin_date     > t2.begin_date )
                                        
 group by  trim( t1.cha_id    ), 
-          trim( t1.person_id ),
+          t1.person_id,
           t1.module
 having    count( * ) >= 1
 ;

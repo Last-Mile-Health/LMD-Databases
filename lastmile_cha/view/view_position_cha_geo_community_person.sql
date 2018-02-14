@@ -7,7 +7,6 @@ create view view_position_cha_geo_community_person as
 select
       -- cha position fields
       p.position_id,
-      p.position_id_lmh,
       p.position_begin_date,
       
       -- cha health facility and geographical info
@@ -35,7 +34,7 @@ select
       -- cha person fields
       pr.position_person_begin_date,
       rf.begin_date                                               as hire_date,
-      pr.person_id,  -- not cha_id, this is our internal id
+      pr.person_id,  -- not position_id for CHA, this is our internal id, unique for every person.
       pr.first_name,
       pr.last_name,
       pr.birth_date,
@@ -45,6 +44,10 @@ select
       
       -- CHA Training completed
       m.cha_module_list                                             as module,
+      
+      -- ---------------------------------------------------------------------------------------------------
+      -- Beginning of CHSS info
+      -- ---------------------------------------------------------------------------------------------------
          
       ps.position_supervision_begin_date                            as chss_position_supervision_begin_date,  
       
@@ -78,7 +81,7 @@ select
       
       po.position_person_begin_date                              as chss_position_person_begin_date,
       po.hire_date                                               as chss_hire_date,
-      po.person_id                                               as chss_person_id, -- this is chss_id
+      po.person_id                                               as chss_person_id,
       po.first_name                                              as chss_first_name,
       po.last_name                                               as chss_last_name,
       po.birth_date                                              as chss_birth_date,
@@ -88,14 +91,18 @@ select
       
       po.module                                                  as chss_module
       
-from                          view_position_cha                       as p
+from view_position_cha as p
+
     left outer join           view_geo_health_facility                as f  on p.health_facility_id       like f.health_facility_id
     left outer join           view_position_cha_community_list        as c  on p.position_id              like c.position_id
     left outer join           view_position_cha_registration          as g  on p.position_id              like g.position_id
+    
     left outer join           view_position_cha_person                as pr on p.position_id              like pr.position_id
         left outer join       view_history_position_last_date         as d  on pr.position_id             like d.position_id
         left outer join       view_history_position_person_first      as rf on pr.person_id               like rf.person_id
-    left outer join           lastmile_program.view_train_cha_module  as m  on ( p.position_id like m.cha_id ) and ( pr.person_id like m.person_id )
+    
+    left outer join           lastmile_program.view_train_cha_module  as m  on ( p.position_id like m.position_id ) and ( pr.person_id = m.person_id )
+    
     left outer join           view_position_cha_supervisor            as ps on p.position_id              like ps.position_id
         left outer join       view_position_chss_person_geo           as po on ps.position_supervisor_id  like po.position_id
 ;  

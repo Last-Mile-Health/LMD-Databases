@@ -15,7 +15,6 @@ select
       health_facility,
       
       position_id,
-      position_id                           as chss_id,
       position_begin_date,
       
       position_filled,

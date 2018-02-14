@@ -8,13 +8,13 @@ drop view if exists view_train_chss_last;
 create view view_train_chss_last as
 
 select
-      trim( t1.chss_id )                      as chss_id,
+      trim( t1.chss_id )                      as position_id,
       trim( t1.person_id )                    as person_id,
          
       t1.begin_date,
       t1.end_date,
       
-      trim( t1.chss_id_inserted )             as chss_id_inserted,
+      trim( t1.chss_id_inserted )             as position_id_inserted,
       
       trim( t1.participant_name )             as participant_name,
       trim( t1.participant_type )             as participant_type,
@@ -55,13 +55,13 @@ select
       
  
 from train_chss as t1
-    left outer join train_chss as t2 on ( trim( t1.chss_id )    like  trim( t2.chss_id  ) )   and
-                                        ( trim( t1.person_id )  like  trim( t2.person_id ) )  and                                     
-                                        ( t1.begin_date > t2.begin_date )
+    left outer join train_chss as t2 on ( trim( t1.chss_id )  like  trim( t2.chss_id  ) ) and
+                                        ( t1.person_id        =     t2.person_id      )   and                                     
+                                        ( t1.begin_date       >     t2.begin_date     )
                                         
 where not ( trim( t1.chss_id ) like '' )
 
 group by  trim( t1.chss_id ), 
-          trim( t1.person_id )
+          t1.person_id
 having    count( * ) >= 1
 ;

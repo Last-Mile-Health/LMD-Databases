@@ -64,3 +64,7 @@ update lastmile_program.train_cha
 where ( person_id like '%|%' ) and ( trim( substring_index( person_id, '|', -1 ) ) like '0' )
 ;
 
+-- make person_id an int.  Nulls okay.
+alter table lastmile_program.train_cha modify   person_id int(10) unsigned null;
+alter table lastmile_program.train_chss modify  person_id int(10) unsigned null;
+

@@ -1,0 +1,699 @@
+
+use lastmile_cha;
+
+drop view if exists view_position;
+
+create view view_position as
+
+select
+      trim( p.position_id )                                                     as position_id,
+      trim( j.title )                                                           as job,
+            p.begin_date                                                        as position_begin_date,
+            p.end_date                                                          as position_end_date,
+      trim( p.health_facility_id )                                              as health_facility_id,
+      trim( f.health_facility)                                                  as health_facility,
+      trim( f.description )                                                     as health_facility_description
+
+from `position` as p
+    left outer join job as j              on trim( p.job_id )             like trim( j.job_id )
+    left outer join health_facility as f  on trim( p.health_facility_id ) like trim( f.health_facility_id )
+where p.end_date is null
+;
+
+use lastmile_cha;
+
+drop view if exists view_position_cha;
+
+create view view_position_cha as
+
+select
+      p.position_id,
+      p.position_begin_date,
+      p.health_facility_id,
+      p.health_facility,
+      p.health_facility_description
+from view_position as p
+where p.job like 'CHA'
+;
+
+use lastmile_cha;
+
+drop view if exists view_position_person;
+
+create view view_position_person as
+
+select
+
+      pr.position_id,
+      pr.begin_date               as position_person_begin_date,
+
+      r.person_id,
+      r.first_name,
+      r.last_name,
+      r.other_name,
+      r.birth_date,
+      r.gender,
+      r.phone_number,
+      r.phone_number_alternate
+      
+from position_person as pr
+    left outer join person as r on  pr.person_id = r.person_id 
+where pr.end_date is null -- only return active position_person records
+;
+
+use lastmile_program;
+  
+drop view if exists view_registration_year;
+
+create view view_registration_year as 
+
+select
+      year( trim( g.registrationDate ) )                                        as registration_year,
+      trim( g.communityID )                                                     as community_id,
+      trim( g.chaID )                                                           as position_id,
+      
+      max( trim( g.registrationDate ) )                                         as  registration_date,
+
+      sum( cast( g.1_1_A_total_number_households as unsigned ) )                as total_household,
+      sum( cast( g.1_1_B_total_household_members as unsigned ) )                as total_household_member,
+                                                    
+      sum( cast( g.1_1_C_total_zero_eleven_months_male as unsigned ) )          as total_zero_eleven_month_male,
+      sum( cast( g.1_1_D_total_zero_eleven_months_female as unsigned ) )        as total_zero_eleven_month_female,
+  
+      sum( cast( g.1_1_E_total_one_five_years_male as unsigned ) )              as total_one_five_year_male,
+      sum( cast( g.1_1_F_total_one_five_years_female as unsigned ) )            as total_one_five_year_female,
+  
+      sum( cast( g.1_1_G_total_six_fourteen_years_male as unsigned ) )          as total_six_fourteen_year_male,
+      sum( cast( g.1_1_H_total_six_fourteen_years_female as unsigned ) )        as total_six_fourteen_year_female,
+  
+      sum( cast( g.1_1_I_total_fifteen_forty_nine_years_male as unsigned ) )    as total_fifteen_forty_nine_year_male,
+      sum( cast( g.1_1_J_total_fifteen_forty_nine_years_female as unsigned ) )  as total_fifteen_forty_nine_year_female,
+  
+      sum( cast( g.1_1_K_total_fifty_plus_years_male as unsigned ) )            as total_fifty_plus_year_male,
+      sum( cast( g.1_1_L_total_fifty_plus_years_female as unsigned ) )          as total_fifty_plus_year_female
+  
+from lastmile_upload.de_chaHouseholdRegistration as g
+group by registration_year, community_id, position_id
+;
+
+
+use lastmile_program;
+  
+drop view if exists view_registration;
+
+create view view_registration as 
+
+select
+      g1.community_id, 
+      g1.position_id, 
+      g1.registration_year,
+      
+      g1.registration_date,
+      
+      g1.total_household,
+      g1.total_household_member,
+      
+      g1.total_zero_eleven_month_male,
+      g1.total_zero_eleven_month_female,
+  
+      g1.total_one_five_year_male,
+      g1.total_one_five_year_female,
+  
+      g1.total_six_fourteen_year_male,
+      g1.total_six_fourteen_year_female,
+  
+      g1.total_fifteen_forty_nine_year_male,
+      g1.total_fifteen_forty_nine_year_female,
+  
+      g1.total_fifty_plus_year_male,
+      g1.total_fifty_plus_year_female
+      
+from view_registration_year as g1
+    left outer join view_registration_year as g2 on ( trim( g1.community_id ) like trim( g2.community_id  )  ) and 
+                                                    ( trim( g1.position_id )  like trim( g2.position_id   )  ) and
+                                                    ( g1.registration_year    > g2.registration_year      )
+group by trim( g1.community_id ), trim( g1.position_id )
+having count( * ) >= 1
+;
+
+use lastmile_cha;
+  
+drop view if exists view_position_cha_registration;
+
+create view view_position_cha_registration as 
+
+select
+      pc.position_id,
+
+      sum( g.total_household )                        as total_household,
+      sum( g.total_household_member )                 as total_household_member,
+      
+      sum( g.total_zero_eleven_month_male )           as total_zero_eleven_month_male,
+      sum( g.total_zero_eleven_month_female )         as total_zero_eleven_month_female,
+  
+      sum( g.total_one_five_year_male )               as total_one_five_year_male,
+      sum( g.total_one_five_year_female )             as total_one_five_year_female,
+  
+      sum( g.total_six_fourteen_year_male )           as total_six_fourteen_year_male,
+      sum( g.total_six_fourteen_year_female )         as total_six_fourteen_year_female,
+  
+      sum( g.total_fifteen_forty_nine_year_male )     as total_fifteen_forty_nine_year_male,
+      sum( g.total_fifteen_forty_nine_year_female )   as total_fifteen_forty_nine_year_female,
+  
+      sum( g.total_fifty_plus_year_male )             as total_fifty_plus_year_male,
+      sum( g.total_fifty_plus_year_female )           as total_fifty_plus_year_female
+      
+
+from view_position_cha_id_community_id as pc
+    left outer join lastmile_program.view_registration as g on ( pc.position_id like g.position_id ) and ( pc.community_id like g.community_id )
+group by pc.position_id
+;
+
+
+use lastmile_cha;
+
+drop view if exists view_history_position_person_first;
+
+create view view_history_position_person_first as
+
+select
+      pr1.person_id,
+      trim( pr1.position_id )     as position_id,
+      pr1.begin_date,
+      pr1.end_date
+     
+from position_person as pr1
+    left outer join position_person as pr2 on  ( pr1.person_id  = pr2.person_id   ) and 
+                                               ( pr1.begin_date < pr2.begin_date  )
+group by  pr1.person_id
+having    count( * ) >= 1
+;
+
+use lastmile_cha;
+
+drop view if exists view_history_position_person_last;
+
+create view view_history_position_person_last as
+
+select
+      pr1.person_id,
+      trim( pr1.position_id ) as position_id,
+      pr1.begin_date,
+      pr1.end_date
+     
+from position_person as pr1
+    left outer join position_person as pr2 on  (  pr1.person_id   = pr2.person_id   ) and 
+                                               (  pr1.begin_date  > pr2.begin_date  )
+group by  pr1.person_id
+having    count( * ) >= 1
+;
+
+
+use lastmile_program;
+
+drop view if exists view_train_cha_last;
+
+-- Throw out duplicate records by cha_id, person_id, module.  There will be instances where specific CHAs
+-- will be retrain in particular modules.  Only take the latest one.
+
+create view view_train_cha_last as
+
+select
+      trim( t1.cha_id    )            as position_id,
+      t1.person_id,
+      
+      t1.module,
+      t1.begin_date,
+      t1.end_date,
+      
+      trim( t1.cha_id_inserted )      as position_id_inserted,
+      
+      trim( t1.participant_name )     as participant_name,
+      trim( t1.participant_type )     as participant_type,
+      
+      trim( t1.facilitator_1 )        as facilitator_1,
+      trim( t1.facilitator_2 )        as facilitator_2,
+      trim( t1.facilitator_3 )        as facilitator_3,
+      trim( t1.facilitator_4 )        as facilitator_4,
+      
+      trim( t1.health_district )      as health_district,
+      trim( t1.county )               as county,
+      trim( t1.gender )               as gender,
+      trim( t1.phone )                as phone,
+     
+      t1.pre_test,
+      t1.practical_skills_check,
+      t1.post_test,
+      t1.overall_assessment,
+      
+      trim( t1.note )                 as note,
+      trim( t1.data_entry_name )      as data_entry_name
+      
+from train_cha as t1
+    left outer join train_cha as t2 on  ( trim( t1.cha_id ) like trim( t2.cha_id ) )  and
+                                        ( t1.person_id      = t2.person_id )          and
+                                        ( t1.module         = t2.module     )         and
+                                        ( t1.begin_date     > t2.begin_date )
+                                       
+group by  trim( t1.cha_id    ), 
+          t1.person_id,
+          t1.module
+having    count( * ) >= 1
+;
+
+use lastmile_program;
+
+drop view if exists view_train_cha_module;
+
+create view view_train_cha_module as
+
+select
+      t.position_id,
+      t.person_id,
+      group_concat( distinct t.module order by cast( t.module as unsigned ) asc separator ', ' ) as cha_module_list
+      
+from view_train_cha_last as t
+group by t.position_id, t.person_id
+;
+
+use lastmile_cha;
+
+drop view if exists view_position_chss_person_geo;
+
+create view view_position_chss_person_geo as
+
+select
+      pr.position_id,
+      pr.position_begin_date,
+      pr.health_facility_id,
+      pr.health_facility,
+      
+      if( pr.position_person_begin_date is null, 'N', 'Y' )                                         as position_filled,
+      if( pr.position_person_begin_date is null, d.end_date_last, pr.position_person_begin_date )   as position_filled_last_date,
+      
+      pr.position_person_begin_date,
+      rf.begin_date                       as hire_date,
+      pr.person_id,
+      pr.first_name,
+      pr.last_name,
+      pr.birth_date,
+      pr.gender,
+      pr.phone_number,
+      pr.phone_number_alternate,
+
+      gf.cohort,
+      gf.health_district,
+      gf.health_district_id,
+      gf.county_id,
+      gf.county,
+      
+      t.module
+      
+from view_position_chss_person as pr
+    left outer join   view_history_position_last_date           as d    on pr.position_id         like  d.position_id
+    left outer join   view_history_position_person_first        as rf   on pr.person_id           =     rf.person_id 
+    left outer join   view_geo_health_facility                  as gf   on pr.health_facility_id  like  gf.health_facility_id
+    left outer join   lastmile_program.view_train_chss_module   as t    on ( pr.position_id like t.position_id ) and ( pr.person_id = t.person_id )
+;
+
+
+use lastmile_cha;
+
+drop view if exists view_position_cha_geo_community_person;
+
+create view view_position_cha_geo_community_person as
+
+select
+      -- cha position fields
+      p.position_id,
+      p.
+      p.position_begin_date,
+      
+      -- cha health facility and geographical info
+      p.health_facility_id,
+      f.health_facility,
+      f.cohort,
+      f.health_district_id,
+      f.health_district,
+      f.county_id,
+      f.county,
+      
+      -- list of communityIDs, communities, and dates assocaited with the CHA position
+      c.begin_date                                               as communtiy_begin_date,
+      c.begin_date_list                                          as communtiy_begin_date_list,  
+      c.community_id_list,
+      c.community_list,
+      
+      -- household registration data from paper forms
+      g.total_household,
+      g.total_household_member,
+      
+      if( pr.position_person_begin_date is null, 'N', 'Y' )                                         as position_filled,
+      if( pr.position_person_begin_date is null, d.end_date_last, pr.position_person_begin_date )   as position_filled_last_date,
+      
+      -- cha person fields
+      pr.position_person_begin_date,
+      rf.begin_date                                               as hire_date,
+      pr.person_id,  -- not position_id for CHA, this is our internal id, unique for every person.
+      pr.first_name,
+      pr.last_name,
+      pr.birth_date,
+      pr.gender,
+      pr.phone_number,
+      pr.phone_number_alternate,
+      
+      -- CHA Training completed
+      m.cha_module_list                                             as module,
+      
+      -- ---------------------------------------------------------------------------------------------------
+      -- Beginning of CHSS info
+      -- ---------------------------------------------------------------------------------------------------
+         
+      ps.position_supervision_begin_date                            as chss_position_supervision_begin_date,  
+      
+      -- All the dates, except for position_person.[ begin, end ], are position-to-position oriented.
+      -- position_supervision_beginDate only tells us when a chss position began supervising a cha position,
+      -- not when a specific chss starting supervising a specific chp.
+      
+      -- So the actual supervision date is the later of chss and cha position_person begin dates, assuming 
+      -- the chss and/or person begin dates are not null.  These would be the cases of either or both positions
+      -- being unfilled.
+      
+      if( ( pr.position_person_begin_date is null ) or ( po.position_person_begin_date is null ), 
+            null,  
+            if( pr.position_person_begin_date > po.position_person_begin_date, 
+                pr.position_person_begin_date, 
+                po.position_person_begin_date  ) 
+      )                                                         as chss_cha_supervision_begin_date,
+      
+      ps.position_supervisor_id                                  as chss_position_id,
+      ps.position_supervisor_health_facility_id                  as chss_health_facility_id,
+      ps.position_supervisor_begin_date                          as chss_position_begin_date,
+      
+      -- When chwdb data was migrated into lastmile_cha and the CHAs and CHSSs changes were made for the NCHAP, 
+      -- all CHA and CHSS position were assigned to the same health facility.  I can see that changing over time
+      -- So I added the CHSS geo fields for future reference.
+      po.health_facility                                         as chss_health_facility,
+      po.health_district_id                                      as chss_health_district_id,
+      po.health_district                                         as chss_health_district,
+      po.county_id                                               as chss_county_id,
+      po.county                                                  as chss_county,
+      
+      po.position_person_begin_date                              as chss_position_person_begin_date,
+      po.hire_date                                               as chss_hire_date,
+      po.person_id                                               as chss_person_id,
+      po.first_name                                              as chss_first_name,
+      po.last_name                                               as chss_last_name,
+      po.birth_date                                              as chss_birth_date,
+      po.gender                                                  as chss_gender,
+      po.phone_number                                            as chss_phone_number,
+      po.phone_number_alternate                                  as chss_phone_number_alternate,
+      
+      po.module                                                  as chss_module
+      
+from view_position_cha as p
+
+    left outer join           view_geo_health_facility                as f  on p.health_facility_id       like f.health_facility_id
+    left outer join           view_position_cha_community_list        as c  on p.position_id              like c.position_id
+    left outer join           view_position_cha_registration          as g  on p.position_id              like g.position_id
+    
+    left outer join           view_position_cha_person                as pr on p.position_id              like pr.position_id
+        left outer join       view_history_position_last_date         as d  on pr.position_id             like d.position_id
+        left outer join       view_history_position_person_first      as rf on pr.person_id               like rf.person_id
+    
+    left outer join           lastmile_program.view_train_cha_module  as m  on ( p.position_id like m.position_id ) and ( pr.person_id = m.person_id )
+    
+    left outer join           view_position_cha_supervisor            as ps on p.position_id              like ps.position_id
+        left outer join       view_position_chss_person_geo           as po on ps.position_supervisor_id  like po.position_id
+; 
+
+
+
+use lastmile_cha;
+
+drop view if exists view_base_position_cha;
+
+create view view_base_position_cha as
+
+select
+      county_id,
+      county,
+      
+      health_district_id,
+      health_district,
+      cohort,
+      health_facility_id,
+      health_facility,
+      
+      position_filled,
+      position_filled_last_date,
+      
+      position_id,                                
+      person_id,
+      
+      concat( first_name, ' ', last_name )        as cha,
+      position_person_begin_date,
+      position_begin_date,
+          
+      -- cha person fields
+      hire_date,
+      
+      birth_date,
+      gender,
+      phone_number,
+      phone_number_alternate,
+      
+      community_id_list,
+      community_list,
+      
+      -- household registration data from paper forms
+      total_household,
+      total_household_member,
+      
+      -- CHA Training completed
+      module,
+      
+      -- Beginning of the CHSS info
+      
+      chss_position_begin_date,
+      chss_cha_supervision_begin_date                         as chss_supervision_begin_date,
+      
+      chss_position_id,
+      chss_person_id,
+      concat( chss_first_name, ' ', chss_last_name )          as chss,
+      
+      chss_position_person_begin_date,
+      chss_hire_date,
+
+      chss_birth_date,
+      chss_gender,
+      chss_phone_number,
+      chss_phone_number_alternate,
+      
+      chss_module,
+      
+      chss_health_facility_id,
+      chss_health_facility,
+      
+      chss_health_district_id,
+      chss_health_district,
+      
+      chss_county_id,
+      chss_county
+      
+from view_position_cha_geo_community_person
+;
+
+use lastmile_cha;
+
+drop view if exists view_base_cha;
+
+create view view_base_cha as
+
+select
+      *
+from view_base_position_cha
+where not ( ( cha is null ) or ( trim( cha ) like '' ) )
+;
+
+
+use lastmile_cha;
+
+drop view if exists view_base_history_position;
+
+create view view_base_history_position as
+
+select
+      j.title                   as job,
+      p.position_id,
+      p.begin_date,
+      p.end_date,
+      p.health_facility_id,
+      f.health_facility,
+      f.health_district_id,
+      h.health_district,
+      h.county_id,
+      c.county
+        
+from `position`                               as p
+    left outer join job                       as j  on p.job_id = j.job_id
+    left outer join health_facility           as f  on trim( p.health_facility_id ) like trim( f.health_facility_id )
+        left outer join health_district       as h  on f.health_district_id = h.health_district_id
+            left outer join county            as c  on h.county_id = c.county_id
+;
+
+
+use lastmile_program;
+
+drop view if exists view_train_chss_last;
+
+-- Throw out duplicate records by chss_id and person_id .  There will be instances where CHSSs
+-- will be retrain in particular modules.  Only take the latest one.
+
+create view view_train_chss_last as
+
+select
+      trim( t1.chss_id )                      as position_id,
+      trim( t1.person_id )                    as person_id,
+         
+      t1.begin_date,
+      t1.end_date,
+      
+      trim( t1.chss_id_inserted )             as position_id_inserted,
+      
+      trim( t1.participant_name )             as participant_name,
+      trim( t1.participant_type )             as participant_type,
+  
+      trim( t1.facilitator_1 )                as facilitator_1,
+      trim( t1.facilitator_2 )                as facilitator_2,
+      trim( t1.facilitator_3 )                as facilitator_3,
+      trim( t1.facilitator_4 )                as facilitator_4,
+      
+      trim( t1.county )                       as county,
+      trim( t1.health_district_training )     as health_district_training,
+      trim( t1.gender )                       as gender,
+      trim( t1.phone )                        as phone,
+  
+      trim( t1.m1_pre_test )                  as m1_pre_test, 
+      trim( t1.m1_practical_skills_check )    as m1_practical_skills_check, 
+      trim( t1.m1_post_test )                 as m1_post_test,   
+      trim( t1.m1_overall_assessment )        as m1_overall_assessment,
+      
+      trim( t1.m2_pre_test )                  as m2_pre_test, 
+      trim( t1.m2_practical_skills_check )    as m2_practical_skills_check, 
+      trim( t1.m2_post_test )                 as m2_post_test,   
+      trim( t1.m2_overall_assessment )        as m2_overall_assessment,
+      
+      trim( t1.m3_pre_test )                  as m3_pre_test, 
+      trim( t1.m3_practical_skills_check )    as m3_practical_skills_check, 
+      trim( t1.m3_post_test )                 as m3_post_test,
+      trim( t1.m3_overall_assessment )        as m3_overall_assessment,
+      
+      trim( t1.m4_pre_test )                  as m4_pre_test, 
+      trim( t1.m4_practical_skills_check )    as m4_practical_skills_check,
+      trim( t1.m4_post_test )                 as m4_post_test,
+      trim( t1.m4_overall_assessment )        as m4_overall_assessment,
+  
+      trim( t1.certificate_given )            as certificate_given,
+      trim( t1.note )                         as note,
+      trim( t1.data_entry_name )              as data_entry_name
+      
+ 
+from train_chss as t1
+    left outer join train_chss as t2 on ( trim( t1.chss_id )  like  trim( t2.chss_id  ) ) and
+                                        ( t1.person_id        =     t2.person_id      )   and                                     
+                                        ( t1.begin_date       >     t2.begin_date     )
+                                        
+where not ( trim( t1.chss_id ) like '' )
+
+group by  trim( t1.chss_id ), 
+          t1.person_id
+having    count( * ) >= 1
+;
+
+
+use lastmile_program;
+
+drop view if exists view_train_chss_module;
+
+create view view_train_chss_module as 
+
+select
+      t.position_id,
+      t.person_id,
+      
+      replace( 
+      trim( replace( concat(  if( not ( ( t.m1_overall_assessment is null  ) or ( trim( t.m1_overall_assessment ) like '' ) ), '1', ''  ), ' ',
+                              if( not ( ( t.m2_overall_assessment is null  ) or ( trim( t.m2_overall_assessment ) like '' ) ), '2', ''  ), ' ',
+                              if( not ( ( t.m3_overall_assessment is null  ) or ( trim( t.m3_overall_assessment ) like '' ) ), '3', ''  ), ' ',
+                              if( not ( ( t.m4_overall_assessment is null  ) or ( trim( t.m4_overall_assessment ) like '' ) ), '4', ''  ), ' '
+                            ), '  ', ' ' 
+                    ) 
+          ), 
+          ' ', ', ' ) as module
+          
+from lastmile_program.view_train_chss_last as t
+where ( not ( ( t.position_id is null ) or ( trim( t.position_id ) like '' ) ) ) and 
+      ( not (   t.person_id   is null ) ) 
+;
+
+
+
+
+
+
+
+
+
+
+
+
+use lastmile_cha;
+
+drop view if exists view_base_position_chss;
+
+create view view_base_position_chss as
+
+select
+
+      county_id,
+      county,
+      health_district_id,
+      health_district,
+      cohort,
+      health_facility_id,
+      health_facility,
+      
+      position_id,
+      position_begin_date,
+      
+      position_filled,
+      position_filled_last_date,
+      
+      person_id,
+      concat( first_name, ' ', last_name )  as chss,
+      position_person_begin_date,
+      hire_date,
+      birth_date,
+      gender,
+      phone_number,
+      phone_number_alternate,
+
+      module
+      
+from view_position_chss_person_geo
+;
+
+
+use lastmile_cha;
+
+drop view if exists view_base_chss;
+
+create view view_base_chss as
+
+select 
+      *
+from view_base_position_chss
+where not ( ( chss is null ) or ( trim( chss ) like '' ) )
+;
+

@@ -19,6 +19,6 @@ select
       r.phone_number_alternate
       
 from position_person as pr
-    left outer join person as r on  trim( pr.person_id ) like trim( r.person_id ) 
+    left outer join person as r on  pr.person_id = r.person_id 
 where pr.end_date is null -- only return active position_person records
 ;

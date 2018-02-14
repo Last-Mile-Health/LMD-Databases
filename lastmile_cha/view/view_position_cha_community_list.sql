@@ -18,4 +18,4 @@ where pc.end_date is null
 group by trim( pc.position_id )
 ;
 -- When a position has multiple communities it is serving, show the earliest date as the begin date, but then also
--- show a list of communities, IDs, and their begin dates, oderbed by communities.
+-- show a list of communities, IDs, and their begin dates, ordered by communities.

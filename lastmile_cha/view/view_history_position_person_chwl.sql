@@ -12,8 +12,6 @@ select
       position_end_date,
 
       person_id,
-      staff_id                      as chwl_id,
-      
       full_name,
       birth_date,
       gender,

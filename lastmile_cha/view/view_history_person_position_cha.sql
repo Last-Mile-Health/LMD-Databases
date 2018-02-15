@@ -7,8 +7,6 @@ create view view_history_person_position_cha as
 select
 
       person_id,
-      staff_id    as cha_id,
-      
       full_name,
       birth_date,
       gender,

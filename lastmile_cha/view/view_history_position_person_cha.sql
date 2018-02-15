@@ -11,9 +11,7 @@ select
       position_begin_date,
       position_end_date,
  
-      person_id,
-      staff_id    as cha_id,
-      
+      person_id,    
       full_name,
       birth_date,
       gender,

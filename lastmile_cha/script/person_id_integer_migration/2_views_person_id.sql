@@ -136,6 +136,24 @@ group by trim( g1.community_id ), trim( g1.position_id )
 having count( * ) >= 1
 ;
 
+
+use lastmile_cha;
+
+drop view if exists view_position_cha_id_community_id;
+
+create view view_position_cha_id_community_id as
+
+select
+      p.position_id,
+      pc.community_id
+      
+from view_position_cha as p
+    left outer join position_community as pc on p.position_id like trim( pc.position_id )
+where pc.end_date is null
+;  
+
+
+
 use lastmile_cha;
   
 drop view if exists view_position_cha_registration;
@@ -165,7 +183,7 @@ select
       
 
 from view_position_cha_id_community_id as pc
-    left outer join lastmile_program.view_registration as g on ( pc.position_id like g.position_id ) and ( pc.community_id like g.community_id )
+    left outer join lastmile_program.view_registration as g on ( pc.position_id like g.position_id ) and ( pc.community_id = cast( g.community_id as unsigned) )
 group by pc.position_id
 ;
 

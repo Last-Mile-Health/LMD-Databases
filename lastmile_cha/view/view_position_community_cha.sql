@@ -7,7 +7,7 @@ create view view_position_community_cha as
 select
       pc.community_id,
       pc.position_id,
-      pc.begin_date         as position_community_begin_date,
+      pc.begin_date as position_community_begin_date,
       
       pr.position_begin_date,
       pr.health_facility_id,

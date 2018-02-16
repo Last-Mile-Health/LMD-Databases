@@ -770,4 +770,362 @@ from view_base_position_chss
 ;
 
 
+use lastmile_cha;
+
+drop view if exists view_history_position_person;
+
+create view view_history_position_person as 
+
+select
+
+      p.job,
+      p.position_id,
+      p.position_active,
+      p.position_begin_date,
+      p.position_end_date,
+
+      r.person_id,
+      concat( trim( r.first_name ), ' ', trim( r.last_name ) )  as full_name,
+      r.birth_date,
+      trim( r.gender )                                          as gender,
+      trim( r.phone_number )                                    as phone_number,
+      trim( r.phone_number_alternate )                          as phone_number_alternate, 
+         
+      -- position person relationship active Y/N
+      if( pr.end_date is null, 'Y', 'N' )                       as position_person_active,
+      pr.begin_date                                             as position_person_begin_date,
+      pr.end_date                                               as position_person_end_date,
+      trim( l.reason_left )                                     as reason_left,
+      trim( pr.reason_left_description )                        as reason_left_description,
+      
+      p.health_facility_id,
+      p.health_facility,
+      p.cohort,
+      p.health_district_id,
+      p.health_district,
+      p.county_id,
+      p.county
+
+from view_history_position_geo      as p
+    left outer join position_person as pr on p.position_id      like trim( pr.position_id )
+        left outer join person      as r  on pr.person_id       = r.person_id
+        left outer join reason_left as l  on pr.reason_left_id  = l.reason_left_id 
+;
+
+
+
+use lastmile_cha;
+
+drop view if exists view_history_position_person_chwl;
+
+create view view_history_position_person_chwl as 
+
+select
+
+      position_id,
+      position_active,
+      position_begin_date,
+      position_end_date,
+
+      person_id,
+      full_name,
+      birth_date,
+      gender,
+      phone_number,
+      phone_number_alternate, 
+         
+      position_person_active,
+      position_person_begin_date,
+      position_person_end_date,
+      reason_left,
+      reason_left_description,
+      
+      health_facility_id,
+      health_facility,
+      cohort,
+      health_district_id,
+      health_district,
+      county_id,
+      county
+
+from view_history_position_person
+where job like 'CHWL'
+;
+
+
+use lastmile_cha;
+
+drop view if exists view_history_position_person_cha;
+
+create view view_history_position_person_cha as 
+
+select
+ 
+      position_id,
+      position_active,
+      position_begin_date,
+      position_end_date,
+ 
+      person_id,    
+      full_name,
+      birth_date,
+      gender,
+      phone_number,
+      phone_number_alternate, 
+      
+      position_person_active,
+      position_person_begin_date,
+      position_person_end_date,
+      
+      reason_left,
+      reason_left_description,
+      
+      health_facility_id,
+      health_facility,
+      
+      cohort,
+      health_district_id,
+      health_district,
+      county_id,
+      county
+      
+from view_history_position_person
+where job like 'CHA'
+;
+
+use lastmile_cha;
+
+drop view if exists view_history_position_person_chss;
+
+create view view_history_position_person_chss as 
+
+select
+      position_id,                                    
+      full_name,
+      person_id,    
+      position_person_begin_date,
+      position_person_end_date
+from view_history_position_person
+where job like 'CHSS'
+;
+
+use lastmile_cha;
+
+drop view if exists view_history_person_position;
+
+create view view_history_person_position as 
+
+select
+      r.person_id,
+      concat( trim( r.first_name ), ' ', trim( r.last_name ) )  as full_name,
+      r.birth_date,
+      trim( r.gender )                                          as gender,
+      trim( r.phone_number )                                    as phone_number,
+      trim( r.phone_number_alternate )                          as phone_number_alternate, 
+   
+      p.job,
+      trim( pr.position_id )                                    as position_id,
+      p.position_active,
+      p.position_begin_date,
+      p.position_end_date,
+      
+      -- position person relationship active Y/N
+      if( pr.end_date is null, 'Y', 'N' )                       as position_person_active,
+      pr.begin_date                                             as position_person_begin_date,
+      pr.end_date                                               as position_person_end_date,
+      trim( l.reason_left )                                     as reason_left,
+      trim( pr.reason_left_description )                        as reason_left_description,
+      
+      p.health_facility_id,
+      p.health_facility,
+      p.cohort,
+      p.health_district_id,
+      p.health_district,
+      p.county_id,
+      p.county
+
+from person as r
+    left outer join position_person                 as pr on r.person_id            = pr.person_id
+        left outer join reason_left                 as l  on pr.reason_left_id      = l.reason_left_id
+        left outer join view_history_position_geo   as p  on trim( pr.position_id ) like  p.position_id
+;
+
+use lastmile_cha;
+
+drop view if exists view_history_person_position_cha;
+
+create view view_history_person_position_cha as 
+
+select
+
+      person_id,
+      full_name,
+      birth_date,
+      gender,
+      phone_number,
+      phone_number_alternate, 
+ 
+      position_id,
+      position_active,
+      position_begin_date,
+      position_end_date,
+      
+      position_person_active,
+      position_person_begin_date,
+      position_person_end_date,
+      
+      reason_left,
+      reason_left_description,
+      
+      health_facility_id,
+      health_facility,
+      
+      cohort,
+      health_district_id,
+      health_district,
+      county_id,
+      county
+      
+from view_history_person_position
+where job like 'CHA'
+;
+
+use lastmile_cha;
+
+drop view if exists view_history_person_geo;
+
+create view view_history_person_geo as
+
+select
+      r.person_id,
+      trim( concat( r.first_name, ' ', r.last_name ) )  as full_name,
+      r.birth_date,
+      trim( r.gender )                                  as gender,
+      trim( r.phone_number )                            as phone_number,
+      trim( r.phone_number_alternate )                  as phone_number_alternate,
+      
+      pl.job,
+      rl.position_id,
+      rl.begin_date                                     as position_person_begin_date,
+      rl.end_date                                       as position_person_end_date,
+      if( rl.end_date is null, 'Y', 'N' )               as position_person_active, 
+      
+      pl.health_facility,
+      pl.health_facility_id,
+      pl.cohort,
+      pl.health_district,
+      pl.health_district_id,
+      pl.county,
+      pl.county_id,
+      
+      pf.job                                            as job_first,
+      rf.position_id                                    as position_id_first,
+      rf.begin_date                                     as position_person_begin_date_first,
+      rf.end_date                                       as position_person_end_date_first,
+      if( rf.end_date is null, 'Y', 'N' )               as position_person_active_first 
+      
+from person as r
+    left outer join       view_history_position_person_last     as rl on r.person_id              like rl.person_id
+        left outer join   view_history_position_geo             as pl on rl.position_id           like pl.position_id
+    left outer join       view_history_position_person_first    as rf on r.person_id              like rf.person_id
+        left outer join   view_history_position_geo             as pf on rf.position_id           like pf.position_id
+;
+
+
+use lastmile_cha;
+
+-- View of all commuunities, the CHAs asssigned to them, and the household and member registration counts.
+
+drop view if exists view_community_registration;
+
+create view view_community_registration as 
+
+select
+      pc.community_id,
+      
+      -- have the cha_id and year be lists ordered by the cha_id
+      group_concat( pc.position_id        order by cast( pc.position_id as unsigned ) separator ', ' )  as position_id_list,
+      group_concat( g.registration_year   order by cast( pc.position_id as unsigned ) separator ', ' )  as registration_year_list, 
+      
+      sum( g.total_household )                      as total_household, 
+      sum( g.total_household_member )               as total_household_member,
+      
+      sum( g.total_zero_eleven_month_male )         as total_zero_eleven_month_male, 
+      sum( g.total_zero_eleven_month_female )       as total_zero_eleven_month_female, 
+      sum( g.total_one_five_year_male )             as total_one_five_year_male, 
+      sum( g.total_one_five_year_female )           as total_one_five_year_female, 
+      sum( g.total_six_fourteen_year_male )         as total_six_fourteen_year_male, 
+      sum( g.total_six_fourteen_year_female )       as total_six_fourteen_year_female, 
+      sum( g.total_fifteen_forty_nine_year_male )   as total_fifteen_forty_nine_year_male, 
+      sum( g.total_fifteen_forty_nine_year_female ) as total_fifteen_forty_nine_year_female, 
+      sum( g.total_fifty_plus_year_male )           as total_fifty_plus_year_male, 
+      sum( g.total_fifty_plus_year_female )         as total_fifty_plus_year_female
+      
+from view_position_community as pc 
+        left outer join lastmile_program.view_registration as g on  ( pc.community_id = cast( g.community_id as unsigned ) ) and 
+                                                                    ( pc.position_id  like g.position_id )
+group by pc.community_id
+;
+
+use lastmile_cha;
+
+drop view if exists view_geo_community_cha_population;
+
+create view view_geo_community_cha_population as 
+
+select
+
+      c.county_id,
+      c.county,
+      
+      c.health_district_id,
+      c.health_district,
+      
+      c.district_id,
+      c.district,
+      
+      c.community_health_facility_id,
+      c.community_health_facility,
+      
+      c.community_id,
+      c.community,
+      c.community_alternate,
+      c.health_facility_proximity,
+      c.health_facility_km,
+      c.x,
+      c.y,
+      
+      c.motorbike_access,
+      c.cell_reception,
+      c.mining_community,
+      c.lms_2015,
+      c.lms_2016,
+      c.archived,
+      c.note,
+      
+      -- If a household registration has never been completed for a community estimate population from the household
+      -- mapping value in community table, six persons per household.
+      if( g.total_household_member is null, c.household_map_count * 6, g.total_household_member ) as population,
+      if( g.total_household is null, c.household_map_count, g.total_household )                   as household_total,
+      
+      c.household_map_count,
+      g.total_household             as registration_total_household,
+      g.total_household_member      as registration_total_household_member,
+      g.position_id_list            as registration_position_id_list,
+      g.registration_year_list,
+      
+      a.position_id_list,
+      a.position_count,
+      if( a.position_id_list is null, 'N', 'Y' )              as active_position,
+      
+      a.person_id_list,
+      a.person_count,
+      if( a.person_id_list is null, 'N', 'Y' )                as active_person
+      
+from view_geo_community as c
+    left outer join view_community_registration as g on c.community_id = g.community_id
+    left outer join view_community_cha          as a on c.community_id = a.community_id
+;
+
+
 

@@ -42,7 +42,7 @@ select
       c.household_map_count,
       g.total_household             as registration_total_household,
       g.total_household_member      as registration_total_household_member,
-      g.cha_id_list                 as registration_cha_id_list,
+      g.position_id_list            as registration_position_id_list,
       g.registration_year_list,
       
       a.position_id_list,
@@ -51,7 +51,7 @@ select
       
       a.person_id_list,
       a.person_count,
-      if( a.person_id_list is null, 'N', 'Y' )                as active_cha
+      if( a.person_id_list is null, 'N', 'Y' )                as active_person
       
 from view_geo_community as c
     left outer join view_community_registration as g on c.community_id = g.community_id

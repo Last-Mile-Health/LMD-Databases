@@ -35,8 +35,8 @@ select
       
 from view_registration_year as g1
     left outer join view_registration_year as g2 on ( trim( g1.community_id ) like trim( g2.community_id  )  ) and 
-                                                    ( trim( g1.cha_id )       like trim( g2.cha_id        )  ) and
+                                                    ( trim( g1.position_id )  like trim( g2.position_id   )  ) and
                                                     ( g1.registration_year    > g2.registration_year      )
-group by trim( g1.community_id ), trim( g1.cha_id )
+group by trim( g1.community_id ), trim( g1.position_id )
 having count( * ) >= 1
 ;

@@ -10,7 +10,7 @@ select
       pc.community_id,
       
       -- have the cha_id and year be lists ordered by the cha_id
-      group_concat( pc.position_id        order by cast( pc.position_id as unsigned ) separator ', ' )  as cha_id_list,
+      group_concat( pc.position_id        order by cast( pc.position_id as unsigned ) separator ', ' )  as position_id_list,
       group_concat( g.registration_year   order by cast( pc.position_id as unsigned ) separator ', ' )  as registration_year_list, 
       
       sum( g.total_household )                      as total_household, 
@@ -29,6 +29,6 @@ select
       
 from view_position_community as pc 
         left outer join lastmile_program.view_registration as g on  ( pc.community_id = cast( g.community_id as unsigned ) ) and 
-                                                                    ( pc.position_id like g.cha_id )
+                                                                    ( pc.position_id  like g.position_id )
 group by pc.community_id
 ;

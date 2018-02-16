@@ -51,7 +51,7 @@ select
       
       a.person_id_list,
       a.person_count,
-      if( a.person_id_list is null, 'N', 'Y' )                as active_person
+      if( a.person_id_list is null, 'N', 'Y' )                as active_cha
       
 from view_geo_community as c
     left outer join view_community_registration as g on c.community_id = g.community_id

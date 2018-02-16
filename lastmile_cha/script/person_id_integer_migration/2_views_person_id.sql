@@ -1120,7 +1120,7 @@ select
       
       a.person_id_list,
       a.person_count,
-      if( a.person_id_list is null, 'N', 'Y' )                as active_person
+      if( a.person_id_list is null, 'N', 'Y' )                as active_cha
       
 from view_geo_community as c
     left outer join view_community_registration as g on c.community_id = g.community_id
@@ -1128,4 +1128,136 @@ from view_geo_community as c
 ;
 
 
+use lastmile_cha;
+
+drop view if exists view_base_geo_community;
+
+create view view_base_geo_community as 
+
+select
+
+      county_id,
+      county,
+      
+      health_district_id,
+      health_district,
+      
+      district_id,
+      district,
+      
+      community_health_facility_id,
+      community_health_facility,
+      
+      community_id,
+      community,
+      community_alternate,
+      health_facility_proximity,
+      health_facility_km,
+      x,
+      y,
+      
+      motorbike_access,
+      cell_reception,
+      mining_community,
+      lms_2015,
+      lms_2016,
+      archived,
+      note,
+      
+      population,
+      household_total,
+      
+      active_position,
+      active_cha,
+      
+      if( active_position like 'N', 'None',
+        if( active_cha like 'N', 'No CHA',
+          if( person_count < position_count, 'Partial', 'Full' )
+        )
+      ) as service_level,
+              
+      position_id_list,
+      position_count,
+      
+      person_id_list,
+      person_count
+
+from view_geo_community_cha_population
+;
+
+use lastmile_cha;
+
+drop view if exists view_base_geo_community_in_program;
+
+create view view_base_geo_community_in_program as 
+
+select *
+from view_base_geo_community
+where active_position like 'Y'
+;
+
+use lastmile_cha;
+
+drop view if exists view_base_geo_community_remote;
+
+create view view_base_geo_community_remote as 
+
+select *
+from view_base_geo_community
+where health_facility_proximity like 'remote'
+;
+
+
+use lastmile_cha;
+
+drop view if exists view_geo_community_primary;
+ 
+create view view_geo_community_primary as 
+select substring_index( community_id_list, ',', 1 ) as community_id_primary 
+from view_base_cha 
+group by community_id_primary;
+
+
+
+use lastmile_cha;
+
+drop view if exists view_base_geo_community_primary;
+
+create view view_base_geo_community_primary as 
+select 
+      a.county_id,
+      a.county,
+      a.health_district_id,
+      a.health_district,
+      a.district_id,
+      a.district,
+      a.community_health_facility_id,
+      a.community_health_facility,
+      a.community_id,
+      a.community,
+      a.community_alternate,
+      a.health_facility_proximity,
+      a.health_facility_km,
+      a.x,
+      a.y AS y,
+      a.motorbike_access,
+      a.cell_reception,
+      a.mining_community,
+      a.lms_2015,
+      a.lms_2016,
+      a.archived,
+      a.note,
+      a.population,
+      a.household_total,
+      a.active_position,
+      a.active_cha,
+      a.service_level,
+      a.position_id_list,
+      a.position_count
+      
+ from lastmile_cha.view_base_geo_community a 
+    join lastmile_cha.view_geo_community_primary b on a.community_id = b.community_id_primary
+ where a.archived <> 1
+ ;
+ 
 

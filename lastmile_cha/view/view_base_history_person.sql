@@ -5,7 +5,7 @@ drop view if exists view_base_history_person;
 create view view_base_history_person as
 
 select
-      staff_id,
+      person_id,
       full_name,
       birth_date,
       gender,

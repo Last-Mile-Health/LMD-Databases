@@ -5,7 +5,7 @@ drop view if exists view_train_chss_module;
 create view view_train_chss_module as 
 
 select
-      t.position_id,
+      -- t.position_id,
       t.person_id,
       
       replace( 
@@ -19,6 +19,6 @@ select
           ' ', ', ' ) as module
           
 from lastmile_program.view_train_chss_last as t
-where ( not ( ( t.position_id is null ) or ( trim( t.position_id ) like '' ) ) ) and 
+where -- ( not ( ( t.position_id is null ) or ( trim( t.position_id ) like '' ) ) ) and 
       ( not (   t.person_id   is null ) ) 
 ;

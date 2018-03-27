@@ -10,10 +10,10 @@ select
       health_facility,
       
       chss,
-      chss_id,
+      chss_position_id    as chss_id,
      
       cha,
-      cha_id,
+      position_id         as cha_id,
 
       community_list,
       community_id_list

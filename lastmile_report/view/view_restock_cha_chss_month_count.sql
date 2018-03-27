@@ -25,7 +25,7 @@ select
       a.community_list,
      
       a.chss_position_id,
-      a.chss_id,
+      a.chss_position_id          as chss_id,
       a.chss,
       a.chss_position_begin_date,
       a.chss_hire_date,

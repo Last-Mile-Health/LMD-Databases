@@ -16,6 +16,7 @@ select
       pr.position_person_begin_date,
       rf.begin_date                       as hire_date,
       pr.person_id,
+      pr.person_id_lmh,
       pr.first_name,
       pr.last_name,
       pr.birth_date,

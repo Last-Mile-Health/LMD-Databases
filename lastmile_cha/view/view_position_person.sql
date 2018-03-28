@@ -10,6 +10,8 @@ select
       pr.begin_date               as position_person_begin_date,
 
       r.person_id,
+      trim( r.person_id_lmh )     as person_id_lmh,
+      
       r.first_name,
       r.last_name,
       r.other_name,

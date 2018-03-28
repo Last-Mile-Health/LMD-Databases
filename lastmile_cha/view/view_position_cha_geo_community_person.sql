@@ -7,6 +7,7 @@ create view view_position_cha_geo_community_person as
 select
       -- cha position fields
       p.position_id,
+      p.position_id_lmh,
       p.position_begin_date,
       
       -- cha health facility and geographical info
@@ -82,6 +83,7 @@ select
       po.position_person_begin_date                              as chss_position_person_begin_date,
       po.hire_date                                               as chss_hire_date,
       po.person_id                                               as chss_person_id,
+      po.person_id_lmh                                           as chss_person_id_lmh,
       po.first_name                                              as chss_first_name,
       po.last_name                                               as chss_last_name,
       po.birth_date                                              as chss_birth_date,
@@ -105,6 +107,6 @@ from view_position_cha as p
       left outer join           lastmile_program.view_train_cha_module  as m  on pr.person_id = m.person_id
     
     left outer join           view_position_cha_supervisor            as ps on p.position_id              like ps.position_id
---        left outer join       view_position_chss_person_geo           as po on ps.position_supervisor_id  like po.position_id
-        left outer join       view_position_chss_person_geo           as po on ps.position_supervisor_id  like po.person_id
+        left outer join       view_position_chss_person_geo           as po on ps.position_supervisor_id  like po.position_id
+        -- left outer join       view_position_chss_person_geo           as po on ps.position_supervisor_id  like po.person_id
 ;  

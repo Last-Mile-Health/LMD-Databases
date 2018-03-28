@@ -18,6 +18,8 @@ select
       position_filled_last_date,
       
       position_id,
+      position_id_lmh,
+      
       person_id,
       
       concat( first_name, ' ', last_name )        as cha,
@@ -49,6 +51,7 @@ select
       
       chss_position_id,
       chss_person_id,
+      chss_person_id_lmh,
       concat( chss_first_name, ' ', chss_last_name )          as chss,
       
       chss_position_person_begin_date,

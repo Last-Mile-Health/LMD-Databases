@@ -6,6 +6,10 @@ create view view_position as
 
 select
       trim( p.position_id )                                                     as position_id,
+      
+      -- For CHA positions, this is valid.  For CHSSs, show the person_id_lmh for chss position id lmh
+      trim( p.position_id_lmh )                                                 as position_id_lmh,
+      
       trim( j.title )                                                           as job,
             p.begin_date                                                        as position_begin_date,
             p.end_date                                                          as position_end_date,

@@ -6,6 +6,7 @@ create view view_position_cha_person as
 
 select
       p.position_id,
+      p.position_id_lmh,
       p.position_begin_date,
       p.health_facility_id,
       p.health_facility,

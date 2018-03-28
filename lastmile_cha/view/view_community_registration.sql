@@ -8,8 +8,6 @@ create view view_community_registration as
 
 select
       pc.community_id,
-      
-      -- have the cha_id and year be lists ordered by the cha_id
       group_concat( pc.position_id        order by cast( pc.position_id as unsigned ) separator ', ' )  as position_id_list,
       group_concat( g.registration_year   order by cast( pc.position_id as unsigned ) separator ', ' )  as registration_year_list, 
       

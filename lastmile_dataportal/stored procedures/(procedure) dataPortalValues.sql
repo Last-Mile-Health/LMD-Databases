@@ -1130,6 +1130,33 @@ set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        400,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
+-- 401. Cumulative number of births tracked in Liberia
+--      This indicator is the cumulative calculation of indicator 18, which is inputted monthly.  
+--      If indicator 18 is not updated before the 15th of the month then the stored procedure 
+--      needs to be rerun.
+
+                                     
+set @old_value =                ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 401             ) and 
+                                        ( `month`       = @p_monthMinus1  ) and 
+                                        ( `year`        = @p_yearMinus1   ) and 
+                                        ( territory_id  = '6_27'          ) and 
+                                        ( period_id     = 1               )                                                               
+                                );                                       
+                                        
+
+set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 18       ) and 
+                                        ( `month`       = @p_month ) and 
+                                        ( `year`        = @p_year  ) and
+                                        ( territory_id  = '6_27'   ) and 
+                                        ( period_id     = 1        ) );
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        401,      '6_27',         1,            @p_month, @p_year,  @new_value;
+
 
 
 

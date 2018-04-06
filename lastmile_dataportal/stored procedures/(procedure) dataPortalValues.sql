@@ -1008,16 +1008,22 @@ REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`
 SELECT 386, territory_id, 1, @p_month, @p_year, COALESCE(malaria_odk,0)
 FROM lastmile_report.mart_view_odk_sickchild WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
 
+
 -- 396. Cumulative number of child cases of malaria treated in Liberia
-set @old_value =                ( select value 
+--      This indicator is the cumulative calculation of indicator 23, which is inputted monthly.  If indicator 23
+--      is not updated before the 15th of the month then the stored procedure needs to be rerun.
+                                     
+set @old_value =                ( select coalesce( min( value ), 0 )
                                   from lastmile_dataportal.tbl_values
                                   where ( `ind_id`      = 396             ) and 
                                         ( `month`       = @p_monthMinus1  ) and 
                                         ( `year`        = @p_yearMinus1   ) and 
                                         ( territory_id  = '6_27'          ) and 
-                                        ( period_id     = 1               ) );
+                                        ( period_id     = 1               )                                                               
+                                );                                       
+                                        
 
-set @new_value = @old_value +   ( select sum( coalesce( value , 0 ) )
+set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
                                   from lastmile_dataportal.tbl_values
                                   where ( `ind_id`      = 23       ) and 
                                         ( `month`       = @p_month ) and 
@@ -1029,7 +1035,10 @@ replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_
 SELECT                                        396,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
 -- 397. Cumulative number of child cases of diarrhea treated in Liberia
-set @old_value =                ( select value 
+--      This indicator is the cumulative calculation of indicator 23, which is inputted monthly.  If indicator 23
+--      is not updated before the 15th of the month then the stored procedure needs to be rerun.
+
+set @old_value =                ( select coalesce( min( value ), 0 )
                                   from lastmile_dataportal.tbl_values
                                   where ( `ind_id`      = 397             ) and 
                                         ( `month`       = @p_monthMinus1  ) and 
@@ -1037,7 +1046,7 @@ set @old_value =                ( select value
                                         ( territory_id  = '6_27'          ) and 
                                         ( period_id     = 1               ) );
 
-set @new_value = @old_value +   ( select sum( coalesce( value , 0 ) )
+set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
                                   from lastmile_dataportal.tbl_values
                                   where ( `ind_id`      = 21       ) and 
                                         ( `month`       = @p_month ) and 
@@ -1049,7 +1058,10 @@ replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_
 SELECT                                        397,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
 -- 398. Cumulative number of child cases of ARI treated in Liberia
-set @old_value =                ( select value 
+--      This indicator is the cumulative calculation of indicator 23, which is inputted monthly.  If indicator 23
+--      is not updated before the 15th of the month then the stored procedure needs to be rerun.
+
+set @old_value =                ( select coalesce( min( value ), 0 )
                                   from lastmile_dataportal.tbl_values
                                   where ( `ind_id`      = 398             ) and 
                                         ( `month`       = @p_monthMinus1  ) and 
@@ -1057,7 +1069,7 @@ set @old_value =                ( select value
                                         ( territory_id  = '6_27'          ) and 
                                         ( period_id     = 1               ) );
 
-set @new_value = @old_value +   ( select sum( coalesce( value , 0 ) )
+set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
                                   from lastmile_dataportal.tbl_values
                                   where ( `ind_id`      = 19       ) and 
                                         ( `month`       = @p_month ) and 
@@ -1067,7 +1079,6 @@ set @new_value = @old_value +   ( select sum( coalesce( value , 0 ) )
 
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        398,      '6_27',         1,            @p_month, @p_year,  @new_value;
-
 
 
 -- ------ --

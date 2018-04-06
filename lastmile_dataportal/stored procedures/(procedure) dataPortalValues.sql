@@ -1010,7 +1010,7 @@ FROM lastmile_report.mart_view_odk_sickchild WHERE `month`=@p_month AND `year`=@
 
 
 -- 396. Cumulative number of child cases of malaria treated in Liberia
---      This indicator is the cumulative calculation of indicator 23, which is inputted monthly.  If indicator 23
+--      This indicator is the cumulative calculation of indicator 23, which is inputted monthly. If indicator 23 
 --      is not updated before the 15th of the month then the stored procedure needs to be rerun.
                                      
 set @old_value =                ( select coalesce( min( value ), 0 )
@@ -1035,7 +1035,7 @@ replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_
 SELECT                                        396,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
 -- 397. Cumulative number of child cases of diarrhea treated in Liberia
---      This indicator is the cumulative calculation of indicator 23, which is inputted monthly.  If indicator 23
+--      This indicator is the cumulative calculation of indicator 21, which is inputted monthly.  If indicator 21
 --      is not updated before the 15th of the month then the stored procedure needs to be rerun.
 
 set @old_value =                ( select coalesce( min( value ), 0 )
@@ -1058,7 +1058,7 @@ replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_
 SELECT                                        397,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
 -- 398. Cumulative number of child cases of ARI treated in Liberia
---      This indicator is the cumulative calculation of indicator 23, which is inputted monthly.  If indicator 23
+--      This indicator is the cumulative calculation of indicator 19, which is inputted monthly.  If indicator 19
 --      is not updated before the 15th of the month then the stored procedure needs to be rerun.
 
 set @old_value =                ( select coalesce( min( value ), 0 )
@@ -1079,6 +1079,58 @@ set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
 
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        398,      '6_27',         1,            @p_month, @p_year,  @new_value;
+
+-- 399. Cumulative number of routine visits conducted in Liberia
+--      This indicator is the cumulative calculation of indicator 119, which is inputted monthly.  If indicator 119
+--      is not updated before the 15th of the month then the stored procedure needs to be rerun.
+                                    
+set @old_value =                ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 399             ) and 
+                                        ( `month`       = @p_monthMinus1  ) and 
+                                        ( `year`        = @p_yearMinus1   ) and 
+                                        ( territory_id  = '6_27'          ) and 
+                                        ( period_id     = 1               )                                                               
+                                );                                       
+                                        
+
+set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 119       ) and 
+                                        ( `month`       = @p_month ) and 
+                                        ( `year`        = @p_year  ) and
+                                        ( territory_id  = '6_27'   ) and 
+                                        ( period_id     = 1        ) );
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        399,      '6_27',         1,            @p_month, @p_year,  @new_value;
+
+-- 400. Cumulative number of monthly service reports (MSRs) collected in Liberia
+--      This indicator is the cumulative calculation of indicator 381, which is inputted monthly.  If indicator 381 
+--      is not updated before the 15th of the month then the stored procedure needs to be rerun.
+                                     
+set @old_value =                ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 400             ) and 
+                                        ( `month`       = @p_monthMinus1  ) and 
+                                        ( `year`        = @p_yearMinus1   ) and 
+                                        ( territory_id  = '6_27'          ) and 
+                                        ( period_id     = 1               )                                                               
+                                );                                       
+                                        
+
+set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 381       ) and 
+                                        ( `month`       = @p_month ) and 
+                                        ( `year`        = @p_year  ) and
+                                        ( territory_id  = '6_27'   ) and 
+                                        ( period_id     = 1        ) );
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        400,      '6_27',         1,            @p_month, @p_year,  @new_value;
+
+
 
 
 -- ------ --

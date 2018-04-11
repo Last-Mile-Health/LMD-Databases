@@ -82,9 +82,11 @@ INSERT INTO `lastmile_report`.`mart_program_scale` (`territory_id`) VALUES ('6_3
 
 
 -- 28. Number of CHAs deployed
+-- !!!!! broken !!!!!
 UPDATE `lastmile_report`.`mart_program_scale` a LEFT JOIN (
 SELECT IF(county_id=6,'6_31',CONCAT('1_',county_id)) AS county_id_mod, COUNT(1) as num_cha FROM lastmile_report.mart_view_base_history_person
-WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY county_id_mod
+WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date)
+AND (county_id=4 OR health_district_id=6 OR 1) GROUP BY county_id_mod
 UNION SELECT '6_16', COUNT(1) FROM lastmile_report.mart_view_base_history_person
 WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date)
 ) b ON a.territory_id = b.county_id_mod SET a.num_cha = b.num_cha;
@@ -102,7 +104,7 @@ WHERE job='CHSS' AND position_person_begin_date <= @p_date AND (position_person_
 -- 45. Number of people served (CHA program)
 -- !!!!! TEMP until Owen fixes data mart adjusted for county !!!!!
 UPDATE `lastmile_report`.`mart_program_scale` SET num_people = 12185 WHERE territory_id = '6_31';
-UPDATE `lastmile_report`.`mart_program_scale` SET num_people = 30400 WHERE territory_id = '6_26';
+UPDATE `lastmile_report`.`mart_program_scale` SET num_people = 45367 WHERE territory_id = '6_26';
 UPDATE `lastmile_report`.`mart_program_scale` SET num_people = 40483 WHERE territory_id = '1_14';
 UPDATE `lastmile_report`.`mart_program_scale` SET num_people = 0 WHERE territory_id = '1_4';
 UPDATE `lastmile_report`.`mart_program_scale` SET num_people = 83068 WHERE territory_id = '6_16';
@@ -111,7 +113,7 @@ UPDATE `lastmile_report`.`mart_program_scale` SET num_people = 83068 WHERE terri
 -- 50. Number of communities served
 -- !!!!! TEMP until Owen fixes data mart adjusted for county !!!!!
 UPDATE `lastmile_report`.`mart_program_scale` SET num_communities = 58 WHERE territory_id = '6_31';
-UPDATE `lastmile_report`.`mart_program_scale` SET num_communities = 152 WHERE territory_id = '6_26';
+UPDATE `lastmile_report`.`mart_program_scale` SET num_communities = 157 WHERE territory_id = '6_26';
 UPDATE `lastmile_report`.`mart_program_scale` SET num_communities = 240 WHERE territory_id = '1_14';
 UPDATE `lastmile_report`.`mart_program_scale` SET num_communities = 0 WHERE territory_id = '1_4';
 UPDATE `lastmile_report`.`mart_program_scale` SET num_communities = 450 WHERE territory_id = '6_16';
@@ -119,7 +121,7 @@ UPDATE `lastmile_report`.`mart_program_scale` SET num_communities = 450 WHERE te
 
 -- X. Misc GG UNICEF + Grand Bassa
 -- !!!!! TEMP until UNICEF CHAs and CHSSs are in database !!!!!
-UPDATE `lastmile_report`.`mart_program_scale` SET num_cha = 152 WHERE territory_id = '6_26';
+UPDATE `lastmile_report`.`mart_program_scale` SET num_cha = 155 WHERE territory_id = '6_26';
 UPDATE `lastmile_report`.`mart_program_scale` SET num_chss = 17 WHERE territory_id = '6_26';
 UPDATE `lastmile_report`.`mart_program_scale` SET num_cha = 0 WHERE territory_id = '1_4';
 UPDATE `lastmile_report`.`mart_program_scale` SET num_chss = 0 WHERE territory_id = '1_4';
@@ -243,7 +245,9 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 
 
 -- 45. Number of people served (CHA program)
-# !!!!! TO DO !!!!!
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+SELECT 45, territory_id, 1, @p_month, @p_year, num_people
+FROM lastmile_report.mart_program_scale;
 
 
 -- 47. Number of records entered
@@ -252,7 +256,9 @@ SELECT 47, '6_16', 1, @p_month, @p_year, SUM(`# records entered`) FROM lastmile_
 
 
 -- 50. Number of communities served
-# !!!!! TO DO !!!!!
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+SELECT 50, territory_id, 1, @p_month, @p_year, num_communities
+FROM lastmile_report.mart_program_scale;
 
 
 -- 59. Percent of records QA'd
@@ -436,12 +442,12 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 
 
 -- 147. Percent of CHAs with all essential commodities in stock
--- The if-clause suppresses the results if the reporting rate is below 25%
+-- The if-clause suppresses the results if the reporting rate is below 25% (here and below)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 147, a.territory_id, 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND((COALESCE(COUNT(1),0) - COALESCE(SUM(stockout_essentials),0))/COALESCE(COUNT(1),0),3),NULL)
+SELECT 147, a.territory_id, 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND((COALESCE(COUNT(1),0) - COALESCE(SUM(any_stockouts_essentials),0))/COALESCE(COUNT(1),0),3),NULL)
 FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
 WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL GROUP BY county_id
-UNION SELECT 147, '6_16', 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND((COALESCE(COUNT(1),0) - COALESCE(SUM(stockout_essentials),0))/COALESCE(COUNT(1),0),3),NULL)
+UNION SELECT 147, '6_16', 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND((COALESCE(COUNT(1),0) - COALESCE(SUM(any_stockouts_essentials),0))/COALESCE(COUNT(1),0),3),NULL)
 FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
 WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
 
@@ -1034,6 +1040,7 @@ set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        396,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
+
 -- 397. Cumulative number of child cases of diarrhea treated in Liberia
 --      This indicator is the cumulative calculation of indicator 21, which is inputted monthly.  If indicator 21
 --      is not updated before the 15th of the month then the stored procedure needs to be rerun.
@@ -1057,6 +1064,7 @@ set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        397,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
+
 -- 398. Cumulative number of child cases of ARI treated in Liberia
 --      This indicator is the cumulative calculation of indicator 19, which is inputted monthly.  If indicator 19
 --      is not updated before the 15th of the month then the stored procedure needs to be rerun.
@@ -1079,6 +1087,7 @@ set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
 
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        398,      '6_27',         1,            @p_month, @p_year,  @new_value;
+
 
 -- 399. Cumulative number of routine visits conducted in Liberia
 --      This indicator is the cumulative calculation of indicator 119, which is inputted monthly.  If indicator 119
@@ -1105,6 +1114,7 @@ set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        399,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
+
 -- 400. Cumulative number of monthly service reports (MSRs) collected in Liberia
 --      This indicator is the cumulative calculation of indicator 381, which is inputted monthly.  If indicator 381 
 --      is not updated before the 15th of the month then the stored procedure needs to be rerun.
@@ -1129,6 +1139,7 @@ set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
 
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        400,      '6_27',         1,            @p_month, @p_year,  @new_value;
+
 
 -- 401. Cumulative number of births tracked in Liberia
 --      This indicator is the cumulative calculation of indicator 18, which is inputted monthly.  
@@ -1158,6 +1169,14 @@ replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_
 SELECT                                        401,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
 
+-- 403. Average number of essential commodity stock-outs per CHA
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+SELECT 403, a.territory_id, 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND(COALESCE(SUM(num_stockouts_essentials),0)/COALESCE(COUNT(1),0),1),NULL)
+FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
+WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL GROUP BY county_id
+UNION SELECT 403, '6_16', 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND(COALESCE(SUM(num_stockouts_essentials),0)/COALESCE(COUNT(1),0),1),NULL)
+FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
+WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
 
 
 -- ------ --

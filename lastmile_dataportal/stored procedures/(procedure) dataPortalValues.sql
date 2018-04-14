@@ -1169,6 +1169,33 @@ replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_
 SELECT                                        401,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
 
+-- 402. Cumulative number of community triggers tracked in Liberia
+--      This indicator is the cumulative calculation of indicator 347, which is inputted monthly.  
+--      If indicator 347 is not updated before the 15th of the month then the stored procedure 
+--      needs to be rerun.
+                                  
+set @old_value =                ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 402             ) and 
+                                        ( `month`       = @p_monthMinus1  ) and 
+                                        ( `year`        = @p_yearMinus1   ) and 
+                                        ( territory_id  = '6_27'          ) and 
+                                        ( period_id     = 1               )                                                               
+                                );                                       
+                                        
+
+set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 347       ) and 
+                                        ( `month`       = @p_month ) and 
+                                        ( `year`        = @p_year  ) and
+                                        ( territory_id  = '6_27'   ) and 
+                                        ( period_id     = 1        ) );
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        402,      '6_27',         1,            @p_month, @p_year,  @new_value;
+
+
 -- 403. Average number of essential commodity stock-outs per CHA
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 403, a.territory_id, 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND(COALESCE(SUM(num_stockouts_essentials),0)/COALESCE(COUNT(1),0),1),NULL)
@@ -1177,6 +1204,149 @@ WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL GROUP BY cou
 UNION SELECT 403, '6_16', 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND(COALESCE(SUM(num_stockouts_essentials),0)/COALESCE(COUNT(1),0),1),NULL)
 FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
 WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
+
+
+                                     
+-- 405. Cumulative number of pregnant woman visits tracked in Liberia
+--      This indicator is the cumulative calculation of indicator 349, which is inputted monthly.  
+--      If indicator 349 is not updated before the 15th of the month then the stored procedure 
+--      needs to be rerun.
+
+                                     
+set @old_value =                ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 405             ) and 
+                                        ( `month`       = @p_monthMinus1  ) and 
+                                        ( `year`        = @p_yearMinus1   ) and 
+                                        ( territory_id  = '6_27'          ) and 
+                                        ( period_id     = 1               )                                                               
+                                );                                       
+                                        
+
+set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 349       ) and 
+                                        ( `month`       = @p_month ) and 
+                                        ( `year`        = @p_year  ) and
+                                        ( territory_id  = '6_27'   ) and 
+                                        ( period_id     = 1        ) );
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        405,      '6_27',         1,            @p_month, @p_year,  @new_value;
+
+
+-- 406. Cumulative number of women currently using a modern method of family planning tracked in Liberia
+--      This indicator is the cumulative calculation of indicator 356, which is inputted monthly.  
+--      If indicator 356 is not updated before the 15th of the month then the stored procedure 
+--      needs to be rerun.
+
+                                     
+set @old_value =                ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 406             ) and 
+                                        ( `month`       = @p_monthMinus1  ) and 
+                                        ( `year`        = @p_yearMinus1   ) and 
+                                        ( territory_id  = '6_27'          ) and 
+                                        ( period_id     = 1               )                                                               
+                                );                                       
+                                        
+
+set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 356       ) and 
+                                        ( `month`       = @p_month ) and 
+                                        ( `year`        = @p_year  ) and
+                                        ( territory_id  = '6_27'   ) and 
+                                        ( period_id     = 1        ) );
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        406,      '6_27',         1,            @p_month, @p_year,  @new_value;
+
+-- 407. Cumulative number of number of children screened for malnutrition (MUAC) tracked in Liberia
+--      This indicator is the cumulative calculation of indicator 235, which is inputted monthly.  
+--      If indicator 235 is not updated before the 15th of the month then the stored procedure 
+--      needs to be rerun.
+
+                                     
+set @old_value =                ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 407             ) and 
+                                        ( `month`       = @p_monthMinus1  ) and 
+                                        ( `year`        = @p_yearMinus1   ) and 
+                                        ( territory_id  = '6_27'          ) and 
+                                        ( period_id     = 1               )                                                               
+                                );                                       
+                                        
+
+set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 235       ) and 
+                                        ( `month`       = @p_month ) and 
+                                        ( `year`        = @p_year  ) and
+                                        ( territory_id  = '6_27'   ) and 
+                                        ( period_id     = 1        ) );
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        407,      '6_27',         1,            @p_month, @p_year,  @new_value;
+
+
+-- 408. Cumulative number of Number of HIV client visits tracked in Liberia
+--      This indicator is the cumulative calculation of indicator 357, which is inputted monthly.  
+--      If indicator 357 is not updated before the 15th of the month then the stored procedure 
+--      needs to be rerun.
+
+                                     
+set @old_value =                ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 408             ) and 
+                                        ( `month`       = @p_monthMinus1  ) and 
+                                        ( `year`        = @p_yearMinus1   ) and 
+                                        ( territory_id  = '6_27'          ) and 
+                                        ( period_id     = 1               )                                                               
+                                );                                       
+                                        
+
+set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 357       ) and 
+                                        ( `month`       = @p_month ) and 
+                                        ( `year`        = @p_year  ) and
+                                        ( territory_id  = '6_27'   ) and 
+                                        ( period_id     = 1        ) );
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        408,      '6_27',         1,            @p_month, @p_year,  @new_value;
+
+
+
+-- 409. Cumulative number of Number of TB client visits tracked in Liberia
+--      This indicator is the cumulative calculation of indicator 358, which is inputted monthly.  
+--      If indicator 358 is not updated before the 15th of the month then the stored procedure 
+--      needs to be rerun.
+
+                                     
+set @old_value =                ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 409             ) and 
+                                        ( `month`       = @p_monthMinus1  ) and 
+                                        ( `year`        = @p_yearMinus1   ) and 
+                                        ( territory_id  = '6_27'          ) and 
+                                        ( period_id     = 1               )                                                               
+                                );                                       
+                                        
+
+set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
+                                  from lastmile_dataportal.tbl_values
+                                  where ( `ind_id`      = 358       ) and 
+                                        ( `month`       = @p_month ) and 
+                                        ( `year`        = @p_year  ) and
+                                        ( territory_id  = '6_27'   ) and 
+                                        ( period_id     = 1        ) );
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        409,      '6_27',         1,            @p_month, @p_year,  @new_value;
+
+
 
 
 -- ------ --

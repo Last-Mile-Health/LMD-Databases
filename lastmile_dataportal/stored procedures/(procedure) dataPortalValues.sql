@@ -1240,34 +1240,6 @@ set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        405,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
-
--- 406. Cumulative number of women currently using a modern method of family planning tracked in Liberia
---      This indicator is the cumulative calculation of indicator 356, which is inputted monthly.  
---      If indicator 356 is not updated before the 15th of the month then the stored procedure 
---      needs to be rerun.
-
-                                     
-set @old_value =                ( select coalesce( min( value ), 0 )
-                                  from lastmile_dataportal.tbl_values
-                                  where ( `ind_id`      = 406             ) and 
-                                        ( `month`       = @p_monthMinus1  ) and 
-                                        ( `year`        = @p_yearMinus1   ) and 
-                                        ( territory_id  = '6_27'          ) and 
-                                        ( period_id     = 1               )                                                               
-                                );                                       
-                                        
-
-set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
-                                  from lastmile_dataportal.tbl_values
-                                  where ( `ind_id`      = 356       ) and 
-                                        ( `month`       = @p_month ) and 
-                                        ( `year`        = @p_year  ) and
-                                        ( territory_id  = '6_27'   ) and 
-                                        ( period_id     = 1        ) );
-
-replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
-SELECT                                        406,      '6_27',         1,            @p_month, @p_year,  @new_value;
-
 -- 407. Cumulative number of number of children screened for malnutrition (MUAC) tracked in Liberia
 --      This indicator is the cumulative calculation of indicator 235, which is inputted monthly.  
 --      If indicator 235 is not updated before the 15th of the month then the stored procedure 

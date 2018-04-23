@@ -7,23 +7,18 @@ CREATE PROCEDURE `dataPortalValues`(IN p_month INT, IN p_year INT)
 BEGIN
 
 
--- !!!!! unchanged when imported; check all of this !!!!!
--- !!!!! check if all temporary tables are needed !!!!!
--- !!!!! stop tracking numerators / denominators (unless n-value is in report) ?????
--- !!!!! Move as many calculations as possible into queries (rather than DP script); e.g. month(restock_date)=@p_month --> restock_month=@p_month !!!!!
 -- NOTES:
---  1. This procedure is called by the MySQL event `evt_dataPortalValues` on a monthly basis
---  2. This entire procedure is idempotent (en.wikipedia.org/wiki/Idempotence). That is, it can be run multiple times consecutively, and assuming the underlying data hasn't changed, the second run, third run, etc. should not change the values stored in the tbl_values warehouse. This allows for the procedure to be re-run if the underlying data DOES change (e.g. if data errors are corrected and we want to re-run the procedure)
---  2. Each block below generates a single value for one month/year (or in some cases, on quarter), and inserts or replaces it in the table `lastmile_dataportal.tbl_values`
---  3. Code is generally written in order of instID. However, sometimes this convention is broken when values for certain instanceIDs need to be calculated before others.
---  4. If a "percent" indicator is created, be sure to always create indicators for the numerator and denominator. This enables calculations of aggregates.
---  5. Ensure that all queries account for the fact that MySQL treats most strings as zero in comparisons (e.g. 'hello'=0 is true); sometimes, values need to be typecasted to enable comparisons
---  6. The REPLACE INTO commands don't have effect if the returned value is NULL (by setting the @instID variable to 0 if the value is NULL). This is to make it easier when the data source switches (e.g. Sick Child Form --> Monthly Service Report) to not overwrite historical data.
---  7. If the calculation does not calculate historical values, wrap it in the following: IF(@isCurrentMonth,(calculation),NULL)
---  8. If the calculation runs quarterly, wrap it in the following: IF(@isEndOfQuarter,(calculation),NULL). See @instID 28 for an example.
---  9. Some calculations suppress values if the "n-value" isn't high enough. Wrap these in the following: IF(@nValueIsLargeEnough,(calculation),NULL). See @instID 296 for an example.
+--  1. This procedure is called by the MySQL event `evt_dataPortalValues` on a monthly basis and populates a data warehouse, `lastmile_dataportal`.`tbl_values`.
+--  2. This entire procedure is idempotent (en.wikipedia.org/wiki/Idempotence). That is, it can be run multiple times consecutively, and assuming the underlying data hasn't changed, the second run, third run, etc. should not change the values stored in tbl_values. This allows for the procedure to be re-run if the underlying data DOES change (e.g. if data errors are corrected and we want to re-run the procedure).
+--  3. Each block in the "core updates" section below generates a set of values for one indicator and inserts or replaces it in tbl_values.
+--  4. Code is generally written in order of indicator ID# ("ind_id"). Therefore, dependencies (i.e. calculations that depend on previous calculations) should be avoided
+--  5. Ensure that all queries account for the fact that MySQL treats most strings as zero in comparisons (e.g. 'hello'=0 is true); sometimes, values need to first be typecasted to enable comparisons.
+--  6. If the data source for an indicator switches, historical data can be accidentally overwritten (usually by NULLs). To avoid this, if a data source changes, account for this in the underlying SQL by creating a query that merges both source tables and read from that table here.
+--  7. If the calculation does not calculate historical values, wrap it in the following: IF(@isCurrentMonth,(calculation),NULL).
+--  8. If the calculation runs quarterly, wrap it in the following: IF(@isEndOfQuarter,(calculation),NULL). See ind_id #28 for an example.
+--  9. Some calculations suppress values if the "n-value" isn't high enough. Wrap these in the following: IF([test],(calculation),NULL). See ind_id #147 for an example.
 -- 10. In SQL, NULL+number=NULL, so wrap calculations in COALESCE(value,0) before performing addition, subtraction, etc. However, this does not apply to GROUP BY statements involving the SUM() function.
--- 11. Generally, the assumption is made that if an event isn't reported, it didn't happen. One exception to this convention is restock data
+-- 11. For populating historical values, do not run the entire script. Instead, use the procedure `dataPortalValues_backfill` to run only the new block of code.
 
 
 -- Log errors
@@ -65,6 +60,16 @@ SET @isEndOfQuarter := IF(@p_month IN (3,6,9,12),1,0);
 
 
 
+-- ------------ --
+-- Misc cleanup --
+-- ------------ --
+
+
+-- Delete blank values from tbl_values
+DELETE FROM lastmile_dataportal.tbl_values WHERE `value`='';
+
+
+
 -- --------------- --
 -- Set scale table --
 -- --------------- --
@@ -73,58 +78,63 @@ SET @isEndOfQuarter := IF(@p_month IN (3,6,9,12),1,0);
 
 
 -- Create table
-DROP TABLE IF EXISTS `lastmile_report`.`mart_program_scale`;
-CREATE TABLE `lastmile_report`.`mart_program_scale` (`territory_id` VARCHAR(20) NOT NULL, `num_cha` INT NULL, `num_chss` INT NULL, `num_communities` INT NULL, `num_households` INT NULL, `num_people` INT NULL, PRIMARY KEY (`territory_id`)) DEFAULT CHARACTER SET = utf8mb4;
+-- Note: num_communities and num_people currently only used to populate scale indicators (#45 and #50); num_households not used at all
+DROP TABLE IF EXISTS lastmile_report.mart_program_scale;
+CREATE TABLE lastmile_report.mart_program_scale (`territory_id` VARCHAR(20) NOT NULL, `num_cha` INT NULL, `num_chss` INT NULL, `num_communities` INT NULL, `num_households` INT NULL, `num_people` INT NULL, PRIMARY KEY (`territory_id`)) DEFAULT CHARACTER SET = utf8mb4;
 
 
 -- !!!!! TEMP: Set territories !!!!!
-INSERT INTO `lastmile_report`.`mart_program_scale` (`territory_id`) VALUES ('6_31'), ('6_26'), ('1_14'), ('1_4'), ('6_16');
+INSERT INTO lastmile_report.mart_program_scale (territory_id) VALUES ('6_31'), ('6_26'), ('1_14'), ('1_4'), ('1_6'), ('6_16');
 
 
 -- 28. Number of CHAs deployed
--- !!!!! broken !!!!!
-UPDATE `lastmile_report`.`mart_program_scale` a LEFT JOIN (
-SELECT IF(county_id=6,'6_31',CONCAT('1_',county_id)) AS county_id_mod, COUNT(1) as num_cha FROM lastmile_report.mart_view_base_history_person
-WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date)
-AND (county_id=4 OR health_district_id=6 OR 1) GROUP BY county_id_mod
+-- !!!!! the "cohort IS NULL" clause needs to be changed once cohorts are assigned !!!!!
+UPDATE lastmile_report.mart_program_scale a LEFT JOIN (
+SELECT IF(cohort IS NULL,'6_31',IF(cohort='UNICEF','6_26','error')) AS territory_id, COUNT(1) as num_cha FROM lastmile_report.mart_view_base_history_person
+WHERE county_id=6 AND job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY territory_id
+UNION SELECT CONCAT('1_',county_id), COUNT(1) FROM lastmile_report.mart_view_base_history_person
+WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY county_id
 UNION SELECT '6_16', COUNT(1) FROM lastmile_report.mart_view_base_history_person
 WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date)
-) b ON a.territory_id = b.county_id_mod SET a.num_cha = b.num_cha;
+) b ON a.territory_id = b.territory_id SET a.num_cha = b.num_cha;
 
 
 -- 29. Number of CHSSs deployed
-UPDATE `lastmile_report`.`mart_program_scale` a LEFT JOIN (
-SELECT IF(county_id=6,'6_31',CONCAT('1_',county_id)) AS county_id_mod, COUNT(1) as num_chss FROM lastmile_report.mart_view_base_history_person
-WHERE job='CHSS' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY county_id_mod
+-- !!!!! the "cohort IS NULL" clause needs to be changed once cohorts are assigned !!!!!
+UPDATE lastmile_report.mart_program_scale a LEFT JOIN (
+SELECT IF(cohort IS NULL,'6_31',IF(cohort='UNICEF','6_26','error')) AS territory_id, COUNT(1) as num_chss FROM lastmile_report.mart_view_base_history_person
+WHERE county_id=6 AND job='CHSS' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY territory_id
+UNION SELECT CONCAT('1_',county_id), COUNT(1) FROM lastmile_report.mart_view_base_history_person
+WHERE job='CHSS' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY county_id
 UNION SELECT '6_16', COUNT(1) FROM lastmile_report.mart_view_base_history_person
 WHERE job='CHSS' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date)
-) b ON a.territory_id = b.county_id_mod SET a.num_chss = b.num_chss;
+) b ON a.territory_id = b.territory_id SET a.num_chss = b.num_chss;
 
 
 -- 45. Number of people served (CHA program)
--- !!!!! TEMP until Owen fixes data mart adjusted for county !!!!!
-UPDATE `lastmile_report`.`mart_program_scale` SET num_people = 12185 WHERE territory_id = '6_31';
-UPDATE `lastmile_report`.`mart_program_scale` SET num_people = 45367 WHERE territory_id = '6_26';
-UPDATE `lastmile_report`.`mart_program_scale` SET num_people = 40483 WHERE territory_id = '1_14';
-UPDATE `lastmile_report`.`mart_program_scale` SET num_people = 0 WHERE territory_id = '1_4';
-UPDATE `lastmile_report`.`mart_program_scale` SET num_people = 83068 WHERE territory_id = '6_16';
+-- !!!!! TEMP until we start collecting UNICEF MSRs !!!!!
+UPDATE lastmile_report.mart_program_scale SET num_people = 12185 WHERE territory_id = '6_31';
+UPDATE lastmile_report.mart_program_scale SET num_people = 45367 WHERE territory_id = '6_26';
+UPDATE lastmile_report.mart_program_scale SET num_people = 40483 WHERE territory_id = '1_14';
+UPDATE lastmile_report.mart_program_scale SET num_people = 0 WHERE territory_id = '1_4';
+UPDATE lastmile_report.mart_program_scale SET num_people = 57552 WHERE territory_id = '1_6';
+UPDATE lastmile_report.mart_program_scale SET num_people = 83068 WHERE territory_id = '6_16';
 
 
 -- 50. Number of communities served
--- !!!!! TEMP until Owen fixes data mart adjusted for county !!!!!
-UPDATE `lastmile_report`.`mart_program_scale` SET num_communities = 58 WHERE territory_id = '6_31';
-UPDATE `lastmile_report`.`mart_program_scale` SET num_communities = 157 WHERE territory_id = '6_26';
-UPDATE `lastmile_report`.`mart_program_scale` SET num_communities = 240 WHERE territory_id = '1_14';
-UPDATE `lastmile_report`.`mart_program_scale` SET num_communities = 0 WHERE territory_id = '1_4';
-UPDATE `lastmile_report`.`mart_program_scale` SET num_communities = 450 WHERE territory_id = '6_16';
+-- !!!!! TEMP until we start collecting UNICEF MSRs !!!!!
+UPDATE lastmile_report.mart_program_scale SET num_communities = 58 WHERE territory_id = '6_31';
+UPDATE lastmile_report.mart_program_scale SET num_communities = 157 WHERE territory_id = '6_26';
+UPDATE lastmile_report.mart_program_scale SET num_communities = 240 WHERE territory_id = '1_14';
+UPDATE lastmile_report.mart_program_scale SET num_communities = 0 WHERE territory_id = '1_4';
+UPDATE lastmile_report.mart_program_scale SET num_communities = 215 WHERE territory_id = '1_6';
+UPDATE lastmile_report.mart_program_scale SET num_communities = 450 WHERE territory_id = '6_16';
 
 
 -- X. Misc GG UNICEF + Grand Bassa
 -- !!!!! TEMP until UNICEF CHAs and CHSSs are in database !!!!!
-UPDATE `lastmile_report`.`mart_program_scale` SET num_cha = 155 WHERE territory_id = '6_26';
-UPDATE `lastmile_report`.`mart_program_scale` SET num_chss = 17 WHERE territory_id = '6_26';
-UPDATE `lastmile_report`.`mart_program_scale` SET num_cha = 0 WHERE territory_id = '1_4';
-UPDATE `lastmile_report`.`mart_program_scale` SET num_chss = 0 WHERE territory_id = '1_4';
+UPDATE lastmile_report.mart_program_scale SET num_cha = 0 WHERE territory_id = '1_4';
+UPDATE lastmile_report.mart_program_scale SET num_chss = 21 WHERE territory_id = '1_4';
 
 
 
@@ -206,18 +216,12 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 
 -- 28. Number of CHAs deployed
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 28, IF(county_id=6,'6_31',CONCAT('1_',county_id)), 1, @p_month, @p_year, COUNT(1) FROM lastmile_report.mart_view_base_history_person
-WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY county_id
-UNION SELECT 28, '6_16', 1, @p_month, @p_year, COUNT(1) FROM lastmile_report.mart_view_base_history_person
-WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date);
+SELECT 28, territory_id, 1, @p_month, @p_year, num_cha FROM lastmile_report.mart_program_scale;
 
 
 -- 29. Number of CHSSs deployed
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 29, IF(county_id=6,'6_31',CONCAT('1_',county_id)), 1, @p_month, @p_year, COUNT(1) FROM lastmile_report.mart_view_base_history_person
-WHERE job='CHSS' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY county_id
-UNION SELECT 29, '6_16', 1, @p_month, @p_year, COUNT(1) FROM lastmile_report.mart_view_base_history_person
-WHERE job='CHSS' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date);
+SELECT 29, territory_id, 1, @p_month, @p_year, num_chss FROM lastmile_report.mart_program_scale;
 
 
 -- 30. Number of deaths (child)
@@ -246,8 +250,7 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 
 -- 45. Number of people served (CHA program)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 45, territory_id, 1, @p_month, @p_year, num_people
-FROM lastmile_report.mart_program_scale;
+SELECT 45, territory_id, 1, @p_month, @p_year, num_people FROM lastmile_report.mart_program_scale;
 
 
 -- 47. Number of records entered
@@ -257,8 +260,7 @@ SELECT 47, '6_16', 1, @p_month, @p_year, SUM(`# records entered`) FROM lastmile_
 
 -- 50. Number of communities served
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 50, territory_id, 1, @p_month, @p_year, num_communities
-FROM lastmile_report.mart_program_scale;
+SELECT 50, territory_id, 1, @p_month, @p_year, num_communities FROM lastmile_report.mart_program_scale;
 
 
 -- 59. Percent of records QA'd
@@ -543,16 +545,20 @@ WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
 
 
 -- 220. Percent of CHAs who are female
+-- !!!!! the "cohort IS NULL" clause needs to be changed once cohorts are assigned !!!!!
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 220, IF(county_id=6,'6_31',CONCAT('1_',county_id)), 1, @p_month, @p_year, ROUND(SUM(IF(gender='F',1,0))/COUNT(1),3) FROM lastmile_report.mart_view_base_history_person
+SELECT 220, IF(county_id=6 AND cohort IS NULL,'6_31',IF(county_id=6 AND cohort='UNICEF','6_26',CONCAT('1_',county_id))), 1, @p_month, @p_year,
+ROUND(SUM(IF(gender='F',1,0))/COUNT(1),3) FROM lastmile_report.mart_view_base_history_person
 WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY county
 UNION SELECT 220, '6_16', 1, @p_month, @p_year, ROUND(SUM(IF(gender='F',1,0))/COUNT(1),3) FROM lastmile_report.mart_view_base_history_person
 WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date);
 
 
 -- 221. Percent of CHSSs who are female
+-- !!!!! the "cohort IS NULL" clause needs to be changed once cohorts are assigned !!!!!
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 221, IF(county_id=6,'6_31',CONCAT('1_',county_id)), 1, @p_month, @p_year, ROUND(SUM(IF(gender='F',1,0))/COUNT(1),3) FROM lastmile_report.mart_view_base_history_person
+SELECT 221, IF(county_id=6 AND cohort IS NULL,'6_31',IF(county_id=6 AND cohort='UNICEF','6_26',CONCAT('1_',county_id))), 1, @p_month, @p_year,
+ROUND(SUM(IF(gender='F',1,0))/COUNT(1),3) FROM lastmile_report.mart_view_base_history_person
 WHERE job='CHSS' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY county
 UNION SELECT 221, '6_16', 1, @p_month, @p_year, ROUND(SUM(IF(gender='F',1,0))/COUNT(1),3) FROM lastmile_report.mart_view_base_history_person
 WHERE job='CHSS' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date);

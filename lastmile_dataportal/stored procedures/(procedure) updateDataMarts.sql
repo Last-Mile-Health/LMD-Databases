@@ -47,6 +47,22 @@ DROP TABLE IF EXISTS lastmile_report.mart_view_base_msr_chss;
 CREATE TABLE lastmile_report.mart_view_base_msr_chss SELECT * FROM lastmile_report.view_base_msr_chss;
 DROP TABLE IF EXISTS lastmile_report.mart_view_odk_sickchild;
 CREATE TABLE lastmile_report.mart_view_odk_sickchild SELECT * FROM lastmile_report.view_odk_sickchild;
+
+-- create federated table data marts, pulled from liberiamohdata.com
+DROP TABLE IF EXISTS lastmile_report.mart_de_integrated_supervision_tool_community;
+CREATE TABLE lastmile_report.mart_de_integrated_supervision_tool_community as SELECT * FROM lastmile_liberiamohdata.federated_de_integrated_supervision_tool_community;
+
+DROP TABLE IF EXISTS lastmile_report.mart_de_integrated_supervision_tool_community_spot_check;
+CREATE TABLE lastmile_report.mart_de_integrated_supervision_tool_community_spot_check as SELECT * FROM lastmile_liberiamohdata.federated_de_integrated_supervision_tool_community_spot_check;
+
+DROP TABLE IF EXISTS lastmile_report.mart_de_integrated_supervision_tool_facility;
+CREATE TABLE lastmile_report.mart_de_integrated_supervision_tool_facility as SELECT * FROM lastmile_liberiamohdata.federated_de_integrated_supervision_tool_facility;
+
+DROP TABLE IF EXISTS lastmile_report.mart_de_integrated_supervision_tool_facility_spot_check;
+CREATE TABLE lastmile_report.mart_de_integrated_supervision_tool_facility_spot_check as SELECT * FROM lastmile_liberiamohdata.federated_de_integrated_supervision_tool_facility_spot_check;
+
+
+
 #DROP TABLE IF EXISTS lastmile_cha.mart_view_base_cha;
 #CREATE TABLE lastmile_cha.mart_view_base_cha SELECT * FROM lastmile_cha.view_base_cha;
 #DROP TABLE IF EXISTS lastmile_cha.mart_view_base_chss;

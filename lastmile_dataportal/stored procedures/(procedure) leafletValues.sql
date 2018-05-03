@@ -87,17 +87,36 @@ UNION SELECT 18, CONCAT('1_',county_id), 2, SUM(num_births) FROM lastmile_report
 UNION SELECT 18, CONCAT('1_',county_id), 3, SUM(num_births) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY county_id;
 
 
--- 28. Number of CHAs deployed
+-- 28. Number of CHAs deployed (LMH)
 REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
-SELECT 28, CONCAT('2_',health_district_id), 99, COUNT(*) FROM lastmile_cha.view_base_cha GROUP BY health_district_id
-UNION SELECT 28, CONCAT('1_',county_id), 99, COUNT(*) FROM lastmile_cha.view_base_cha GROUP BY county_id;
+SELECT 28, CONCAT('2_',health_district_id), 1, COUNT(*) FROM lastmile_cha.view_base_cha GROUP BY health_district_id
+UNION SELECT 28, CONCAT('1_',county_id), 1, COUNT(*) FROM lastmile_cha.view_base_cha GROUP BY county_id;
+
+
+-- 28. Number of CHAs deployed (NCHA)
+-- !!!!! temporary !!!!! 
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_1',1,28,107);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_2',1,28,229);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_3',1,28,160);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_4',1,28,0);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_5',1,28,122);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_6',1,28,219);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_7',1,28,129);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_8',1,28,357);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_9',1,28,110);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_10',1,28,114);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_11',1,28,0);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_12',1,28,770);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_13',1,28,150);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_14',1,28,213);
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_15',1,28,193);
 
 
 -- 29. Number of CHSSs deployed
 -- !!!!! check if this is still true !!!!! Note: the second SELECT is disabled because it is manually being overwritten by NCHA scale numbers !!!!!
 REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
-SELECT 29, CONCAT('2_',health_district_id), 99, COUNT(*) FROM lastmile_cha.view_base_chss GROUP BY health_district_id
-UNION SELECT 29, CONCAT('1_',county_id), 99, COUNT(*) FROM lastmile_cha.view_base_chss GROUP BY county_id;
+SELECT 29, CONCAT('2_',health_district_id), 1, COUNT(*) FROM lastmile_cha.view_base_chss GROUP BY health_district_id
+UNION SELECT 29, CONCAT('1_',county_id), 1, COUNT(*) FROM lastmile_cha.view_base_chss GROUP BY county_id;
 
 
 -- 34. Number of deaths (under-five)
@@ -137,82 +156,6 @@ UNION SELECT 146, CONCAT('2_',health_district_id), 3, ROUND(SUM(num_tx_malaria_u
 UNION SELECT 146, CONCAT('1_',county_id), 1, ROUND(num_tx_malaria_under24/num_tx_malaria_under24_denominator,3) FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year
 UNION SELECT 146, CONCAT('1_',county_id), 2, ROUND(SUM(num_tx_malaria_under24)/SUM(num_tx_malaria_under24_denominator),3) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY county_id
 UNION SELECT 146, CONCAT('1_',county_id), 3, ROUND(SUM(num_tx_malaria_under24)/SUM(num_tx_malaria_under24_denominator),3) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY county_id;
-
-
--- 168. Number of CHAs trained within the NCHA program (module 1)
--- !!!!! temporary !!!!!
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_1',99,168,107);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_2',99,168,242);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_3',99,168,160);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_4',99,168,0);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_5',99,168,122);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_6',99,168,219);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_7',99,168,129);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_8',99,168,364);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_9',99,168,110);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_10',99,168,114);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_11',99,168,0);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_12',99,168,770);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_13',99,168,150);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_14',99,168,225);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_15',99,168,191);
-
-
--- 169. Number of CHAs trained within the NCHA program (modules 1-2)
--- !!!!! temporary !!!!!
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_1',99,169,107);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_2',99,169,241);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_3',99,169,160);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_4',99,169,0);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_5',99,169,122);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_6',99,169,219);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_7',99,169,129);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_8',99,169,358);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_9',99,169,110);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_10',99,169,114);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_11',99,169,0);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_12',99,169,770);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_13',99,169,148);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_14',99,169,225);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_15',99,169,193);
-
-
--- 170. Number of CHAs trained within the NCHA program (modules 1-3)
--- !!!!! temporary !!!!!
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_1',99,170,107);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_2',99,170,241);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_3',99,170,0);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_4',99,170,0);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_5',99,170,0);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_6',99,170,65);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_7',99,170,129);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_8',99,170,358);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_9',99,170,110);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_10',99,170,113);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_11',99,170,0);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_12',99,170,770);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_13',99,170,150);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_14',99,170,218);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_15',99,170,193);
-
-
--- 171. Number of CHAs trained within the NCHA program (modules 1-4)
--- !!!!! temporary !!!!!
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_1',99,171,107);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_2',99,171,241);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_3',99,171,0);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_4',99,171,0);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_5',99,171,0);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_6',99,171,63);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_7',99,171,0);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_8',99,171,357);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_9',99,171,110);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_10',99,171,114);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_11',99,171,0);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_12',99,171,770);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_13',99,171,151);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_14',99,171,218);
-REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,`ind_id`,`value`) VALUES ('1_15',99,171,193);
 
 
 -- 222. Number of child cases of malaria treated per 1,000 population

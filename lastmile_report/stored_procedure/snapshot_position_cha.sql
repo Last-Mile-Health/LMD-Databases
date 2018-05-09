@@ -34,10 +34,6 @@ create temporary table faux_cursor_snapshot_position_cha as
 
 select 
 
-      -- position 
-      -- For CHAs, the cha_id is the same value as the position_id.  Developers should choose one or the other depending on how
-      -- they want to use the data.  Use the cha_id for reportting and the position_id for tying this resultset to other records
-      -- internal to the the database.
       p.position_id,
       p.position_begin_date,
       p.position_end_date,
@@ -51,7 +47,6 @@ select
         
       -- person/CHA
       r.person_id,
-      r.cha_id,
       r.full_name,
       r.birth_date,
       r.gender,
@@ -89,7 +84,6 @@ from lastmile_cha.view_history_position_geo as p
     left outer join ( select
                             pr.position_id,
                             pr.person_id,
-                            pr.cha_id,
                             pr.full_name,
                             pr.birth_date,
                             pr.gender,
@@ -134,14 +128,14 @@ from lastmile_cha.view_history_position_geo as p
 
                                               -- The view lastmile_program.view_registration "bubbles" registration records from previous years to the "top" of 
                                               -- the self-join of lastmile_program.view_registration_year.  It is the record of the latest registration data for a
-                                              -- cha_id and community_id pair.  Querying and conditioning on it directly would cause some records to be discarded
+                                              -- position_id and community_id pair.  Querying and conditioning on it directly would cause some records to be discarded
                                               -- because their registration dates came after the snapshot_date, even though there were older records that would have
                                               -- matched because they were registered before the snapshot date.
                                               -- Therefore, we need to duplicate the lastmile_program.view_registration code here and condition on the snapshot date.
                             
                                               select
                                                     g1.community_id, 
-                                                    g1.cha_id, 
+                                                    g1.position_id, 
                                                     g1.registration_year,
       
                                                     g1.registration_date,
@@ -166,13 +160,13 @@ from lastmile_cha.view_history_position_geo as p
       
                                               from lastmile_program.view_registration_year as g1
                                                     left outer join lastmile_program.view_registration_year as g2 on  ( trim( g1.community_id ) like trim( g2.community_id  )  ) and 
-                                                                                                                      ( trim( g1.cha_id )       like trim( g2.cha_id        )  ) and
+                                                                                                                      ( trim( g1.position_id )  like trim( g2.position_id   )  ) and
                                                                                                                       ( g1.registration_year    > g2.registration_year      )
                                               where g1.registration_date <= snapshot_date 
-                                              group by trim( g1.community_id ), trim( g1.cha_id )
+                                              group by trim( g1.community_id ), trim( g1.position_id )
                                               having count( * ) >= 1
                                                
-                                            ) as g on ( hpc.position_id like g.cha_id ) and ( hpc.community_id like g.community_id )
+                                            ) as g on ( hpc.position_id like g.position_id ) and ( hpc.community_id like g.community_id )
                       
                             left outer join (                                           
                                               select 

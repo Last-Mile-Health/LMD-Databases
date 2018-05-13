@@ -189,6 +189,21 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 UNION SELECT 18, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_births,0))
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
+-- 18. 	NCHA Outputs: Number of births tracked
+-- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
+-- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+
+set @liberia_total = (  select sum( value ) from tbl_values 
+                        where ( ind_id = 18                       ) and 
+                              ( `month` = @p_month                ) and 
+                              ( `year` = @p_year                  ) and                          
+                              ( period_id = 1                     ) and
+                              ( territory_id like '1_%'           ) 
+);
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        18,       '6_27',         1,            @p_month, @p_year,  @liberia_total;
+
 
 -- 19. Number of child cases of ARI treated
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -196,6 +211,21 @@ SELECT 19, territory_id, 1, @p_month, @p_year, COALESCE(num_tx_ari,0)
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL
 UNION SELECT 19, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_tx_ari,0))
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
+
+-- 19. NCHA Outputs: Number of child cases of ARI treated
+-- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
+-- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+
+set @liberia_total = (  select sum( value ) from tbl_values 
+                        where ( ind_id = 19                       ) and 
+                              ( `month` = @p_month                ) and 
+                              ( `year` = @p_year                  ) and                          
+                              ( period_id = 1                     ) and
+                              ( territory_id like '1_%'           ) 
+);
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        19,       '6_27',         1,            @p_month, @p_year,  @liberia_total;
 
 
 -- 21. Number of child cases of diarrhea treated
@@ -206,12 +236,43 @@ UNION SELECT 21, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_tx_diarrhea,0))
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
 
+-- 21. NCHA Outputs: Number of child cases of diarrhea treated
+-- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
+-- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+
+set @liberia_total = (  select sum( value ) from tbl_values 
+                        where ( ind_id = 21                       ) and 
+                              ( `month` = @p_month                ) and 
+                              ( `year` = @p_year                  ) and                          
+                              ( period_id = 1                     ) and
+                              ( territory_id like '1_%'           ) 
+);
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        21,       '6_27',         1,            @p_month, @p_year,  @liberia_total;
+
+
 -- 23. Number of child cases of malaria treated
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 23, territory_id, 1, @p_month, @p_year, COALESCE(num_tx_malaria,0)
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL
 UNION SELECT 23, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_tx_malaria,0))
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
+
+-- 23.	NCHA Outputs: Number of child cases of malaria treated
+-- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
+-- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+
+set @liberia_total = (  select sum( value ) from tbl_values 
+                        where ( ind_id = 23                       ) and 
+                              ( `month` = @p_month                ) and 
+                              ( `year` = @p_year                  ) and                          
+                              ( period_id = 1                     ) and
+                              ( territory_id like '1_%'           ) 
+);
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        23,       '6_27',         1,            @p_month, @p_year,  @liberia_total;
 
 
 -- 28. Number of CHAs deployed
@@ -360,6 +421,22 @@ SELECT 119, territory_id, 1, @p_month, @p_year, COALESCE(num_routine_visits,0)
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL
 UNION SELECT 119, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_routine_visits,0))
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
+
+
+-- 119.	NCHA Outputs: Number of routine visits conducted
+-- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
+-- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+
+set @liberia_total = (  select sum( value ) from tbl_values 
+                        where ( ind_id = 119                      ) and 
+                              ( `month` = @p_month                ) and 
+                              ( `year` = @p_year                  ) and                          
+                              ( period_id = 1                     ) and
+                              ( territory_id like '1_%'           ) 
+);
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        119,      '6_27',         1,            @p_month, @p_year,  @liberia_total;
 
 
 -- 121. CHA reporting rate
@@ -611,6 +688,20 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 UNION SELECT 235, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_muac_red,0)+COALESCE(num_muac_yellow,0)+COALESCE(num_muac_green,0))
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
+-- 235.	NCHA Outputs: Number of malnutrition screenings (MUAC) conducted for children under-five
+-- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
+-- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+
+set @liberia_total = (  select sum( value ) from tbl_values 
+                        where ( ind_id = 235                      ) and 
+                              ( `month` = @p_month                ) and 
+                              ( `year` = @p_year                  ) and                          
+                              ( period_id = 1                     ) and
+                              ( territory_id like '1_%'           ) 
+);
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        235,      '6_27',         1,            @p_month, @p_year,  @liberia_total;
 
 -- 237. Number of CHAs who received a restock visit
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -827,6 +918,22 @@ UNION SELECT 347, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_community_trigg
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
 
+-- 347.	NCHA Outputs: Number of community triggers reported
+-- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
+-- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+
+set @liberia_total = (  select sum( value ) from tbl_values 
+                        where ( ind_id = 347                      ) and 
+                              ( `month` = @p_month                ) and 
+                              ( `year` = @p_year                  ) and                          
+                              ( period_id = 1                     ) and
+                              ( territory_id like '1_%'           ) 
+);
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        347,      '6_27',         1,            @p_month, @p_year,  @liberia_total;
+
+
 -- 348. Number of referrals for HIV / TB / CM-NTD / mental health
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 348, territory_id, 1, @p_month, @p_year, COALESCE(num_referrals_mod4,0)
@@ -841,6 +948,22 @@ SELECT 349, territory_id, 1, @p_month, @p_year, COALESCE(num_pregnant_woman_visi
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL
 UNION SELECT 349, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_pregnant_woman_visits,0))
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
+
+
+-- 349. NCHA Outputs: Number of pregnant woman visits
+-- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
+-- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+
+set @liberia_total = (  select sum( value ) from tbl_values 
+                        where ( ind_id = 349                      ) and 
+                              ( `month` = @p_month                ) and 
+                              ( `year` = @p_year                  ) and                          
+                              ( period_id = 1                     ) and
+                              ( territory_id like '1_%'           ) 
+);
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        349,      '6_27',         1,            @p_month, @p_year,  @liberia_total;
 
 
 -- 350. Number of women referred to a health facility for delivery
@@ -899,6 +1022,22 @@ UNION SELECT 356, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_clients_modern_
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
 
+-- 356.	NCHA Outputs: Number of women currently using a modern method of family planning
+-- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
+-- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+
+set @liberia_total = (  select sum( value ) from tbl_values 
+                        where ( ind_id = 356                      ) and 
+                              ( `month` = @p_month                ) and 
+                              ( `year` = @p_year                  ) and                          
+                              ( period_id = 1                     ) and
+                              ( territory_id like '1_%'           ) 
+);
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        356,      '6_27',         1,            @p_month, @p_year,  @liberia_total;
+
+
 -- 357. Number of HIV client visits
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 357, territory_id, 1, @p_month, @p_year, COALESCE(num_hiv_client_visits,0)
@@ -907,6 +1046,21 @@ UNION SELECT 357, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_hiv_client_visi
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
 
+-- 357. NCHA Outputs: Number of HIV client visits
+-- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
+-- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+
+set @liberia_total = (  select sum( value ) from tbl_values 
+                        where ( ind_id = 357                      ) and 
+                              ( `month` = @p_month                ) and 
+                              ( `year` = @p_year                  ) and                          
+                              ( period_id = 1                     ) and
+                              ( territory_id like '1_%'           ) 
+);
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        357,      '6_27',         1,            @p_month, @p_year,  @liberia_total;
+
 -- 358. Number of TB client visits
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 358, territory_id, 1, @p_month, @p_year, COALESCE(num_tb_client_visits,0)
@@ -914,6 +1068,20 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 UNION SELECT 358, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_tb_client_visits,0))
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
+-- 358.	NCHA Outputs: Number of TB client visits
+-- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
+-- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+
+set @liberia_total = (  select sum( value ) from tbl_values 
+                        where ( ind_id = 358                      ) and 
+                              ( `month` = @p_month                ) and 
+                              ( `year` = @p_year                  ) and                          
+                              ( period_id = 1                     ) and
+                              ( territory_id like '1_%'           ) 
+);
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        358,      '6_27',         1,            @p_month, @p_year,  @liberia_total;
 
 -- 359. Number of CM-NTD client visits
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -985,6 +1153,22 @@ UNION SELECT 369, '6_27', 1, @p_month, @p_year, ROUND(SUM(COALESCE(receivedLastI
 FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year
 UNION SELECT 369, territory_id, 2, @p_month, @p_year, ROUND(SUM(COALESCE(receivedLastIncentiveOnTime,0))/SUM(COALESCE(numReports,0)),3)
 FROM lastmile_report.mart_view_base_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
+
+
+-- 381. NCHA Outputs: Number of CHA monthly service reports (MSRs) received by MOH
+-- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
+-- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+
+set @liberia_total = (  select sum( value ) from tbl_values 
+                        where ( ind_id = 381                      ) and 
+                              ( `month` = @p_month                ) and 
+                              ( `year` = @p_year                  ) and                               
+                              ( period_id = 1                     ) and
+                              ( territory_id like '1_%'           )                             
+);
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+SELECT                                        381,      '6_27',         1,            @p_month, @p_year,  @liberia_total;
 
 
 -- 382. Number of children with malnutrition (yellow MUAC)

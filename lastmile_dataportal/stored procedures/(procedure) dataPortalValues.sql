@@ -1508,7 +1508,34 @@ set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        409,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
+-- 410. Number of community triggers reported per 1,000 population
 
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+
+SELECT 
+        410, 
+        territory_id,  -- 6_31 GG LMH, 1_14 Rivercess
+        1, 
+        @p_month, 
+        @p_year, 
+        ROUND( 1000 * ( COALESCE( num_community_triggers, 0 ) / COALESCE( num_catchment_people_iccm, 0 ) ), 1 )
+
+FROM lastmile_report.mart_view_base_msr_county 
+WHERE month_reported=@p_month AND 
+      year_reported=@p_year   AND 
+      county_id IS NOT NULL
+UNION  
+SELECT 
+      410, 
+      '6_16', -- total LMH
+      1, 
+      @p_month, 
+      @p_year, 
+      ROUND( 1000 * ( SUM( COALESCE( num_community_triggers, 0 ) ) / SUM( COALESCE( num_catchment_people_iccm, 0 ) ) ), 1 )
+FROM lastmile_report.mart_view_base_msr_county 
+WHERE month_reported = @p_month AND 
+      year_reported=@p_year     AND 
+      county_id IS NOT NULL;
 
 
 -- ------ --

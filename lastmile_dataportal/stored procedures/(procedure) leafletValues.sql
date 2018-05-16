@@ -223,6 +223,32 @@ UNION SELECT 347, CONCAT('1_',county_id), 2, SUM(COALESCE(num_community_triggers
 UNION SELECT 347, CONCAT('1_',county_id), 3, SUM(COALESCE(num_community_triggers,0)) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY county_id;
 
 
+-- 382. Number of children with moderate acute malnutrition (yellow MUAC)
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
+SELECT 382, CONCAT('5_',community_id), 1, num_muac_yellow FROM lastmile_report.mart_view_base_msr_community WHERE month_reported=@p_month AND year_reported=@p_year
+UNION SELECT 382, CONCAT('5_',community_id), 2, SUM(num_muac_yellow) FROM lastmile_report.mart_view_base_msr_community WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY community_id
+UNION SELECT 382, CONCAT('5_',community_id), 3, SUM(num_muac_yellow) FROM lastmile_report.mart_view_base_msr_community WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY community_id
+UNION SELECT 382, CONCAT('2_',health_district_id), 1, num_muac_yellow FROM lastmile_report.mart_view_base_msr_healthdistrict WHERE month_reported=@p_month AND year_reported=@p_year
+UNION SELECT 382, CONCAT('2_',health_district_id), 2, SUM(num_muac_yellow) FROM lastmile_report.mart_view_base_msr_healthdistrict WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY health_district_id
+UNION SELECT 382, CONCAT('2_',health_district_id), 3, SUM(num_muac_yellow) FROM lastmile_report.mart_view_base_msr_healthdistrict WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY health_district_id
+UNION SELECT 382, CONCAT('1_',county_id), 1, num_muac_yellow FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year
+UNION SELECT 382, CONCAT('1_',county_id), 2, SUM(num_muac_yellow) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY county_id
+UNION SELECT 382, CONCAT('1_',county_id), 3, SUM(num_muac_yellow) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY county_id;
+
+
+-- 383. Number of children with severe acute malnutrition (red MUAC)
+REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
+SELECT 383, CONCAT('5_',community_id), 1, num_muac_red FROM lastmile_report.mart_view_base_msr_community WHERE month_reported=@p_month AND year_reported=@p_year
+UNION SELECT 383, CONCAT('5_',community_id), 2, SUM(num_muac_red) FROM lastmile_report.mart_view_base_msr_community WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY community_id
+UNION SELECT 383, CONCAT('5_',community_id), 3, SUM(num_muac_red) FROM lastmile_report.mart_view_base_msr_community WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY community_id
+UNION SELECT 383, CONCAT('2_',health_district_id), 1, num_muac_red FROM lastmile_report.mart_view_base_msr_healthdistrict WHERE month_reported=@p_month AND year_reported=@p_year
+UNION SELECT 383, CONCAT('2_',health_district_id), 2, SUM(num_muac_red) FROM lastmile_report.mart_view_base_msr_healthdistrict WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY health_district_id
+UNION SELECT 383, CONCAT('2_',health_district_id), 3, SUM(num_muac_red) FROM lastmile_report.mart_view_base_msr_healthdistrict WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY health_district_id
+UNION SELECT 383, CONCAT('1_',county_id), 1, num_muac_red FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year
+UNION SELECT 383, CONCAT('1_',county_id), 2, SUM(num_muac_red) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY county_id
+UNION SELECT 383, CONCAT('1_',county_id), 3, SUM(num_muac_red) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY county_id;
+
+
 
 -- ------ --
 -- Finish --

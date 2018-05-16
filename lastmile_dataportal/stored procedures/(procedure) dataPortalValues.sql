@@ -112,23 +112,23 @@ WHERE job='CHSS' AND position_person_begin_date <= @p_date AND (position_person_
 
 
 -- 45. Number of people served (CHA program)
--- !!!!! TEMP until we start collecting UNICEF MSRs !!!!!
+-- !!!!! TEMP until we start collecting UNICEF HHR data !!!!!
 UPDATE lastmile_report.mart_program_scale SET num_people = 12185 WHERE territory_id = '6_31';
 UPDATE lastmile_report.mart_program_scale SET num_people = 45367 WHERE territory_id = '6_26';
 UPDATE lastmile_report.mart_program_scale SET num_people = 40483 WHERE territory_id = '1_14';
 UPDATE lastmile_report.mart_program_scale SET num_people = 0 WHERE territory_id = '1_4';
 UPDATE lastmile_report.mart_program_scale SET num_people = 57552 WHERE territory_id = '1_6';
-UPDATE lastmile_report.mart_program_scale SET num_people = 83068 WHERE territory_id = '6_16';
+UPDATE lastmile_report.mart_program_scale SET num_people = 98035 WHERE territory_id = '6_16';
 
 
 -- 50. Number of communities served
--- !!!!! TEMP until we start collecting UNICEF MSRs !!!!!
+-- !!!!! TEMP until we start collecting UNICEF HHR data !!!!!
 UPDATE lastmile_report.mart_program_scale SET num_communities = 58 WHERE territory_id = '6_31';
 UPDATE lastmile_report.mart_program_scale SET num_communities = 157 WHERE territory_id = '6_26';
 UPDATE lastmile_report.mart_program_scale SET num_communities = 240 WHERE territory_id = '1_14';
 UPDATE lastmile_report.mart_program_scale SET num_communities = 0 WHERE territory_id = '1_4';
 UPDATE lastmile_report.mart_program_scale SET num_communities = 215 WHERE territory_id = '1_6';
-UPDATE lastmile_report.mart_program_scale SET num_communities = 450 WHERE territory_id = '6_16';
+UPDATE lastmile_report.mart_program_scale SET num_communities = 455 WHERE territory_id = '6_16';
 
 
 -- X. Misc GG UNICEF + Grand Bassa

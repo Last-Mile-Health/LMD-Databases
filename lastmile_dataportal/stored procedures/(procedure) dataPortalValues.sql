@@ -145,13 +145,70 @@ UPDATE lastmile_report.mart_program_scale SET num_chss = 21 WHERE territory_id =
 -- 7. Monthly supervision rate
 -- Currently based off of ODK data
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 7, a.territory_id, 1, @p_month, @p_year, ROUND(SUM(supervisionAttendance)/num_cha,1)
-FROM lastmile_report.mart_view_base_odk_supervision a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
-WHERE manualMonth=@p_month AND manualYear=@p_year AND county_id IS NOT NULL GROUP BY county_id
-UNION SELECT 7, '6_16', 1, @p_month, @p_year, ROUND(SUM(supervisionAttendance)/num_cha,1)
-FROM lastmile_report.mart_view_base_odk_supervision a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
-WHERE manualMonth=@p_month AND manualYear=@p_year AND county_id IS NOT NULL;
 
+SELECT 
+        7, 
+        a.territory_id, 
+        1, 
+        @p_month, 
+        @p_year, 
+        ROUND( SUM( supervisionAttendance ) / num_cha, 1 )
+FROM lastmile_report.mart_view_base_odk_supervision a 
+    LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
+WHERE manualMonth=@p_month  AND 
+      manualYear=@p_year    AND 
+      county_id IS NOT NULL 
+GROUP BY county_id
+;
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 
+        7,
+        '6_16', 
+        1, 
+        @p_month, 
+        @p_year,  
+        ROUND( SUM( t.supervisionAttendance_sum ) / sum( t.num_cha ), 1 )    
+from 
+(
+  select
+        a.territory_id, 
+        sum( a.supervisionAttendance ) as supervisionAttendance_sum,
+        b.num_cha
+  from lastmile_report.mart_view_base_odk_supervision a
+      left outer join lastmile_report.mart_program_scale b on a.territory_id = b.territory_id
+  where a.territory_id like '6_31'    and 
+        a.manualMonth =     @p_month  and 
+        a.manualYear =      @p_year   and
+        a.county_id IS NOT NULL
+      
+  union all
+
+  select
+        a.territory_id, 
+        sum( a.supervisionAttendance )  as supervisionAttendance_sum,
+        b.num_cha
+  from lastmile_report.mart_view_base_odk_supervision a
+      left outer join lastmile_report.mart_program_scale b on a.territory_id = b.territory_id
+  where a.territory_id like '1_14'    and 
+        a.manualMonth =     @p_month  and 
+        a.manualYear =      @p_year   and
+        a.county_id IS NOT NULL
+      
+) as t;
+
+-- Note: this code is appropriate for the national indicator once we have supervison totals for Grand Bassa and Unicef.
+-- For now, though, we'll add the num_cha totals for 6_31 and 1_14 (GG LMH and RI) to get the correct denominator.
+-- SELECT 
+--        7, 
+--        '6_16', 
+--        1, 
+--        @p_month, 
+--        @p_year, 
+--        ROUND( SUM( supervisionAttendance ) / num_cha, 1 )
+-- FROM lastmile_report.mart_view_base_odk_supervision a 
+--    LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id 
+-- WHERE manualMonth=@p_month AND manualYear=@p_year AND county_id IS NOT NULL;
 
 -- 11. CHA attendance rate at supervision
 -- Currently based off of ODK data

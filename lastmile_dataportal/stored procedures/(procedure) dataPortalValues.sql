@@ -112,23 +112,23 @@ WHERE job='CHSS' AND position_person_begin_date <= @p_date AND (position_person_
 
 
 -- 45. Number of people served (CHA program)
--- !!!!! TEMP until we start collecting UNICEF MSRs !!!!!
+-- !!!!! TEMP until we start collecting UNICEF HHR data !!!!!
 UPDATE lastmile_report.mart_program_scale SET num_people = 12185 WHERE territory_id = '6_31';
 UPDATE lastmile_report.mart_program_scale SET num_people = 45367 WHERE territory_id = '6_26';
 UPDATE lastmile_report.mart_program_scale SET num_people = 40483 WHERE territory_id = '1_14';
 UPDATE lastmile_report.mart_program_scale SET num_people = 0 WHERE territory_id = '1_4';
 UPDATE lastmile_report.mart_program_scale SET num_people = 57552 WHERE territory_id = '1_6';
-UPDATE lastmile_report.mart_program_scale SET num_people = 83068 WHERE territory_id = '6_16';
+UPDATE lastmile_report.mart_program_scale SET num_people = 98035 WHERE territory_id = '6_16';
 
 
 -- 50. Number of communities served
--- !!!!! TEMP until we start collecting UNICEF MSRs !!!!!
+-- !!!!! TEMP until we start collecting UNICEF HHR data !!!!!
 UPDATE lastmile_report.mart_program_scale SET num_communities = 58 WHERE territory_id = '6_31';
 UPDATE lastmile_report.mart_program_scale SET num_communities = 157 WHERE territory_id = '6_26';
 UPDATE lastmile_report.mart_program_scale SET num_communities = 240 WHERE territory_id = '1_14';
 UPDATE lastmile_report.mart_program_scale SET num_communities = 0 WHERE territory_id = '1_4';
 UPDATE lastmile_report.mart_program_scale SET num_communities = 215 WHERE territory_id = '1_6';
-UPDATE lastmile_report.mart_program_scale SET num_communities = 450 WHERE territory_id = '6_16';
+UPDATE lastmile_report.mart_program_scale SET num_communities = 455 WHERE territory_id = '6_16';
 
 
 -- X. Misc GG UNICEF + Grand Bassa
@@ -144,6 +144,7 @@ UPDATE lastmile_report.mart_program_scale SET num_chss = 21 WHERE territory_id =
 
 -- 7. Monthly supervision rate
 -- Currently based off of ODK data
+-- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 
 SELECT 
@@ -497,6 +498,7 @@ SELECT                                        119,      '6_27',         1,      
 
 
 -- 121. CHA reporting rate
+-- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 121, a.territory_id, 1, @p_month, @p_year, ROUND(COALESCE(num_reports,0)/num_cha,3)
 FROM lastmile_report.mart_view_base_msr_county a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
@@ -769,6 +771,7 @@ FROM lastmile_report.mart_view_base_restock_cha WHERE `month`=@p_month AND `year
 
 
 -- 238. Percent of CHAs who received a restock visit
+-- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 238, a.territory_id, 1, @p_month, @p_year, ROUND(COALESCE(COUNT(1),0)/num_cha,3)
 FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
@@ -850,6 +853,7 @@ SELECT 258, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_date
 
 -- 302. CHSS reporting rate
 -- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted
+-- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 302, a.territory_id, 1, @p_month, @p_year, ROUND(COUNT(1)/num_chss,3)
 FROM lastmile_report.view_chss_msr a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
@@ -861,6 +865,7 @@ WHERE month_reported=@p_month AND year_reported=@p_year AND a.territory_id IS NO
 
 -- 305. Percent of expected CHSS mHealth supervision visit logs received
 -- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted
+-- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 305, a.territory_id, 1, @p_month, @p_year, ROUND(COUNT(1)/(2*num_cha),3)
 FROM lastmile_report.mart_view_base_odk_supervision a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
@@ -958,6 +963,7 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 
 -- 331. CHSS restock rate
 -- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted
+-- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 331, a.territory_id, 1, @p_month, @p_year, ROUND(COUNT(DISTINCT chss_id)/num_chss,3)
 FROM lastmile_report.view_base_restock_chss a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 

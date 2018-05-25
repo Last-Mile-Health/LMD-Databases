@@ -6,7 +6,7 @@ create view view_position_person as
 
 select
 
-      pr.position_id,
+      trim( pr.position_id )      as position_id,
       pr.begin_date               as position_person_begin_date,
 
       r.person_id,

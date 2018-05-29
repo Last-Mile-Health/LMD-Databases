@@ -1526,10 +1526,25 @@ set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        409,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
--- 410. Number of community triggers reported per 1,000 population
+
+/* 410. Number of community triggers reported per 1,000 population.
+
+For territories 1_14 (Rivercess), 6_31 (GG LMH), and 6_16 (Total LMH) we calculate values from the data collected in the LMD CHA MSRs.
+
+For all other counties it is based on the number of community triggers reported (347) and the number of CHA MSRs reported by counties (381) 
+from the MOH dhis2 NCHA Outputs report, so territories 1_1 ... 1_15
+
+The county population served is estimated from the the number of CHA MSRs reported for a month and multiplying by 300, 
+which is an estimate of the number of persons served by a CHA.  This is considered a more accurate estimate than the 
+number of CHAs deployed (ind_id 28).
+
+Lastly, 410 indicator values for all counties (1_1..1_15) are sum'ed and used to calculate the Liberaia wide estimate.
+
+*/
+
+-- First, calculate indicator values for Rivercess, GG LMH, and total LMH 
 
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-
 SELECT 
         410, 
         territory_id,  -- 6_31 GG LMH, 1_14 Rivercess
@@ -1553,7 +1568,86 @@ SELECT
 FROM lastmile_report.mart_view_base_msr_county 
 WHERE month_reported = @p_month AND 
       year_reported=@p_year     AND 
-      county_id IS NOT NULL;
+      county_id IS NOT NULL
+;
+
+-- Next, calculate indicator values for all counties except Rivercess.
+REPLACE INTO lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select
+      410,
+      a.territory_id,
+      1,
+      @p_month,
+      @p_year,
+      if( max( a.number_cha_msr ) is null          or 
+          trim( max( a.number_cha_msr ) ) like ''  or
+          trim( max( a.number_cha_msr ) ) like '0' , 
+          0, 
+          round( ( max( a.number_community_triggers ) / ( max( a.number_cha_msr ) * 300 ) ) * 1000, 1 )
+        ) as rate                              
+from ( 
+      select 
+            territory_id, 
+            value         as number_community_triggers, 
+            null          as number_cha_msr
+      from lastmile_dataportal.tbl_values    
+      where ( ind_id = 347 )  and ( `month` = @p_month ) and ( `year` = @p_year ) and 
+            ( period_id = 1 ) and ( trim( territory_id ) like '1_%' and ( not trim( territory_id ) like '1_14' ) )
+              
+      union all
+        
+      select 
+            territory_id, 
+            null          as number_community_triggers, 
+            value         as number_cha_msr
+      from lastmile_dataportal.tbl_values    
+      where ( ind_id = 381 )  and ( `month` = @p_month ) and ( `year` = @p_year ) and 
+            ( period_id = 1 ) and ( trim( territory_id ) like '1_%' and ( not trim( territory_id ) like '1_14' ) )
+   
+) as a
+group by a.territory_id
+;
+
+
+-- Lastly, calculate the national community trigger rate per 1000
+REPLACE INTO lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 410, '6_27', 1, @p_month, @p_year, round( ( sum( b.number_community_triggers ) / sum( b.population ) ) * 1000, 1 ) as rate
+from (
+      -- Add in the Rivercess totals.  Note: the populationn is a combination of LMH registration data and estimates where 
+      -- registration is not available.
+      select  
+            num_community_triggers      as number_community_triggers, 
+            num_catchment_people_iccm   as population
+      from lastmile_report.mart_view_base_msr_county 
+      where month_reported=@p_month and year_reported=@p_year and ( not county_id is null ) and territory_id like '1_14'
+
+      union all
+
+      select
+            -- Use indicator as a switch.  Sum indicator value when matched to indicator; otherwise, add 0.  Bit of a hack.
+            sum( if( a.ind_id = 347, a.value, 0 ) )         as number_community_triggers, -- sum of all the community triggers recorded for the month in dhis2, except for Rivercess
+            sum( if( a.ind_id = 381, a.value, 0 ) ) * 300   as population                 -- sum of all the CHA MSRs recorded for the month in dhis2, except for Rivercess
+      from ( 
+            select ind_id, value 
+            from lastmile_dataportal.tbl_values    
+            where ( ind_id = 347 )  and ( `month` = @p_month ) and ( `year` = @p_year ) and 
+                  ( period_id = 1 ) and ( trim( territory_id ) like '1_%' and ( not trim( territory_id ) like '1_14' ) )
+              
+            union all
+        
+            select ind_id, value
+            from lastmile_dataportal.tbl_values    
+            where ( ind_id = 381 )  and ( `month` = @p_month ) and ( `year` = @p_year ) and 
+                  ( period_id = 1 ) and ( trim( territory_id ) like '1_%' and ( not trim( territory_id ) like '1_14' ) )
+   
+      ) as a
+
+) as b;
+
+
+
+
+
 
 
 -- ------ --

@@ -1722,7 +1722,7 @@ select
         1, 
         @p_month, 
         @p_year, 
-        round( ( ( coalesce( num_pregnant_woman_visits, 0 ) / coalesce( num_catchment_people_iccm, 0 ) ) * 1000 ) / ( 28.8 * ( 2 / 3 ) ), 1 )
+        round( ( ( coalesce( num_pregnant_woman_visits, 0 ) / coalesce( num_catchment_people_iccm, 0 ) ) * 1000 ) / ( 28.8 * ( 2 / 3 ) ), 2 )
         
 from lastmile_report.mart_view_base_msr_county 
 where month_reported=@p_month and 
@@ -1737,7 +1737,7 @@ select
       1, 
       @p_month, 
       @p_year, 
-      round( ( ( sum( coalesce( num_pregnant_woman_visits, 0 ) ) / sum( coalesce( num_catchment_people_iccm, 0 ) ) ) * 1000 ) / ( 28.8 * ( 2 / 3 ) ), 1 )
+      round( ( ( sum( coalesce( num_pregnant_woman_visits, 0 ) ) / sum( coalesce( num_catchment_people_iccm, 0 ) ) ) * 1000 ) / ( 28.8 * ( 2 / 3 ) ), 2 )
         
  
 from lastmile_report.mart_view_base_msr_county 
@@ -1745,6 +1745,52 @@ where month_reported = @p_month and
       year_reported=@p_year     and 
       not county_id is null
 ;
+
+
+/* 417. •	Number of RMNH danger signs detected, per 1,000 population.
+
+For territories 1_14 (Rivercess), 6_31 (GG LMH), and 6_16 (Total LMH) we calculate values from the data collected in the LMD CHA MSRs.
+
+For all other counties it is based on the number of RMNH danger signs detected (353) and the number of CHA MSRs reported by counties (381) 
+from the MOH dhis2 NCHA Outputs report, so territories 1_1 ... 1_15
+
+The county population served is estimated from the the number of CHA MSRs reported for a month and multiplying by 300, 
+which is an estimate of the number of persons served by a CHA.  This is considered a more accurate estimate than the 
+number of CHAs deployed (ind_id 28).
+
+Lastly, 417 indicator values for all counties (1_1..1_15) are sum'ed and used to calculate the Liberaia wide estimate.
+
+*/
+
+-- First, calculate indicator values for Rivercess, GG LMH, and total LMH 
+
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+SELECT 
+        417, 
+        territory_id,  -- 6_31 GG LMH, 1_14 Rivercess
+        1, 
+        @p_month, 
+        @p_year, 
+        ROUND( 1000 * ( COALESCE( num_referred_rmnh_danger_sign, 0 ) / COALESCE( num_catchment_people_iccm, 0 ) ), 1 )
+
+FROM lastmile_report.mart_view_base_msr_county 
+WHERE month_reported=@p_month AND 
+      year_reported=@p_year   AND 
+      county_id IS NOT NULL
+UNION  
+SELECT 
+      417, 
+      '6_16', -- total LMH
+      1, 
+      @p_month, 
+      @p_year, 
+      ROUND( 1000 * ( SUM( COALESCE( num_referred_rmnh_danger_sign, 0 ) ) / SUM( COALESCE( num_catchment_people_iccm, 0 ) ) ), 1 )
+FROM lastmile_report.mart_view_base_msr_county 
+WHERE month_reported = @p_month AND 
+      year_reported=@p_year     AND 
+      county_id IS NOT NULL
+;
+
 
 
 -- ------ --

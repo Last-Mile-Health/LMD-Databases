@@ -954,9 +954,9 @@ SELECT                                        347,      '6_27',         1,      
 
 -- 348. Number of referrals for HIV / TB / CM-NTD / mental health
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 348, territory_id, 1, @p_month, @p_year, COALESCE(num_referrals_mod4,0)
+SELECT 348, territory_id, 1, @p_month, @p_year, COALESCE(num_referrals_suspect_hiv_tb_cm_ntd_mh,0)
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL
-UNION SELECT 348, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_referrals_mod4,0))
+UNION SELECT 348, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_referrals_suspect_hiv_tb_cm_ntd_mh,0))
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
 
@@ -1645,9 +1645,106 @@ from (
 ) as b;
 
 
+/* 415. Number of referrals for HIV / TB / CM-NTD / mental health per 1,000 population.
+
+For territories 1_14 (Rivercess), 6_31 (GG LMH), and 6_16 (Total LMH) we calculate values from the data collected in the LMD CHA MSRs.
+
+For all other counties it is based on the number of referrals for HIV / TB / CM-NTD / mental health reported (348) 
+and the number of CHA MSRs reported by counties (381) from the MOH dhis2 NCHA Outputs report, so territories 1_1 ... 1_15
+
+The county population served is estimated from the the number of CHA MSRs reported for a month and multiplying by 300, 
+which is an estimate of the number of persons served by a CHA.  This is considered a more accurate estimate than the 
+number of CHAs deployed (ind_id 28).
+
+Lastly, 415 indicator values for all counties (1_1..1_15) are sum'ed and used to calculate the Liberaia-wide estimate.
+
+*/
+
+-- First, calculate indicator values for Rivercess, GG LMH, and total LMH 
+
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+SELECT 
+        415, 
+        territory_id,  -- 6_31 GG LMH, 1_14 Rivercess
+        1, 
+        @p_month, 
+        @p_year, 
+        ROUND( 1000 * ( COALESCE( num_referrals_suspect_hiv_tb_cm_ntd_mh, 0 ) / COALESCE( num_catchment_people_iccm, 0 ) ), 1 )
+
+FROM lastmile_report.mart_view_base_msr_county 
+WHERE month_reported=@p_month AND 
+      year_reported=@p_year   AND 
+      county_id IS NOT NULL
+UNION  
+SELECT 
+      415, 
+      '6_16', -- total LMH
+      1, 
+      @p_month, 
+      @p_year, 
+      ROUND( 1000 * ( SUM( COALESCE( num_referrals_suspect_hiv_tb_cm_ntd_mh, 0 ) ) / SUM( COALESCE( num_catchment_people_iccm, 0 ) ) ), 1 )
+FROM lastmile_report.mart_view_base_msr_county 
+WHERE month_reported = @p_month AND 
+      year_reported=@p_year     AND 
+      county_id IS NOT NULL
+;
 
 
+/* 416. Expected percentage of pregnant women visited (excluding first trimester) per 1,000 population.
 
+( ( ( number pregnant woman visits per month / population ) * 1000 ) / ( 28.8 * ( 2 / 3 ) ) ) * 100
+
+where 28.8 is the expected number of pregnant woman visits per month per 1000 population
+
+2/3 factors in that visits do not begin until the 2nd trimester
+
+
+For territories 1_14 (Rivercess), 6_31 (GG LMH), and 6_16 (Total LMH) we calculate values from the data 
+collected in the LMD CHA MSRs.
+
+For all other counties it is based on the number of pregnant woman visits (349) and the number of CHA MSRs 
+reported by counties (381) from the MOH dhis2 NCHA Outputs report, so territories 1_1 ... 1_15.
+
+The county population served is estimated from the the number of CHA MSRs reported for a month and multiplying by 300, 
+which is an estimate of the number of persons served by a CHA.  This is considered a more accurate estimate than the 
+number of CHAs deployed (ind_id 28).
+
+Lastly, 416 indicator values for all counties (1_1..1_15) are sum'ed and used to calculate the Liberaia-wide estimate.
+
+*/
+
+-- First, calculate indicator values for Rivercess, GG LMH, and total LMH 
+
+replace INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 
+        416, 
+        territory_id,  -- 6_31 GG LMH, 1_14 Rivercess
+        1, 
+        @p_month, 
+        @p_year, 
+        round( ( ( coalesce( num_pregnant_woman_visits, 0 ) / coalesce( num_catchment_people_iccm, 0 ) ) * 1000 ) / ( 28.8 * ( 2 / 3 ) ), 1 )
+        
+from lastmile_report.mart_view_base_msr_county 
+where month_reported=@p_month and 
+      year_reported=@p_year   and 
+      not county_id is null
+
+union
+
+select
+      416, 
+      '6_16', -- total LMH
+      1, 
+      @p_month, 
+      @p_year, 
+      round( ( ( sum( coalesce( num_pregnant_woman_visits, 0 ) ) / sum( coalesce( num_catchment_people_iccm, 0 ) ) ) * 1000 ) / ( 28.8 * ( 2 / 3 ) ), 1 )
+        
+ 
+from lastmile_report.mart_view_base_msr_county 
+where month_reported = @p_month and 
+      year_reported=@p_year     and 
+      not county_id is null
+;
 
 
 -- ------ --

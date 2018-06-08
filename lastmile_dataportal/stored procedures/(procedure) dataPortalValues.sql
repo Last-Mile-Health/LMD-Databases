@@ -1793,6 +1793,79 @@ WHERE month_reported = @p_month AND
 
 
 
+/*  418. Percent of CHAs who received a supervision visit in the past month. 
+    Notes:  For Grand Gedeh, the UNICEF CHAs are not being counted in the denominator.  To add them in, remove the
+            the "cohort is null" from the where clause (two places) below.
+
+*/
+
+replace into lastmile_dataportal.tbl_values ( ind_id , territory_id, period_id, `month`, `year`, value )
+select
+      418,
+      case 
+          when a.county like 'Rivercess'    then '1_14'
+          when a.county like 'Grand Gedeh'  then '6_31'
+          else null
+      end  as territory_id, 
+      1, 
+      @p_month, 
+      @p_year,
+      round( count( a.position_id_supervision ) / count( a.position_id), 2 ) as supervision_rate 
+from ( 
+        select c.county, c.position_id, s.position_id_supervision
+        from lastmile_report.data_mart_snapshot_position_cha as c
+            left outer join ( 
+                              select supervisedCHAID   as position_id_supervision
+                              from lastmile_upload.odk_supervisionVisitLog
+                              where                          
+                                    ( meta_fabricated = 0 )           and
+                                    ( supervisionAttendance = 1 )     and -- only count record if this flag is set.
+                                    ( month( manualDate ) = @p_month  and year( manualDate ) = @p_year ) 
+                              group by supervisedCHAID 
+                              
+                            ) as s on c.position_id like s.position_id_supervision                   
+        where ( c.cohort is null ) and -- filter out UNICEF for now.
+              ( ( month( c.snapshot_date ) =  @p_month ) and ( year( c.snapshot_date ) = @p_year ) ) 
+      
+) as a
+group by a.county
+
+union all
+
+select
+      418,
+      '6_16' as territory_id,
+      1, 
+      @p_month, 
+      @p_year,
+      round( count( a.position_id_supervision ) / count( a.position_id ), 2 ) as supervision_rate 
+from ( 
+        select c.county, c.position_id, s.position_id_supervision
+        from lastmile_report.data_mart_snapshot_position_cha as c
+            left outer join ( 
+                              select supervisedCHAID   as position_id_supervision
+                              from lastmile_upload.odk_supervisionVisitLog
+                              where                          
+                                    ( meta_fabricated = 0 )           and
+                                    ( supervisionAttendance = 1 )     and -- only count record if this flag is set.
+                                    ( month( manualDate ) = @p_month  and year( manualDate ) = @p_year ) 
+                              group by supervisedCHAID 
+                              
+                            ) as s on c.position_id like s.position_id_supervision                   
+        where ( c.cohort is null ) and -- filter out UNICEF for now.
+              ( ( month( c.snapshot_date ) =  @p_month ) and ( year( c.snapshot_date ) = @p_year ) ) 
+      
+) as a
+;
+
+
+
+
+
+
+
+
+
 -- ------ --
 -- Finish --
 -- ------ --

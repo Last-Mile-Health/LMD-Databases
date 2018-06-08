@@ -1858,13 +1858,178 @@ from (
 ) as a
 ;
 
+/*
+ 419. Estimated percent of children who received a MUAC screen
+ 
+ Number of malnutrition screenings (MUAC) conducted for children under-five divided by the number of children under 5.
+ 
+ To estimate the number of children, multiply the popluation by 16%. (This assumes a child gets only one MUAC 
+ screening per month.
+ 
+ 
+  ( number of muac red + number of muac yellow + number of muac green ) / ( estimated population served * 0.16 )
+    
+ 
+ For territories 1_14 (Rivercess), 6_31 (GG LMH), and 6_16 (Total LMH) we calculate values from the data collected 
+ in the LMD CHA MSRs.
+ 
+ For all other counties it is based on the number of children screened for malnutrition (MUAC) (235) and the number 
+ of CHA MSRs reported by counties (381) from the MOH dhis2 NCHA Outputs report, so territories 1_1 ... 1_15
+
+ The county population served is estimated from the the number of CHA MSRs reported for a month and multiplying by 300, 
+ which is an estimate of the number of persons served by a CHA.  This is considered a more accurate estimate than the 
+ number of CHAs deployed (ind_id 28).
+
+TBD: Lastly, 419 indicator values for all counties (1_1..1_15) are sum'ed and used to calculate the Liberaia-wide estimate.
+
+*/
+
+-- First, calculate indicator values for Rivercess, GG LMH, and total LMH 
+
+replace INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 
+        419, 
+        territory_id,  -- 6_31 GG LMH, 1_14 Rivercess
+        1, 
+        @p_month, 
+        @p_year, 
+        round( ( coalesce( num_muac_red, 0 ) + coalesce( num_muac_yellow, 0 ) + coalesce( num_muac_green, 0 ) ) / ( coalesce( num_catchment_people_iccm, 0 ) * 0.16 ), 2 )
+        
+from lastmile_report.mart_view_base_msr_county 
+where month_reported = @p_month and 
+      year_reported = @p_year   and 
+      not county_id is null
+
+union
+
+select
+      419, 
+      '6_16', -- total LMH
+      1, 
+      @p_month, 
+      @p_year, 
+      round( sum( coalesce( num_muac_red, 0 ) + coalesce( num_muac_yellow, 0 ) + coalesce( num_muac_green, 0 ) )  / sum( coalesce( num_catchment_people_iccm, 0 ) * 0.16 ), 2 )
+        
+from lastmile_report.mart_view_base_msr_county 
+where month_reported = @p_month and 
+      year_reported  = @p_year     and 
+      not county_id is null
+;
 
 
 
+/*
+ 420. Number of children with moderate acute malnutrition (yellow MUAC), per 1,000 children
+ 
+ Number of children with moderate acute malnutrition (yellow MUAC), per 1,000 children under-five divided by the 
+ number of children under 5.
+ 
+ To estimate the number of children, multiply the popluation by 16%. (This assumes only a child only gets one MUAC 
+ screening per month.
+ 
+ For territories 1_14 (Rivercess), 6_31 (GG LMH), and 6_16 (Total LMH) we calculate values from the data collected 
+ in the LMD CHA MSRs.
+ 
+ For all other counties it is based on the Number of children with moderate acute malnutrition (yellow MUAC) (382) 
+ and the number of CHA MSRs reported by counties (381) from the MOH dhis2 NCHA Outputs report, so territories 1_1 ... 1_15
+
+ The county population served is estimated from the the number of CHA MSRs reported for a month and multiplying by 300, 
+ which is an estimate of the number of persons served by a CHA.  This is considered a more accurate estimate than the 
+ number of CHAs deployed (ind_id 28).
+
+TBD: Lastly, 420 indicator values for all counties (1_1..1_15) are sum'ed and used to calculate the Liberaia-wide estimate.
+
+*/
+
+-- First, calculate indicator values for Rivercess, GG LMH, and total LMH 
+
+replace INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 
+        420, 
+        territory_id,  -- 6_31 GG LMH, 1_14 Rivercess
+        1, 
+        @p_month, 
+        @p_year, 
+        round( ( coalesce( num_muac_yellow, 0 ) / ( coalesce( num_catchment_people_iccm, 0 ) * 0.16  ) ) * 1000, 1 )
+      
+        
+from lastmile_report.mart_view_base_msr_county 
+where month_reported=@p_month and 
+      year_reported=@p_year   and 
+      not county_id is null
+
+union
+
+select
+      420, 
+      '6_16', -- total LMH
+      1, 
+      @p_month, 
+      @p_year, 
+      round( ( sum( coalesce( num_muac_yellow, 0 ) ) / sum(  coalesce( num_catchment_people_iccm, 0 ) * 0.16  ) ) * 1000, 1 )
+       
+from lastmile_report.mart_view_base_msr_county 
+where month_reported = @p_month and 
+      year_reported=@p_year     and 
+      not county_id is null
+;
 
 
+/*
+ 421. Number of children with moderate acute malnutrition (yellow MUAC), per 1,000 children
+ 
+ Number of children with severe acute malnutrition (red MUAC), per 1,000 children under-five divided by the 
+ number of children under 5.
+ 
+ To estimate the number of children, multiply the popluation by 16%. (This assumes only a child only gets one MUAC 
+ screening per month.
+ 
+ For territories 1_14 (Rivercess), 6_31 (GG LMH), and 6_16 (Total LMH) we calculate values from the data collected 
+ in the LMD CHA MSRs.
+ 
+ For all other counties it is based on the Number of children with severe acute malnutrition (red MUAC) (383) 
+ and the number of CHA MSRs reported by counties (381) from the MOH dhis2 NCHA Outputs report, so territories 1_1 ... 1_15
 
+ The county population served is estimated from the the number of CHA MSRs reported for a month and multiplying by 300, 
+ which is an estimate of the number of persons served by a CHA.  This is considered a more accurate estimate than the 
+ number of CHAs deployed (ind_id 28).
 
+TBD: Lastly, 421 indicator values for all counties (1_1..1_15) are sum'ed and used to calculate the Liberaia-wide estimate.
+
+*/
+
+-- First, calculate indicator values for Rivercess, GG LMH, and total LMH 
+
+replace INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 
+        421, 
+        territory_id,  -- 6_31 GG LMH, 1_14 Rivercess
+        1, 
+        @p_month, 
+        @p_year, 
+        round( ( coalesce( num_muac_red, 0 ) / ( coalesce( num_catchment_people_iccm, 0 ) * 0.16  ) ) * 1000, 1 )
+      
+        
+from lastmile_report.mart_view_base_msr_county 
+where month_reported=@p_month and 
+      year_reported=@p_year   and 
+      not county_id is null
+
+union
+
+select
+      421, 
+      '6_16', -- total LMH
+      1, 
+      @p_month, 
+      @p_year, 
+      round( ( sum( coalesce( num_muac_red, 0 ) ) / sum(  coalesce( num_catchment_people_iccm, 0 ) * 0.16  ) ) * 1000, 1 )
+       
+from lastmile_report.mart_view_base_msr_county 
+where month_reported = @p_month and 
+      year_reported=@p_year     and 
+      not county_id is null
+;
 
 -- ------ --
 -- Finish --

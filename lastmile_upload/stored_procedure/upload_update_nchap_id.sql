@@ -23,10 +23,8 @@ declare continue handler for sqlexception
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) 
 values ( now(), 'error occurred' );
 
-
--- The first thing you need to do is to reload the table temp_view_base_history_moh_lmh_cha_id.  Note: there is
--- no chss table, the view is fast enough for now.
-
+-- Reload the table temp_view_base_history_moh_lmh_cha_id.  Note: there is no chss table, the view is fast enough for now.
+-- 
 
 drop table if exists lastmile_cha.temp_view_base_history_moh_lmh_cha_id;
 

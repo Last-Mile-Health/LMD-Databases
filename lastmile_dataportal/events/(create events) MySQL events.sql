@@ -26,7 +26,7 @@ delimiter $$
 */
 create event event_data_mart_snapshot_position_cha
 on schedule every 1 month
-starts '2018-06-12 03:00:00'
+starts '2018-06-15 03:00:00'
 do begin
 
 	  -- Set date variables

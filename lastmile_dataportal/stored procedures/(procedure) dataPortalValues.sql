@@ -945,6 +945,40 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 UNION SELECT 323, '6_16', 1, @p_month, @p_year, ROUND(1000*(SUM((COALESCE(num_tx_malaria,0)+COALESCE(num_tx_diarrhea,0)+COALESCE(num_tx_ari,0)))/SUM(COALESCE(num_catchment_people_iccm,0))),1)
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select
+      323,
+      '6_27',
+      1,
+      @p_month,
+      @p_year,
+      round( ( coalesce( s.total_treatment, 0 ) / coalesce( p.population, 0 ) ) * 1000, 1 ) as rate
+
+from (  
+        select
+              r.territory_id,
+              r.period_id,
+              r.`month`,
+              r.`year`,
+              sum( r.value ) as total_treatment  
+              from tbl_values as r 
+        where ( r.ind_id in ( 19, 21, 23) )   and 
+              ( r.territory_id like '6_27' )  and 
+              ( r.period_id = 1 )             and 
+              ( r.`year` = @p_year )          and 
+              ( r.`month` = @p_month )
+      ) as s
+          left outer join (
+                            select  ind_id, 
+                                    territory_id, 
+                                    period_id, 
+                                    `month`, 
+                                    `year`, 
+                                    round( coalesce( value, 0 ) * 350 , 0 ) as population
+                            from tbl_values where ( ind_id = 381 ) and ( territory_id like '6_27' ) and ( period_id = 1 ) and  ( `year` = @p_year )  and ( `month` = @p_month )
+                    ) as p on ( s.territory_id like p.territory_id ) and ( s.`year` = p.`year` ) and ( s.`month` = p.`month` ) and ( s.period_id = p.period_id )
+;    
+
 
 -- 331. CHSS restock rate
 -- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted

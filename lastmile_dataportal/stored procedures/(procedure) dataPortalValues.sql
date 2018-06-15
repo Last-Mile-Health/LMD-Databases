@@ -686,6 +686,36 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 UNION SELECT 226, '6_16', 1, @p_month, @p_year, ROUND(SUM(COALESCE(num_routine_visits,0))/SUM(COALESCE(num_catchment_households,0)),1)
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
+/*
+For NCHA value use an estimate of the  population, which is the number of CHA MSRs turned in multiplied by 350 
+persons served per CHA. (ind_id = 381)
+
+Then, use population divided by 6 to estimate the number of households.
+The numerator is ind_id 119, which is the number of routine visits conducted in Liberia.
+*/
+
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select  226, 
+        '6_27', 
+        1, 
+        @p_month, 
+        @p_year, 
+        round( r.value /p.number_household, 2 )
+from tbl_values as r 
+    left outer join ( select  ind_id, 
+                              territory_id, 
+                              period_id, 
+                              `month`, 
+                              `year`, 
+                               round( ( coalesce( value, 0 ) * 350 ) / 6, 0 ) as number_household
+                      from tbl_values where ( ind_id = 381 ) and ( territory_id like '6_27' ) and ( period_id = 1 ) and  ( `year` = @p_year )  and ( `month` = @p_month )
+                    ) as p on ( r.territory_id like p.territory_id ) and ( r.`year` = p.`year` ) and ( r.`month` = p.`month` ) and ( r.period_id = p.period_id )
+                
+where ( r.ind_id = 119 ) and ( r.territory_id like '6_27' ) and ( r.period_id = 1 ) and ( r.`year` = @p_year )  and ( r.`month` = @p_month )
+;
+
+
+
 
 -- 229. Estimated percent of births tracked by a CHA
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)

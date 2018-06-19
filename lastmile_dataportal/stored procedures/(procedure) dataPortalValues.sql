@@ -507,6 +507,23 @@ WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NUL
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 131, '6_16', 1, @p_month, @p_year, @new_value;
 
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 131, '6_27', 1, @p_month, @p_year, sum( a.number_routine_visit ) as total_routine_visit from (
+
+    -- Audacious cummulative routine visits in Liberia for previous month. 
+    select coalesce( value, 0 ) as number_routine_visit 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 131 and territory_id like '6_27' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+    union all
+    
+    -- NCHA Output for routine visits in Liberia for the current month.  For this to work, the dhis2 NCHA Output data must have been 
+    -- uploaded manually already.
+    select coalesce( value, 0 ) as number_routine_visit 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 119 and territory_id like '6_27' and `year` = @p_year and `month` = @p_month and period_id = 1
+    
+) as a;
 
 -- 132. Cumulative number of supervision visits conducted
 SET @old_value = ( SELECT `value` FROM lastmile_dataportal.tbl_values
@@ -980,6 +997,28 @@ from (
 ;    
 
 
+-- 325. National implementation fidelity reporting rate (LMH Assisted Networks)
+
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 325, '6_27', 1, @p_month,  @p_year,  round( count( * ) / coalesce( d.number_county_report, 0 ), 3 ) as ifi_report_rate
+from (  
+        select county 
+        from lastmile_report.mart_view_base_ifi 
+        where `month` = @p_month and `year` = @p_year 
+        group by county
+) as n
+  cross join (
+                select count( * ) as number_county_report
+                from (  
+                        select county 
+                        from lastmile_report.mart_view_base_ifi  
+                        where date( concat( `year`, '-', `month`,'-', '-01' ) ) <= date( concat( @p_year, '-', @p_month,'-', '-01' ) )
+                        group by county
+                ) as t
+
+  ) as d;
+
+
 -- 331. CHSS restock rate
 -- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted
 -- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
@@ -1285,6 +1324,60 @@ FROM lastmile_report.mart_view_odk_sickchild WHERE `month`=@p_month AND `year`=@
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 386, territory_id, 1, @p_month, @p_year, COALESCE(malaria_odk,0)
 FROM lastmile_report.mart_view_odk_sickchild WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
+
+
+-- 393. Cummulative child cases of malaria, diarrhea,and ARI trieated
+
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 393, '6_27', 1, @p_month, @p_year, sum( a.number_child_case ) as total_child_case from (
+
+    -- Audacious cummulative child cases of malaria, diarrhea,and ARI trieated in Liberia for previous month. 
+    select coalesce( value, 0 ) as number_child_case 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 393 and territory_id like '6_27' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+    union all
+    
+    -- NCHA Output of child cases of malaria, diarrhea,and ARI trieated in Liberia for the current month.  For this to work, the 
+    -- dhis2 NCHA Output data must have been uploaded manually already.
+    select coalesce( value, 0 ) as number_child_case 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 19 and territory_id like '6_27' and `year` = @p_year and `month` = @p_month and period_id = 1
+    
+    union all
+    
+    select coalesce( value, 0 ) as number_child_case 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 21 and territory_id like '6_27' and `year` = @p_year and `month` = @p_month and period_id = 1
+    
+    union all
+    
+    select coalesce( value, 0 ) as number_child_case 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 23 and territory_id like '6_27' and `year` = @p_year and `month` = @p_month and period_id = 1
+    
+) as a;
+
+
+-- 394. Cumulative number of pregnant woman visits in Liberia
+
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 394, '6_27', 1, @p_month, @p_year, sum( a.number_pregnant_woman ) as total_pregnant_woman from (
+
+    -- Audacious cumulative number of pregnant woman visits in Liberia for previous month. 
+    select coalesce( value, 0 ) as number_pregnant_woman 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 394 and territory_id like '6_27' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+    union all
+    
+    -- NCHA Output number of pregnant woman visits in Liberia for the current month.  For this to work, the 
+    -- dhis2 NCHA Output data must have been uploaded manually already.
+    select coalesce( value, 0 ) as number_pregnant_woman 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 349 and territory_id like '6_27' and `year` = @p_year and `month` = @p_month and period_id = 1
+    
+) as a;
 
 
 -- 396. Cumulative number of child cases of malaria treated in Liberia

@@ -58,6 +58,16 @@ SET @p_datePlus1 := DATE(CONCAT(@p_yearPlus1,'-',@p_monthPlus1,'-01'));
 SET @isEndOfQuarter := IF(@p_month IN (3,6,9,12),1,0);
 #SET @isCurrentMonth := IF(@p_month=MONTH(DATE_ADD(NOW(), INTERVAL -1 MONTH)) AND @p_year=YEAR(DATE_ADD(NOW(), INTERVAL -1 MONTH)),1,0);
 
+/*
+ *
+ * Set Global variables
+ *
+*/
+
+-- The ration to calculate population from number of CHAs.
+set @cha_population_ratio = 235;
+-- set @cha_population_ratio = 300;
+
 
 
 -- ------------ --
@@ -89,14 +99,31 @@ INSERT INTO lastmile_report.mart_program_scale (territory_id) VALUES ('6_31'), (
 
 -- 28. Number of CHAs deployed
 -- !!!!! the "cohort IS NULL" clause needs to be changed once cohorts are assigned !!!!!
-UPDATE lastmile_report.mart_program_scale a LEFT JOIN (
-SELECT IF(cohort IS NULL,'6_31',IF(cohort='UNICEF','6_26','error')) AS territory_id, COUNT(1) as num_cha FROM lastmile_report.mart_view_base_history_person
-WHERE county_id=6 AND job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY territory_id
-UNION SELECT CONCAT('1_',county_id), COUNT(1) FROM lastmile_report.mart_view_base_history_person
-WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY county_id
-UNION SELECT '6_16', COUNT(1) FROM lastmile_report.mart_view_base_history_person
-WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date)
-) b ON a.territory_id = b.territory_id SET a.num_cha = b.num_cha;
+UPDATE lastmile_report.mart_program_scale a 
+
+    LEFT JOIN (
+                SELECT 
+                        IF(cohort IS NULL,'6_31',IF(cohort='UNICEF','6_26','error')) AS territory_id, 
+                        COUNT(1) as num_cha 
+                FROM lastmile_report.mart_view_base_history_person
+                WHERE county_id=6 AND job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY territory_id
+
+                UNION 
+                
+                SELECT 
+                      CONCAT('1_',county_id), 
+                      COUNT(1) 
+                FROM lastmile_report.mart_view_base_history_person
+                WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date) GROUP BY county_id
+
+                UNION 
+                
+                SELECT '6_16', COUNT(1) 
+                FROM lastmile_report.mart_view_base_history_person
+                WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date)
+              ) b ON a.territory_id = b.territory_id 
+
+SET a.num_cha = b.num_cha;
 
 
 -- 29. Number of CHSSs deployed
@@ -112,14 +139,171 @@ WHERE job='CHSS' AND position_person_begin_date <= @p_date AND (position_person_
 
 
 -- 45. Number of people served (CHA program)
--- !!!!! TEMP until we start collecting UNICEF HHR data !!!!!
+/* Avi's hard-coded numbers
 UPDATE lastmile_report.mart_program_scale SET num_people = 12185 WHERE territory_id = '6_31';
 UPDATE lastmile_report.mart_program_scale SET num_people = 45367 WHERE territory_id = '6_26';
 UPDATE lastmile_report.mart_program_scale SET num_people = 40483 WHERE territory_id = '1_14';
 UPDATE lastmile_report.mart_program_scale SET num_people = 0 WHERE territory_id = '1_4';
 UPDATE lastmile_report.mart_program_scale SET num_people = 57552 WHERE territory_id = '1_6';
 UPDATE lastmile_report.mart_program_scale SET num_people = 98035 WHERE territory_id = '6_16';
+*/
 
+
+-- Pull these from the snapshot data mart for the year/month.
+
+-- GG LMH 6_31
+update lastmile_report.mart_program_scale s
+    set s.num_people = ( 
+                          select 
+                                  if( min( coalesce( c.population, 0 ) ) = 0, 
+                                      min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
+                                      min( coalesce( c.population, 0 ) )     
+                                  )  as population
+                          from lastmile_report.view_snapshot_position_cha as c
+                          where ( year( c.snapshot_date )   = @p_year )       and 
+                                ( month( c.snapshot_date ) = @p_month )       and
+                                ( trim( c.cohort ) like '%Grand%Gede%LMH%' )                             
+                        )
+where territory_id like '6\\_31'
+;
+
+-- GG LMH 6_26
+update lastmile_report.mart_program_scale s
+    set s.num_people = ( 
+                          select 
+                                  if( min( coalesce( c.population, 0 ) ) = 0, 
+                                      min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
+                                      min( coalesce( c.population, 0 ) )     
+                                  )  as population
+                          from lastmile_report.view_snapshot_position_cha as c
+                          where ( year( c.snapshot_date   ) = @p_year   )       and 
+                                ( month( c.snapshot_date  ) = @p_month  )       and
+                                ( trim( c.cohort ) like '%Grand%Gede%UNICEF%' )                                                            
+                        )
+where territory_id like '6\\_26'
+;
+
+
+-- GG LMH 1_6
+update lastmile_report.mart_program_scale s
+    set s.num_people = (
+                          select sum( a.population ) as population
+                          from ( 
+                                  select 
+                                        if( min( coalesce( c.population, 0 ) ) = 0, 
+                                            min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
+                                            min( coalesce( c.population, 0 ) )     
+                                        ) as population
+                                  from lastmile_report.view_snapshot_position_cha as c
+                                  where ( year( c.snapshot_date )   = @p_year   )       and 
+                                        ( month( c.snapshot_date )  = @p_month  )       and
+                                        ( trim( c.cohort ) like '%Grand%Gede%LMH%' )  
+                                
+                                  union all
+                          
+                                  select 
+                                        if( min( coalesce( c.population, 0 ) ) = 0, 
+                                            min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
+                                            min( coalesce( c.population, 0 ) )     
+                                        ) as population
+                                  from lastmile_report.view_snapshot_position_cha as c
+                                  where ( year( c.snapshot_date   ) = @p_year   )       and 
+                                        ( month( c.snapshot_date  ) = @p_month  )       and
+                                        ( trim( c.cohort ) like '%Grand%Gede%UNICEF%' )   
+                          
+                              ) as a
+                        )
+where territory_id like '1\\_6'
+;
+
+-- Rivercess 1_14
+update lastmile_report.mart_program_scale s
+    set s.num_people = ( 
+                          select 
+                                  if( min( coalesce( c.population, 0 ) ) = 0, 
+                                      min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
+                                      min( coalesce( c.population, 0 ) )     
+                                  ) as population
+                          from lastmile_report.view_snapshot_position_cha as c
+                          where ( year( c.snapshot_date   ) = @p_year   )       and 
+                                ( month( c.snapshot_date  ) = @p_month  )       and
+                                ( trim( c.cohort ) like '%Rivercess%' )                                                            
+                        )
+where territory_id like '1\\_14'
+;
+
+-- Grand Bassa 1_4
+update lastmile_report.mart_program_scale s
+    set s.num_people = ( 
+                          select 
+                                  ifnull( if( min( coalesce( c.population, 0 ) ) = 0, 
+                                              min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
+                                              min( coalesce( c.population, 0 ) )     
+                                  ), 0 ) as population
+                          from lastmile_report.view_snapshot_position_cha as c
+                          where ( year( c.snapshot_date   ) = @p_year   )       and 
+                                ( month( c.snapshot_date  ) = @p_month  )       and
+                                ( trim( c.cohort ) like '%Grand%Bassa%' )                                                            
+                        )
+where territory_id like '1\\_4'
+;
+
+
+-- GG LMH 6_16
+update lastmile_report.mart_program_scale s
+    set s.num_people = (
+                          select sum( a.population ) as population
+                          from ( 
+                                  select 
+                                        if( min( coalesce( c.population, 0 ) ) = 0, 
+                                            min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
+                                            min( coalesce( c.population, 0 ) )     
+                                        ) as population
+                                  from lastmile_report.view_snapshot_position_cha as c
+                                  where ( year( c.snapshot_date )   = @p_year   )       and 
+                                        ( month( c.snapshot_date )  = @p_month  )       and
+                                        ( trim( c.cohort ) like '%Grand%Gede%LMH%' )  
+                                        
+                                  union all
+                          
+                                  select 
+                                        if( min( coalesce( c.population, 0 ) ) = 0, 
+                                            min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
+                                            min( coalesce( c.population, 0 ) )     
+                                        ) as population
+                                  from lastmile_report.view_snapshot_position_cha as c
+                                  where ( year( c.snapshot_date   ) = @p_year   )       and 
+                                        ( month( c.snapshot_date  ) = @p_month  )       and
+                                        ( trim( c.cohort ) like '%Grand%Gede%UNICEF%' )         
+                                
+                                  union all
+                          
+                                  select 
+                                        if( min( coalesce( c.population, 0 ) ) = 0, 
+                                            min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
+                                            min( coalesce( c.population, 0 ) )     
+                                        ) as population
+                                  from lastmile_report.view_snapshot_position_cha as c
+                                  where ( year( c.snapshot_date   ) = @p_year   )       and 
+                                        ( month( c.snapshot_date  ) = @p_month  )       and
+                                        ( trim( c.cohort ) like '%Rivercess%' ) 
+                                        
+                                  union all      
+                                  
+                                  select 
+                                        ifnull( if( min( coalesce( c.population, 0 ) ) = 0, 
+                                                    min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
+                                                    min( coalesce( c.population, 0 ) )     
+                                        ), 0 ) as population
+                                  from lastmile_report.view_snapshot_position_cha as c
+                                  where ( year( c.snapshot_date   ) = @p_year   )       and 
+                                        ( month( c.snapshot_date  ) = @p_month  )       and
+                                        ( trim( c.cohort ) like '%Grand%Bassa%' )         
+                                                                                                  
+                              ) as a
+                       )
+where territory_id like '6\\_16'
+;
 
 -- 50. Number of communities served
 -- !!!!! TEMP until we start collecting UNICEF HHR data !!!!!
@@ -323,9 +507,31 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 
 
 -- 45. Number of people served (CHA program)
-REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 45, territory_id, 1, @p_month, @p_year, num_people FROM lastmile_report.mart_program_scale;
 
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 45, territory_id, 1, @p_month, @p_year, num_people from lastmile_report.mart_program_scale
+union all
+select 45, '6_27', 1, @p_month, @p_year, min( coalesce( value, 0 ) ) * @cha_population_ratio as population
+from lastmile_dataportal.tbl_values
+where ind_id = 28 and territory_id like '6\\_27' and period_id = 1 and `month` = @p_month and `year` = @p_year 
+;
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 45, '6_32', 1, @p_month, @p_year, sum( a.population ) as population
+from (
+        -- Turn total LMH into a negative number to be sum'ed with Total Liberia to get Assisted LMH
+        select 0 - min( coalesce( value, 0 ) ) as population
+        from lastmile_dataportal.tbl_values
+        where ind_id = 45 and territory_id like '6\\_16' and period_id = 1 and `month` = @p_month and `year` = @p_year 
+
+        union
+
+        select min( coalesce( value, 0 ) ) as population
+        from lastmile_dataportal.tbl_values
+        where ind_id = 45 and territory_id like '6\\_27' and period_id = 1 and `month` = @p_month and `year` = @p_year 
+
+) as a
+;
 
 -- 47. Number of records entered
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -506,24 +712,6 @@ SET @new_value = @old_value + ( SELECT SUM(COALESCE(num_routine_visits,0)) FROM 
 WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL );
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 131, '6_16', 1, @p_month, @p_year, @new_value;
-
-replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
-select 131, '6_27', 1, @p_month, @p_year, sum( a.number_routine_visit ) as total_routine_visit from (
-
-    -- Audacious cummulative routine visits in Liberia for previous month. 
-    select coalesce( value, 0 ) as number_routine_visit 
-    from lastmile_dataportal.tbl_values 
-    where ind_id = 131 and territory_id like '6_27' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
-    
-    union all
-    
-    -- NCHA Output for routine visits in Liberia for the current month.  For this to work, the dhis2 NCHA Output data must have been 
-    -- uploaded manually already.
-    select coalesce( value, 0 ) as number_routine_visit 
-    from lastmile_dataportal.tbl_values 
-    where ind_id = 119 and territory_id like '6_27' and `year` = @p_year and `month` = @p_month and period_id = 1
-    
-) as a;
 
 -- 132. Cumulative number of supervision visits conducted
 SET @old_value = ( SELECT `value` FROM lastmile_dataportal.tbl_values
@@ -1137,10 +1325,16 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 
 -- 356. Number of women currently using a modern method of family planning
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+
 SELECT 356, territory_id, 1, @p_month, @p_year, COALESCE(num_clients_modern_fp,0)
-FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL
-UNION SELECT 356, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_clients_modern_fp,0))
-FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
+FROM lastmile_report.mart_view_base_msr_county 
+WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL
+
+UNION 
+
+SELECT 356, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_clients_modern_fp,0))
+FROM lastmile_report.mart_view_base_msr_county 
+WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
 
 -- 356.	NCHA Outputs: Number of women currently using a modern method of family planning
@@ -1157,6 +1351,9 @@ set @liberia_total = (  select sum( value ) from tbl_values
 
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        356,      '6_27',         1,            @p_month, @p_year,  @liberia_total;
+
+
+
 
 
 -- 357. Number of HIV client visits
@@ -1325,6 +1522,46 @@ REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`
 SELECT 386, territory_id, 1, @p_month, @p_year, COALESCE(malaria_odk,0)
 FROM lastmile_report.mart_view_odk_sickchild WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
 
+-- 388. Cumulative TARGET number of routine visits conducted
+--      Every month the cumulative target increases by 30664
+
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 388, '6_27', 1, @p_month, @p_year,(  a.number_routine_visit_target + 30664 ) as number_routine_visit_target from (
+
+    -- Audacious TARGET cummulative routine visits in Liberia for previous month. 
+    select min( coalesce( value, 0 ) ) as number_routine_visit_target 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 388 and territory_id like '6_27' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+        
+) as a;
+
+-- 389. Cummulative TARGET child cases of malaria, diarrhea,and ARI trieated.  (Target for 393.)
+--      Every month the cumulative target increases by 14593
+
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 389, '6_27', 1, @p_month, @p_year, ( a.number_child_case_target + 14593 ) as number_child_case_target from (
+
+    -- Audacious cummulative TARGET child cases of malaria, diarrhea,and ARI trieated in Liberia for previous month. 
+    select min( coalesce( value, 0 ) ) as number_child_case_target 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 389 and territory_id like '6_27' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+) as a;
+
+-- 390. Cumulative TARGET number of pregnant woman visits in Liberia.  (Target for 394.)
+-- Every month the cumulative target increases by 4415
+
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 390, '6_27', 1, @p_month, @p_year, ( a.number_pregnant_woman_target + 4415 ) as number_pregnant_woman_target from (
+
+    -- Audacious cumulative TARGET number of pregnant woman visits in Liberia for previous month. 
+    select min( coalesce( value, 0 ) ) as number_pregnant_woman_target
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 390 and territory_id like '6_27' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+) as a;
+
+
 
 -- 393. Cummulative child cases of malaria, diarrhea,and ARI trieated
 
@@ -1342,21 +1579,46 @@ select 393, '6_27', 1, @p_month, @p_year, sum( a.number_child_case ) as total_ch
     -- dhis2 NCHA Output data must have been uploaded manually already.
     select coalesce( value, 0 ) as number_child_case 
     from lastmile_dataportal.tbl_values 
-    where ind_id = 19 and territory_id like '6_27' and `year` = @p_year and `month` = @p_month and period_id = 1
-    
-    union all
-    
-    select coalesce( value, 0 ) as number_child_case 
-    from lastmile_dataportal.tbl_values 
-    where ind_id = 21 and territory_id like '6_27' and `year` = @p_year and `month` = @p_month and period_id = 1
-    
-    union all
-    
-    select coalesce( value, 0 ) as number_child_case 
-    from lastmile_dataportal.tbl_values 
-    where ind_id = 23 and territory_id like '6_27' and `year` = @p_year and `month` = @p_month and period_id = 1
-    
+    where ind_id in ( 19, 21, 23 ) and territory_id like '6_27' and `year` = @p_year and `month` = @p_month and period_id = 1
+        
 ) as a;
+
+
+
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 393, '6_16', 1, @p_month, @p_year, sum( a.number_child_case ) as total_child_case from (
+
+    -- Audacious cummulative child cases of malaria, diarrhea,and ARI trieated in Liberia for previous month. 
+    select coalesce( value, 0 ) as number_child_case 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 393 and territory_id like '6_16' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+    union all
+    
+    -- NCHA Output of child cases of malaria, diarrhea,and ARI trieated in Liberia for the current month.
+    select coalesce( value, 0 ) as number_child_case 
+    from lastmile_dataportal.tbl_values 
+    where ind_id in ( 19, 21, 23 ) and ( territory_id like '6\\_31' or territory_id like '1\\_14' or territory_id like '1\\_4' ) and `year` = @p_year and `month` = @p_month and period_id = 1
+  
+) as a;
+
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 393, '6_32', 1, @p_month, @p_year, sum( a.number_child_case ) as total_child_case from (
+
+    -- Audacious cummulative child cases of malaria, diarrhea,and ARI trieated in Liberia for previous month. 
+    select coalesce( value, 0 ) as number_child_case 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 393 and territory_id like '6_32' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+    union all
+    
+    -- NCHA Output of child cases of malaria, diarrhea,and ARI trieated in Liberia for the current month.
+    select coalesce( value, 0 ) as number_child_case 
+    from lastmile_dataportal.tbl_values 
+    where ind_id in ( 19, 21, 23 ) and ( territory_id like '1\\_%' and not ( territory_id like '1\\_6' or territory_id like '1\\_14'  or territory_id like '1\\_4' ) ) and `year` = @p_year and `month` = @p_month and period_id = 1
+  
+) as a;
+
 
 
 -- 394. Cumulative number of pregnant woman visits in Liberia
@@ -2187,6 +2449,70 @@ where month_reported = @p_month and
       year_reported=@p_year     and 
       not county_id is null
 ;
+
+
+--
+-- 422. Cumulative number of routine visits conducted since January 2018
+-- 
+
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 422, '6_27', 1, @p_month, @p_year, sum( a.number_routine_visit ) as total_routine_visit from (
+
+    -- Audacious cummulative routine visits in Liberia for previous month. 
+    select coalesce( value, 0 ) as number_routine_visit 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 422 and territory_id like '6\\_27' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+    union all
+    
+    -- NCHA Output for routine visits in Liberia for the current month.  For this to work, the dhis2 NCHA Output data must have been 
+    -- uploaded manually already.
+    select coalesce( value, 0 ) as number_routine_visit 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 119 and territory_id like '6\\_27' and `year` = @p_year and `month` = @p_month and period_id = 1
+    
+ ) as a
+ ;
+ 
+
+ replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+ select 422, '6_16', 1, @p_month, @p_year, sum( a.number_routine_visit ) as total_routine_visit from (
+
+    -- Audacious cummulative routine visits for LMH Total for previous month. 
+    select coalesce( value, 0 ) as number_routine_visit 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 422 and territory_id like '6\\_16' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+    union all
+    
+    -- Audacious routine visits for LMH Total for previous month. 
+    select coalesce( value, 0 ) as number_routine_visit 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 119 and ( territory_id like '1\\_14' or territory_id like '6\\_31' ) and `year` = @p_year and `month` = @p_month and period_id = 1
+    
+ ) as a
+ ;
+ 
+ replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+ select 422, '6_32', 1, @p_month, @p_year, sum( a.number_routine_visit ) as total_routine_visit from (
+
+    -- Audacious cummulative routine visits for LMH Assisted for previous month. 
+    select coalesce( value, 0 ) as number_routine_visit 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 422 and territory_id like '6\\_32' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+    union all
+    
+    -- Audacious routine visits for LMH Assisted for previous month. 
+    select coalesce( value, 0 ) as number_routine_visit 
+    from lastmile_dataportal.tbl_values 
+    where ( ind_id = 119 ) and 
+          ( territory_id like '1\\_%' and not ( territory_id like '1\\_14' or territory_id like '1\\_4' or territory_id like '1\\_6' ) ) and 
+          `year` = @p_year and `month` = @p_month and period_id = 1
+    
+ ) as a
+ ;
+
 
 -- ------ --
 -- Finish --

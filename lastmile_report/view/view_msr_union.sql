@@ -29,8 +29,8 @@ select
         
         1_2_a_routine_household_visits                            as num_routine_visits,
         
-        ( COALESCE( 1_2_b_births_community_home, 0  ) + 
-          COALESCE( 1_2_c_births_facility, 0        ) )           as num_births,
+        ( coalesce( 1_2_b_births_community_home, 0  ) + 
+          coalesce( 1_2_c_births_facility, 0        ) )           as num_births,
                 
         1_2_b_births_community_home                               as num_births_home,
         1_2_c_births_facility                                     as num_births_facility,
@@ -49,8 +49,8 @@ select
         3_1_d_muac_green                                          as num_muac_green,
         3_1_h_pneumonia_treated_antibiotics                       as num_tx_ari,
         3_1_m_diarrhea_treated_zinc_ORS                           as num_tx_diarrhea,
-        ( COALESCE( 3_1_i_malaria_treated_2_11_months, 0  ) + 
-          COALESCE( 3_1_j_malaria_treated_1_5_years, 0    ) )     as num_tx_malaria,
+        ( coalesce( 3_1_i_malaria_treated_2_11_months, 0  ) + 
+          coalesce( 3_1_j_malaria_treated_1_5_years, 0    ) )     as num_tx_malaria,
         3_1_k_malaria_treated_less_24_hours                       as num_tx_malaria_under24,
         3_1_l_malaria_treated_more_24_hours                       as num_tx_malaria_over24,
         
@@ -72,12 +72,23 @@ select
         4_1_f_ltfu_tb_clients_traced                              as num_ltfu_tb_clients_traced
 
 from lastmile_upload.de_cha_monthly_service_report
-/*  Filter out position IDs where the CHSSs and CHAs consciously do not know their IDs (999s).  
-    In Winter/Spring 2018 we had over fifty new CHSSs and CHAs in Rivercess who did not have 
-    IDs (LMH or NCHAP) for months.  This wrecked havoc on our reporting.  The decision was 
-    made to filter them out of all reporting.
+/*  Filter out position IDs where the CHSSs and CHAs consciously did not know their IDs and entered 999s.  In Winter/Spring 2018, 
+    we had over sixty new CHSSs and CHAs in Rivercess who did not have IDs (LMH or NCHAP) for months.  This wrecked havoc on our 
+    reporting because records could not be tied together.  The decision was made to filter out all of the 999s for purposes of 
+    reporting.
 */
-where not ( ( trim( cha_id ) like '999' ) or ( trim( chss_id ) like '999' ) )
+where -- cha_id is not a null or emtpy string and it is not 999
+      ( 
+        not ( ( cha_id is null ) or ( trim( cha_id ) like '' )  ) and 
+        not ( trim( cha_id ) like '999' )
+      )
+      and
+      -- chss_id is not a null or emtpy string and it is not 999
+      ( 
+        not ( ( chss_id is null ) or ( trim( chss_id ) like '' )  ) and 
+        not ( trim( chss_id ) like '999' )
+      )
+      
 
 union all
 
@@ -126,8 +137,8 @@ select
         iCCMNutritionMalariaCasesTotal                          as iCCMNutritionMalariaCasesTotal,
         iCCMNutritionMalariaTreatedWithin24HoursTotal           as iCCMNutritionMalariaTreatedWithin24HoursTotal,
         
-        ( COALESCE( iCCMNutritionMalariaCasesTotal, 0 ) - 
-          COALESCE( iCCMNutritionMalariaTreatedWithin24HoursTotal, 0 ) )  as num_tx_malaria_over24,
+        ( coalesce( iCCMNutritionMalariaCasesTotal, 0 ) - 
+          coalesce( iCCMNutritionMalariaTreatedWithin24HoursTotal, 0 ) )  as num_tx_malaria_over24,
           
         null  as num_tx_malaria_under1,
         null  as num_tx_malaria_over1,

@@ -58,13 +58,23 @@ select
       measlesLocation AS measlesLocation,
       'upload' AS source
       
-FROM lastmile_upload.odk_vaccineTracker
-/*  Filter out position IDs where the CHSSs and CHAs consciously do not know their IDs (999s).  
-    In Winter/Spring 2018 we had over fifty new CHSSs and CHAs in Rivercess who did not have 
-    IDs (LMH or NCHAP) for months.  This wrecked havoc on our reporting.  The decision was 
-    made to filter them out of all reporting.
+from lastmile_upload.odk_vaccineTracker
+/*  Filter out position IDs where the CHSSs and CHAs consciously did not know their IDs and entered 999s.  In Winter/Spring 2018, 
+    we had over sixty new CHSSs and CHAs in Rivercess who did not have IDs (LMH or NCHAP) for months.  This wrecked havoc on our 
+    reporting because records could not be tied together.  The decision was made to filter out all of the 999s for purposes of 
+    reporting.
 */
-where not ( ( trim( chssID ) like '999' ) or ( trim( SupervisedchaID ) like '999' ) )
+where -- SupervisedchaID is not a null or emtpy string and it is not 999
+      ( 
+        not ( ( SupervisedchaID is null ) or ( trim( SupervisedchaID ) like '' )  ) and 
+        not ( trim( SupervisedchaID ) like '999' )
+      )
+      and
+      -- chssID is not a null or emtpy string and it is not 999
+      ( 
+        not ( ( chssID is null ) or ( trim( chssID ) like '' )  ) and 
+        not ( trim( chssID ) like '999' )
+      )
 
 union all
 

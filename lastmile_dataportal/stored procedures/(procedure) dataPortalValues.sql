@@ -124,6 +124,12 @@ UPDATE lastmile_report.mart_program_scale a
               ) b ON a.territory_id = b.territory_id 
 
 SET a.num_cha = b.num_cha;
+-- Total hack hack for Grand Bassa.  Until we get the position_community data in for GB, the num_cha will be null.
+-- Could be argued that this is a flaw in the coding of the snapshot code.
+update lastmile_report.mart_program_scale 
+set num_cha =  ( select count( * ) as num_cha from lastmile_cha.view_base_position_cha where county like '%Grand%Bassa%' and position_filled like 'Y' )
+where territory_id like '1\\_4';
+
 
 
 -- 29. Number of CHSSs deployed
@@ -233,6 +239,7 @@ where territory_id like '1\\_14'
 ;
 
 -- Grand Bassa 1_4
+/*
 update lastmile_report.mart_program_scale s
     set s.num_people = ( 
                           select 
@@ -247,6 +254,11 @@ update lastmile_report.mart_program_scale s
                         )
 where territory_id like '1\\_4'
 ;
+*/
+-- Again, we are hacking around Grand Bassa not having position_community data
+set @number_people_bassa = ( select min( if( num_cha is null, num_cha, round( num_cha * @cha_population_ratio, 0 ) ) ) from lastmile_report.mart_program_scale where territory_id like '1\\_4' );
+update lastmile_report.mart_program_scale set num_people = @number_people_bassa where territory_id like '1\\_4';
+
 
 
 -- GG LMH 6_16
@@ -288,8 +300,13 @@ update lastmile_report.mart_program_scale s
                                         ( month( c.snapshot_date  ) = @p_month  )       and
                                         ( trim( c.cohort ) like '%Rivercess%' ) 
                                         
-                                  union all      
+                                  union all 
                                   
+                                  
+                                  /* Delete above line when position/community data comes in */
+                                  select @number_people_bassa as population
+                                  
+ /* Again word around hack for GB.  This code should work when Bassa position/community data comes in.                            
                                   select 
                                         ifnull( if( min( coalesce( c.population, 0 ) ) = 0, 
                                                     min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
@@ -299,7 +316,8 @@ update lastmile_report.mart_program_scale s
                                   where ( year( c.snapshot_date   ) = @p_year   )       and 
                                         ( month( c.snapshot_date  ) = @p_month  )       and
                                         ( trim( c.cohort ) like '%Grand%Bassa%' )         
-                                                                                                  
+*/
+
                               ) as a
                        )
 where territory_id like '6\\_16'
@@ -318,8 +336,8 @@ UPDATE lastmile_report.mart_program_scale SET num_communities = 455 WHERE territ
 
 -- X. Misc GG UNICEF + Grand Bassa
 -- !!!!! TEMP until UNICEF CHAs and CHSSs are in database !!!!!
-UPDATE lastmile_report.mart_program_scale SET num_cha = 0 WHERE territory_id = '1_4';
-UPDATE lastmile_report.mart_program_scale SET num_chss = 21 WHERE territory_id = '1_4';
+-- UPDATE lastmile_report.mart_program_scale SET num_cha = 0 WHERE territory_id = '1_4';
+-- UPDATE lastmile_report.mart_program_scale SET num_chss = 21 WHERE territory_id = '1_4';
 
 
 
@@ -509,28 +527,45 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 
 -- 45. Number of people served (CHA program)
 
+-- First, bring mart_program_scale numbers into tbl_value for the month
+
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 45, territory_id, 1, @p_month, @p_year, num_people from lastmile_report.mart_program_scale
-union all
-select 45, '6_27', 1, @p_month, @p_year, min( coalesce( value, 0 ) ) * @cha_population_ratio as population
-from lastmile_dataportal.tbl_values
-where ind_id = 28 and territory_id like '6\\_27' and period_id = 1 and `month` = @p_month and `year` = @p_year 
 ;
 
+-- Second, generate the population totals for all the assisted counties from the number of CHAs (ind_id 28)
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 45, '6_32', 1, @p_month, @p_year, sum( a.population ) as population
-from (
-        -- Turn total LMH into a negative number to be sum'ed with Total Liberia to get Assisted LMH
-        select 0 - min( coalesce( value, 0 ) ) as population
+select 45, a.territory_id, 1, @p_month, @p_year, a.population
+from ( 
+        select
+              territory_id,
+              round( coalesce( value, 0 ) * @cha_population_ratio , 0 ) as population
         from lastmile_dataportal.tbl_values
-        where ind_id = 45 and territory_id like '6\\_16' and period_id = 1 and `month` = @p_month and `year` = @p_year 
+        where ind_id = 28 and period_id = 1 and `month` = @p_month and `year` = @p_year and
+              territory_id like '1\\_%' and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
+) as a
+;
 
-        union
-
-        select min( coalesce( value, 0 ) ) as population
+-- Third, add up the population totals for all the assisted counties to get a assiated total.
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 45, '6_32', 1, @p_month, @p_year, a.population
+from ( 
+        select 
+                round( sum( coalesce( value, 0 ) ), 0 ) as population
         from lastmile_dataportal.tbl_values
-        where ind_id = 45 and territory_id like '6\\_27' and period_id = 1 and `month` = @p_month and `year` = @p_year 
+        where ind_id = 45 and period_id = 1 and `month` = @p_month and `year` = @p_year and
+              territory_id like '1\\_%' and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
+) as a
+;
 
+-- Fourth, add up the population totals for all the assisted counties and LMH managed to get the total for Liberia.
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 45, '6_27', 1, @p_month, @p_year, a.population
+from ( 
+        select round( sum( coalesce( value, 0 ) ), 0 ) as population
+        from lastmile_dataportal.tbl_values
+        where ind_id = 45 and period_id = 1 and `month` = @p_month and `year` = @p_year and
+              ( territory_id like '6\\_32' or territory_id like '6\\_16' )
 ) as a
 ;
 

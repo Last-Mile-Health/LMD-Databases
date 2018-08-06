@@ -64,7 +64,7 @@ SET @isEndOfQuarter := IF(@p_month IN (3,6,9,12),1,0);
  *
 */
 
--- The ration to calculate population from number of CHAs.
+-- The estimated ratio of CHAs to population served.
 set @cha_population_ratio = 235;
 -- set @cha_population_ratio = 300;
 
@@ -495,11 +495,25 @@ SELECT                                        23,       '6_27',         1,      
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 28, territory_id, 1, @p_month, @p_year, num_cha FROM lastmile_report.mart_program_scale;
 
+-- Total number of CHAs in LMH Assisted Areas
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 28, '6_32', 1 as period_id, @p_month, @p_year, sum( coalesce( value, 0 ) ) as num_cha
+from lastmile_dataportal.tbl_values
+where ind_id = 28 and period_id = 1 and `month` = @p_month and `year` = @p_year and      
+      ( territory_id like '1\\_%' and not ( territory_id like '1\\_4'  or territory_id like '1\\_6' or territory_id like '1\\_14' ) )
+;
 
 -- 29. Number of CHSSs deployed
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 29, territory_id, 1, @p_month, @p_year, num_chss FROM lastmile_report.mart_program_scale;
 
+-- Total number of CHAs in LMH Assisted Areas
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 29, '6_32', 1 as period_id, @p_month, @p_year, sum( coalesce( value, 0 ) ) as num_chss
+from lastmile_dataportal.tbl_values
+where ind_id = 29 and period_id = 1 and `month` = @p_month and `year` = @p_year and      
+      ( territory_id like '1\\_%' and not ( territory_id like '1\\_4'  or territory_id like '1\\_6' or territory_id like '1\\_14' ) )
+;
 
 -- 30. Number of deaths (child)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -2574,6 +2588,30 @@ select 422, '6_27', 1, @p_month, @p_year, sum( a.number_routine_visit ) as total
     
  ) as a
  ;
+ 
+ 
+-- 423. Total number of CHAS and CHSSs deployed
+
+-- Total number of CHAS and CHSSs deployed in Assisted Areas
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 423, '6_32', 1 as period_id, @p_month, @p_year, sum( coalesce( value, 0 ) ) as num_chss_cha
+from lastmile_dataportal.tbl_values
+where ind_id in ( 28, 29 ) and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_32'
+;
+
+-- Total number of CHAs and CHSSs deployed in LMH Managed Areas
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 423, '6_16', 1 as period_id, @p_month, @p_year, sum( coalesce( value, 0 ) ) as num_chss_cha
+from lastmile_dataportal.tbl_values
+where ind_id in ( 28, 29 ) and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_16'
+;
+
+-- Total number of CHAs and CHSSs deployed in LMH Managed Areas and Assisted Areas
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 423, '6_27', 1 as period_id, @p_month, @p_year, sum( coalesce( value, 0 ) ) as num_chss_cha
+from lastmile_dataportal.tbl_values
+where ind_id in ( 28, 29 ) and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_27'
+;
 
 
 -- ------ --

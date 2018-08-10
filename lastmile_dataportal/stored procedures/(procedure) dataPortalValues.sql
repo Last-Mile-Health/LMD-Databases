@@ -736,6 +736,25 @@ WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NUL
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 128, '6_16', 1, @p_month, @p_year, @new_value;
 
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 128, '6_32', 1, @p_month, @p_year, sum( a.number_malaria ) as number_malaria from (
+
+    --  Cummulative malaria  screens for previous month. 
+    select coalesce( value, 0 ) as number_malaria 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 128 and territory_id like '6\\_32' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+    union all
+    
+    -- Cummulative malaria  screens for current month.
+    select coalesce( value, 0 ) as number_malaria 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 23 and 
+    ( ( territory_id like '1\\_%' ) and not ( territory_id like '1\\_4'  or territory_id like '1\\_6' or territory_id like '1\\_14' ) ) and 
+    `year` = @p_year and `month` = @p_month and period_id = 1
+    
+ ) as a
+ ;
 
 -- 129. Cumulative number of child cases of diarrhea treated
 SET @old_value = ( SELECT `value` FROM lastmile_dataportal.tbl_values
@@ -745,7 +764,26 @@ WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NUL
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 129, '6_16', 1, @p_month, @p_year, @new_value;
 
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 129, '6_32', 1, @p_month, @p_year, sum( a.number_diarrhea ) as number_diarrhea from (
 
+    --  Cummulative malaria  screens for previous month. 
+    select coalesce( value, 0 ) as number_diarrhea 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 129 and territory_id like '6\\_32' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+    union all
+    
+    -- Cummulative malaria  screens for current month.
+    select coalesce( value, 0 ) as number_diarrhea 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 21 and 
+    ( ( territory_id like '1\\_%' ) and not ( territory_id like '1\\_4'  or territory_id like '1\\_6' or territory_id like '1\\_14' ) ) and 
+    `year` = @p_year and `month` = @p_month and period_id = 1
+    
+ ) as a
+ ;
+ 
 -- 130. Cumulative number of child cases of ARI treated
 SET @old_value = ( SELECT `value` FROM lastmile_dataportal.tbl_values
 WHERE ind_id=130 AND `month`=@p_monthMinus1 AND `year`=@p_yearMinus1 AND territory_id='6_16' AND period_id=1 );
@@ -754,6 +792,25 @@ WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NUL
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 130, '6_16', 1, @p_month, @p_year, @new_value;
 
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 130, '6_32', 1, @p_month, @p_year, sum( a.number_ari ) as number_ari from (
+
+    --  Cummulative malaria  screens for previous month. 
+    select coalesce( value, 0 ) as number_ari 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 130 and territory_id like '6\\_32' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+    union all
+    
+    -- Cummulative malaria  screens for current month.
+    select coalesce( value, 0 ) as number_ari 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 19 and 
+    ( ( territory_id like '1\\_%' ) and not ( territory_id like '1\\_4'  or territory_id like '1\\_6' or territory_id like '1\\_14' ) ) and 
+    `year` = @p_year and `month` = @p_month and period_id = 1
+    
+ ) as a
+ ;
 
 -- 131. Cumulative number of routine visits conducted
 SET @old_value = ( SELECT `value` FROM lastmile_dataportal.tbl_values
@@ -1509,6 +1566,11 @@ FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_yea
 UNION SELECT 368, territory_id, 2, @p_month, @p_year, ROUND(SUM(COALESCE(supervisedLastMonth,0))/SUM(COALESCE(numReports,0)),3)
 FROM lastmile_report.mart_view_base_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
 
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 368, '6_32', 1, @p_month, @p_year, round( sum( coalesce( supervisedLastMonth, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year and NOT ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' );
+
 
 -- 369. Percent of CHAs who received their last monetary incentive on time (IFI)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -1518,6 +1580,15 @@ UNION SELECT 369, '6_27', 1, @p_month, @p_year, ROUND(SUM(COALESCE(receivedLastI
 FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year
 UNION SELECT 369, territory_id, 2, @p_month, @p_year, ROUND(SUM(COALESCE(receivedLastIncentiveOnTime,0))/SUM(COALESCE(numReports,0)),3)
 FROM lastmile_report.mart_view_base_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 369, '6_16', 1, @p_month, @p_year, round( sum( coalesce( receivedLastIncentiveOnTime, 0 ) )/sum( coalesce( numReports, 0 ) ), 3)
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month AND `year`=@p_year and ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' )
+union all
+select 369, '6_32', 1, @p_month, @p_year, round( sum( coalesce( receivedLastIncentiveOnTime, 0 ) )/sum( coalesce( numReports, 0 ) ), 3)
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month AND `year`=@p_year and not ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' );
 
 
 -- 381. NCHA Outputs: Number of CHA monthly service reports (MSRs) received by MOH
@@ -1963,6 +2034,50 @@ set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
 
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        407,      '6_27',         1,            @p_month, @p_year,  @new_value;
+
+
+-- LMH Managed Areas 6_16.  Recode 6_27 like below.  It's cleaner code.
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 407, '6_16', 1, @p_month, @p_year, sum( a.number_muac ) as total_number_muac from (
+
+    --  Cummulative muac screens for PREVIOUS month. 
+    select coalesce( value, 0 ) as number_muac 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 407 and territory_id like '6\\_16' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+    union all
+    
+    -- Cummulative muac screens for CURRENT month.
+    select coalesce( value, 0 ) as number_muac 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 235 and territory_id like '6\\_16' and `year` = @p_year and `month` = @p_month and period_id = 1
+    
+) as a
+;
+
+-- 6_32 LMH Assisted areas
+
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 407, '6_32', 1, @p_month, @p_year, sum( a.number_muac ) as total_number_muac from (
+
+    --  Cummulative muac screens for previous month. 
+    select coalesce( value, 0 ) as number_muac 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 407 and territory_id like '6\\_32' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    
+    union all
+    
+    -- Cummulative muac screens for current month.
+    select coalesce( value, 0 ) as number_muac 
+    from lastmile_dataportal.tbl_values 
+    where ind_id = 235 and 
+    ( ( territory_id like '1\\_%' ) and not ( territory_id like '1\\_4'  or territory_id like '1\\_6' or territory_id like '1\\_14' ) ) and 
+    `year` = @p_year and `month` = @p_month and period_id = 1
+    
+ ) as a
+ ;
+
+
 
 
 -- 408. Cumulative number of Number of HIV client visits tracked in Liberia
@@ -2612,6 +2727,62 @@ select 423, '6_27', 1 as period_id, @p_month, @p_year, sum( coalesce( value, 0 )
 from lastmile_dataportal.tbl_values
 where ind_id in ( 28, 29 ) and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_27'
 ;
+
+
+-- 426. Treatments Delivered and Malnutrition Screens for children under age 5
+
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 426, '6_27', 1, @p_month, @p_year, sum( coalesce( value, 0 ) ) as number_treat
+from lastmile_dataportal.tbl_values 
+where (
+        ( ind_id = 407 and ( territory_id like '6\\_32' or territory_id like '6\\_16' ) ) or 
+        ( ind_id = 128 and ( territory_id like '6\\_32' or territory_id like '6\\_16' ) ) or
+        ( ind_id = 129 and ( territory_id like '6\\_32' or territory_id like '6\\_16' ) ) or
+        ( ind_id = 130 and ( territory_id like '6\\_32' or territory_id like '6\\_16' ) ) 
+      ) and
+     `year` = @p_year and `month` = @p_month and period_id = 1
+ ;
+
+-- 429. Total Number of Visits (routine, pregnant woman, HIV, TB)
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 429, '6_27', 1, @p_month, @p_year, sum( coalesce( value, 0 ) ) as number_visits
+from lastmile_dataportal.tbl_values 
+where (
+        ( ind_id = 399 and territory_id like '6\\_27' ) or 
+        ( ind_id = 405 and territory_id like '6\\_27' ) or
+        ( ind_id = 408 and territory_id like '6\\_27' ) or
+        ( ind_id = 409 and territory_id like '6\\_27' )
+      ) and
+     `year` = @p_year and `month` = @p_month and period_id = 1
+ ;
+
+
+-- 430. Percent of CHAs with all life-saving commodities in stock
+-- The if-clause suppresses the results if the reporting rate is below 25% (here and below)
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select  430, a.territory_id, 1, @p_month, @p_year, 
+        if( ( coalesce( count( 1 ), 0 ) / b.num_cha ) >= 0.25, 
+              round( ( coalesce( count( 1 ), 0 ) - coalesce( sum( a.any_stockout_life_saving ), 0 ) ) / coalesce( COUNT( 1 ), 0 ), 3 ),
+              null
+          )
+from lastmile_report.mart_view_base_restock_cha as a 
+left outer join lastmile_report.mart_program_scale as b on a.territory_id = b.territory_id 
+where a.`month`=@p_month and a.`year`=@p_year and a.county_id is not null 
+group by a.county_id
+
+union all
+
+select  430, '6_16', 1, @p_month, @p_year, 
+        if( ( coalesce( count( 1 ), 0 ) / b.num_cha ) >= 0.25,
+              round( ( coalesce( count( 1 ), 0 ) - coalesce( sum( a.any_stockout_life_saving ), 0 ) ) / coalesce( count( 1 ), 0 ), 3 ),
+              null 
+           )
+from lastmile_report.mart_view_base_restock_cha as a 
+    left outer join lastmile_report.mart_program_scale as b on '6\\_16' = b.territory_id
+where a.`month`=@p_month and a.`year`=@p_year and a.county_id is not null;
+
+
 
 
 -- ------ --

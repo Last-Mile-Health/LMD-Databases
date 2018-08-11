@@ -1159,6 +1159,28 @@ UNION SELECT 302, '6_16', 1, @p_month, @p_year, ROUND(COUNT(1)/num_chss,3)
 FROM lastmile_report.view_chss_msr a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
 WHERE month_reported=@p_month AND year_reported=@p_year AND a.territory_id IS NOT NULL;
 
+-- For the national number use all dhis2 numbers.  LMH's collection of CHSS MSRs has been spotted at best.
+-- Also, note 432 values are brought in via the dhis2 upload mechanism
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 302, '6_27', 1, @p_month, @p_year, 
+        round( 
+              min( if( a.fraction_part like 'number_chss_msr',  a.value, null ) ) -- numerator
+              / 
+              min( if( a.fraction_part like 'number_chss',      a.value, null ) )  -- denominator
+              , 3 )
+from (
+      select 
+            'number_chss_msr' as fraction_part, sum( coalesce( value, 0 ) )  as value
+      from lastmile_dataportal.tbl_values 
+      where ind_id = 432 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1
+ 
+      union all
+    
+      select 'number_chss' as fraction_part, min( value ) as value
+      from lastmile_dataportal.tbl_values 
+      where ind_id = 29 and territory_id like '6\\_27' and `year` = @p_year and `month` = @p_month and period_id = 1
+ 
+) as a;
 
 -- 305. Percent of expected CHSS mHealth supervision visit logs received
 -- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted
@@ -2782,7 +2804,46 @@ from lastmile_report.mart_view_base_restock_cha as a
     left outer join lastmile_report.mart_program_scale as b on '6\\_16' = b.territory_id
 where a.`month`=@p_month and a.`year`=@p_year and a.county_id is not null;
 
+-- Note: For assisted areas (6_32, we are not suppressing values under any conditions.  This is IFI sample data, so
+-- the denominator is the number of CHAs sampled during the month.  We could suppress is number of CHAs is too low.
 
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 430, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_life_saving_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year and NOT ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' );
+
+-- 431. Percent of CHAs with ACT 25mg in stock
+-- The if-clause suppresses the results if the reporting rate is below 25% (here and below)
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select  431, a.territory_id, 1, @p_month, @p_year, 
+        if( ( coalesce( count( 1 ), 0 ) / b.num_cha ) >= 0.25, 
+              round( ( coalesce( count( 1 ), 0 ) - coalesce( sum( a.stockout_ACT25mg ), 0 ) ) / coalesce( COUNT( 1 ), 0 ), 3 ),
+              null
+          )
+from lastmile_report.mart_view_base_restock_cha as a 
+left outer join lastmile_report.mart_program_scale as b on a.territory_id = b.territory_id 
+where a.`month`=@p_month and a.`year`=@p_year and a.county_id is not null 
+group by a.county_id
+
+union all
+
+select  431, '6_16', 1, @p_month, @p_year, 
+        if( ( coalesce( count( 1 ), 0 ) / b.num_cha ) >= 0.25,
+              round( ( coalesce( count( 1 ), 0 ) - coalesce( sum( a.stockout_ACT25mg ), 0 ) ) / coalesce( count( 1 ), 0 ), 3 ),
+              null 
+           )
+from lastmile_report.mart_view_base_restock_cha as a 
+    left outer join lastmile_report.mart_program_scale as b on '6\\_16' = b.territory_id
+where a.`month`=@p_month and a.`year`=@p_year and a.county_id is not null;
+
+-- Note: For assisted areas (6_32, we are not suppressing values under any conditions.  This is IFI sample data, so
+-- the denominator is the number of CHAs sampled during the month.  We could suppress is number of CHAs is too low.
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 431, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year and NOT ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' );
 
 
 -- ------ --

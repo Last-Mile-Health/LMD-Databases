@@ -50,8 +50,10 @@ DROP TABLE IF EXISTS lastmile_report.mart_view_base_restock_cha;
 CREATE TABLE lastmile_report.mart_view_base_restock_cha SELECT * FROM lastmile_report.view_base_restock_cha;
 DROP TABLE IF EXISTS lastmile_report.mart_view_base_odk_supervision;
 CREATE TABLE lastmile_report.mart_view_base_odk_supervision SELECT * FROM lastmile_report.view_base_odk_supervision;
+
 DROP TABLE IF EXISTS lastmile_report.mart_view_base_ifi;
 CREATE TABLE lastmile_report.mart_view_base_ifi SELECT * FROM lastmile_report.view_base_ifi;
+
 DROP TABLE IF EXISTS lastmile_report.mart_view_base_msr_county;
 CREATE TABLE lastmile_report.mart_view_base_msr_county SELECT * FROM lastmile_report.view_base_msr_county;
 DROP TABLE IF EXISTS lastmile_report.mart_view_base_msr_community;

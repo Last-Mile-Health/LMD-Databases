@@ -44,6 +44,7 @@ CREATE TABLE lastmile_report.mart_de_integrated_supervision_tool_facility_spot_c
 
 DROP TABLE IF EXISTS lastmile_report.mart_view_base_history_person;
 CREATE TABLE lastmile_report.mart_view_base_history_person SELECT * FROM lastmile_cha.view_base_history_person;
+
 DROP TABLE IF EXISTS lastmile_report.mart_view_base_history_person_position;
 CREATE TABLE lastmile_report.mart_view_base_history_person_position SELECT * FROM lastmile_cha.view_base_history_person_position;
 DROP TABLE IF EXISTS lastmile_report.mart_view_base_restock_cha;

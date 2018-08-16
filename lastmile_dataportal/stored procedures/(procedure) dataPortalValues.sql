@@ -306,7 +306,7 @@ update lastmile_report.mart_program_scale s
                                   /* Delete above line when position/community data comes in */
                                   select @number_people_bassa as population
                                   
- /* Again word around hack for GB.  This code should work when Bassa position/community data comes in.                            
+ /* Again work around hack for GB.  This code should (would/could) work when Bassa position/community data comes in.                            
                                   select 
                                         ifnull( if( min( coalesce( c.population, 0 ) ) = 0, 
                                                     min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
@@ -503,6 +503,21 @@ where ind_id = 28 and period_id = 1 and `month` = @p_month and `year` = @p_year 
       ( territory_id like '1\\_%' and not ( territory_id like '1\\_4'  or territory_id like '1\\_6' or territory_id like '1\\_14' ) )
 ;
 
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 28, '6_27', 1 as period_id, @p_month, @p_year, sum( coalesce( a.number_cha, 0 ) ) as number_cha
+from (
+      select min( value ) as number_cha
+      from lastmile_dataportal.tbl_values 
+      where ind_id = 28 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_16' 
+
+      union all
+
+      select min( value ) as number_cha
+      from lastmile_dataportal.tbl_values 
+      where ind_id = 28 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_32' 
+  ) as a;
+
+
 -- 29. Number of CHSSs deployed
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 29, territory_id, 1, @p_month, @p_year, num_chss FROM lastmile_report.mart_program_scale;
@@ -512,8 +527,21 @@ replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `
 select 29, '6_32', 1 as period_id, @p_month, @p_year, sum( coalesce( value, 0 ) ) as num_chss
 from lastmile_dataportal.tbl_values
 where ind_id = 29 and period_id = 1 and `month` = @p_month and `year` = @p_year and      
-      ( territory_id like '1\\_%' and not ( territory_id like '1\\_4'  or territory_id like '1\\_6' or territory_id like '1\\_14' ) )
-;
+      ( territory_id like '1\\_%' and not ( territory_id like '1\\_4'  or territory_id like '1\\_6' or territory_id like '1\\_14' ) );
+
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 29, '6_27', 1 as period_id, @p_month, @p_year, sum( coalesce( a.number_chss, 0 ) ) as number_chss
+from (
+      select min( value ) as number_chss
+      from lastmile_dataportal.tbl_values 
+      where ind_id = 29 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_16' 
+
+      union all
+
+      select min( value ) as number_chss
+      from lastmile_dataportal.tbl_values 
+      where ind_id = 29 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_32' 
+ ) as a;
 
 -- 30. Number of deaths (child)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -1314,7 +1342,7 @@ from (
 ;    
 
 
--- 325. National implementation fidelity reporting rate (LMH Assisted Networks)
+-- 325. National implementation fidelity reporting rate (LMH Assisted and Managed Networks)
 
 replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
 select 325, '6_27', 1, @p_month,  @p_year,  round( count( * ) / coalesce( d.number_county_report, 0 ), 3 ) as ifi_report_rate
@@ -1324,7 +1352,7 @@ from (
         where `month` = @p_month and `year` = @p_year 
         group by county
 ) as n
-  cross join (
+  cross join (  -- As new counties begin reporting over time, dynamically create a list and count of counties that have reported so far.
                 select count( * ) as number_county_report
                 from (  
                         select county 

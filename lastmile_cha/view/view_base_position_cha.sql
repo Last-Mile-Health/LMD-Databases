@@ -71,7 +71,35 @@ select
       chss_health_district,
       
       chss_county_id,
-      chss_county
+      chss_county,
+      
+      -- Beginning of the QAO info
+      
+      qao_position_begin_date,
+      qao_chss_supervision_begin_date                         as qao_supervision_begin_date,
+      
+      qao_position_id,
+      qao_person_id,
+      qao_person_id_lmh,
+      concat( qao_first_name, ' ', qao_last_name )          as qao,
+      
+      qao_position_person_begin_date,
+      qao_hire_date,
+
+      qao_birth_date,
+      qao_gender,
+      qao_phone_number,
+      qao_phone_number_alternate,
+           
+      qao_health_facility_id,
+      qao_health_facility,
+      
+      qao_health_district_id,
+      qao_health_district,
+      
+      qao_county_id,
+      qao_county
+      
       
 from view_position_cha_geo_community_person
 ;

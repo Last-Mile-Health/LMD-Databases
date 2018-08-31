@@ -91,8 +91,53 @@ select
       po.phone_number                                            as chss_phone_number,
       po.phone_number_alternate                                  as chss_phone_number_alternate,
       
-      po.module                                                  as chss_module
+      po.module                                                  as chss_module,
       
+      -- ---------------------------------------------------------------------------------------------------
+      -- Beginning of QAO info
+      -- ---------------------------------------------------------------------------------------------------
+         
+      -- ps1.position_supervisor_id as qao_id,
+      -- poq.*,
+      
+      ps1.position_supervision_begin_date                          as qao_position_supervision_begin_date,  
+      
+      -- All the dates, except for position_person.[ begin, end ], are position-to-position oriented.
+      -- position_supervision_beginDate only tells us when a chss position began supervising a cha position,
+      -- not when a specific chss starting supervising a specific chp.
+      
+      -- So the actual supervision date is the later of chss and cha position_person begin dates, assuming 
+      -- the chss and/or person begin dates are not null.  These would be the cases of either or both positions
+      -- being unfilled.
+      
+      if( ( pr1.position_person_begin_date is null ) or ( poq.position_person_begin_date is null ), 
+            null,  
+            if( pr1.position_person_begin_date > poq.position_person_begin_date, 
+                pr1.position_person_begin_date, 
+                poq.position_person_begin_date  ) 
+      )                                                           as qao_chss_supervision_begin_date,
+ 
+      ps1.position_supervisor_id                                  as qao_position_id,
+      ps1.position_supervisor_health_facility_id                  as qao_health_facility_id,
+      ps1.position_supervisor_begin_date                          as qao_position_begin_date,
+
+      poq.health_facility                                         as qao_health_facility,
+      poq.health_district_id                                      as qao_health_district_id,
+      poq.health_district                                         as qao_health_district,
+      poq.county_id                                               as qao_county_id,
+      poq.county                                                  as qao_county,
+      
+      poq.position_person_begin_date                              as qao_position_person_begin_date,
+      poq.hire_date                                               as qao_hire_date,
+      poq.person_id                                               as qao_person_id,
+      poq.person_id_lmh                                           as qao_person_id_lmh,
+      poq.first_name                                              as qao_first_name,
+      poq.last_name                                               as qao_last_name,
+      poq.birth_date                                              as qao_birth_date,
+      poq.gender                                                  as qao_gender,
+      poq.phone_number                                            as qao_phone_number,
+      poq.phone_number_alternate                                  as qao_phone_number_alternate
+       
 from view_position_cha as p
 
     left outer join           view_geo_health_facility                as f  on p.health_facility_id       like f.health_facility_id
@@ -106,7 +151,10 @@ from view_position_cha as p
 --    left outer join           lastmile_program.view_train_cha_module  as m  on ( p.position_id like m.position_id ) and ( pr.person_id = m.person_id )
       left outer join           lastmile_program.view_train_cha_module  as m  on pr.person_id = m.person_id
     
-    left outer join           view_position_cha_supervisor            as ps on p.position_id              like ps.position_id
-        left outer join       view_position_chss_person_geo           as po on ps.position_supervisor_id  like po.position_id
-        -- left outer join       view_position_chss_person_geo           as po on ps.position_supervisor_id  like po.person_id
-;  
+    left outer join           view_position_cha_supervisor            as ps   on p.position_id                  like ps.position_id
+        -- left outer join       view_position_chss_person_geo           as po on ps.position_supervisor_id  like po.person_id 
+        left outer join       view_position_chss_person               as pr1  on ps.position_supervisor_id      like pr1.position_id
+        left outer join       view_position_chss_person_geo           as po   on ps.position_supervisor_id      like po.position_id  
+        left outer join           view_position_chss_supervisor       as ps1  on ps.position_supervisor_id      like ps1.position_id
+            left outer join           view_position_qao_person_geo    as poq  on ps1.position_supervisor_id     like poq.position_id   
+;

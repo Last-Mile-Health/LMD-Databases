@@ -118,15 +118,12 @@ select
       )                                                           as qao_chss_supervision_begin_date,
  
       ps1.position_supervisor_id                                  as qao_position_id,
-      ps1.position_supervisor_health_facility_id                  as qao_health_facility_id,
       ps1.position_supervisor_begin_date                          as qao_position_begin_date,
 
-      poq.health_facility                                         as qao_health_facility,
-      poq.health_district_id                                      as qao_health_district_id,
-      poq.health_district                                         as qao_health_district,
-      poq.county_id                                               as qao_county_id,
-      poq.county                                                  as qao_county,
-      
+      poq.health_facility_id_list                                 as qao_health_facility_id_list,
+      poq.health_facility_list                                    as qao_health_facility_list,
+      poq.health_district_list                                    as qao_health_district_list,
+    
       poq.position_person_begin_date                              as qao_position_person_begin_date,
       poq.hire_date                                               as qao_hire_date,
       poq.person_id                                               as qao_person_id,

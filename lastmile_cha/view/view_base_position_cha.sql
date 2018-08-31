@@ -91,14 +91,9 @@ select
       qao_phone_number,
       qao_phone_number_alternate,
            
-      qao_health_facility_id,
-      qao_health_facility,
-      
-      qao_health_district_id,
-      qao_health_district,
-      
-      qao_county_id,
-      qao_county
+      qao_health_facility_id_list,
+      qao_health_facility_list,
+      qao_health_district_list
       
       
 from view_position_cha_geo_community_person

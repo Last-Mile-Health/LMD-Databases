@@ -492,6 +492,16 @@ SELECT                                        23,       '6_27',         1,      
 
 
 -- 28. Number of CHAs deployed
+
+-- Update the number of active CHAs deployed in LMH Assisted areas, so exclude Grand Bassa, Grand Gedeh, Rivercess
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 28, t.territory_id, 1 as period_id, s.month_report, s.year_report, s.cha_number_active
+from lastmile_dataportal.tbl_nchap_scale_chss_cha as s
+    left outer join lastmile_dataportal.view_territories as t on  ( trim( s.county )          like trim( t.territory_name ) ) and 
+                                                                  ( trim( t.territory_type )  like 'county' )
+where not ( s.county like '%Grand%Bassa%' or s.county like '%Grand%Gedeh%' or s.county like '%Rivercess%' )
+;
+
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 28, territory_id, 1, @p_month, @p_year, num_cha FROM lastmile_report.mart_program_scale;
 
@@ -519,6 +529,16 @@ from (
 
 
 -- 29. Number of CHSSs deployed
+
+-- Update the number of active CHSSs deployed in LMH Assisted areas, so exclude Grand Bassa, Grand Gedeh, Rivercess
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 29, t.territory_id, 1 as period_id, s.month_report, s.year_report, s.chss_number_active
+from lastmile_dataportal.tbl_nchap_scale_chss_cha as s
+    left outer join lastmile_dataportal.view_territories as t on  ( trim( s.county )          like trim( t.territory_name ) ) and 
+                                                                  ( trim( t.territory_type )  like 'county' )
+where not ( s.county like '%Grand%Bassa%' or s.county like '%Grand%Gedeh%' or s.county like '%Rivercess%' )
+;
+
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 29, territory_id, 1, @p_month, @p_year, num_chss FROM lastmile_report.mart_program_scale;
 
@@ -2351,6 +2371,9 @@ WHERE month_reported = @p_month AND
 
 
 /* 416. Expected percentage of pregnant women visited (excluding first trimester) per 1,000 population.
+
+I think this is wrong.  I think we can expect 28.8 women to be pregnant in a pop of 1000.
+Change the comment accordingly.
 
 ( ( ( number pregnant woman visits per month / population ) * 1000 ) / ( 28.8 * ( 2 / 3 ) ) ) * 100
 

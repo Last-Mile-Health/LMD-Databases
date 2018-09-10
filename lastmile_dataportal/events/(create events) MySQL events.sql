@@ -49,7 +49,7 @@ end $$
 
 CREATE EVENT evt_dataMartTables
 ON SCHEDULE EVERY 1 DAY
-STARTS '2016-01-15 04:00:00'
+STARTS '2016-01-15 03:30:00'
 DO 
 BEGIN
 
@@ -66,7 +66,7 @@ END $$
 -- This is done because we often get a small number of records 1-2 months late
 CREATE EVENT evt_dataPortalValues
 ON SCHEDULE EVERY 1 MONTH
-STARTS '2016-01-15 05:00:00'
+STARTS '2016-01-15 04:30:00'
 DO 
 BEGIN
 

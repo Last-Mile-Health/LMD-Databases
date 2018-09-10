@@ -132,6 +132,9 @@ update lastmile_upload.odk_vaccineTracker               set chss_id_inserted_for
 
 update lastmile_archive.chwdb_odk_chw_restock           set cha_id_inserted_format            = lastmile_upload.nchap_id_format( cha_id_inserted );
 
+update lastmile_archive.chwdb_odk_vaccine_tracker       set cha_id_inserted_format            = lastmile_upload.nchap_id_format( cha_id_inserted );
+
+
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------
 -- 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -569,7 +572,6 @@ update lastmile_upload.odk_vaccineTracker a, lastmile_cha.temp_view_base_history
 where ( trim( a.cha_id_inserted_format ) like m.position_id ) or ( trim( a.cha_id_inserted_format ) like m.cha_id_historical )
 ;
 
-
 update lastmile_upload.odk_vaccineTracker a, lastmile_cha.view_base_history_moh_lmh_chss_id m
 
     set a.chssID = if( m.chss_id_historical is null, trim( a.chss_id_inserted_format ), m.position_id )
@@ -578,6 +580,20 @@ where ( trim( a.chss_id_inserted_format ) like m.position_id ) or ( trim( a.chss
 ;
 
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_vaccineTracker' );
+
+
+
+-- lastmile_archive.chwdb_odk_vaccine_tracker --------------------------------------- 
+
+update lastmile_archive.chwdb_odk_vaccine_tracker a, lastmile_cha.temp_view_base_history_moh_lmh_cha_id m
+
+    set a.chwID = if( m.cha_id_historical is null, trim( a.cha_id_inserted_format ), m.position_id )
+    
+where ( trim( a.cha_id_inserted_format ) like m.position_id ) or ( trim( a.cha_id_inserted_format ) like m.cha_id_historical )
+;
+
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'chwdb_odk_vaccine_tracker' );
+
 
 
 -- QAO checklist

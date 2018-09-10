@@ -2897,6 +2897,14 @@ from lastmile_report.mart_view_base_ifi
 where `month`=@p_month and `year`=@p_year and NOT ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' );
 
 
+-- 432. Number of CHSS monthly service reports (MSRs) received by MOH
+
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 432, '6_27', 1, @p_month, @p_year, sum( coalesce( value, 0 ) )  as value
+from lastmile_dataportal.tbl_values 
+where ind_id = 432 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1;
+ 
+
 -- ------ --
 -- Finish --
 -- ------ --

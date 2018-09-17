@@ -1085,6 +1085,44 @@ UNION SELECT 229, '6_16', 1, @p_month, @p_year, ROUND(SUM(COALESCE(num_births,0)
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
 
+-- 233. Ratio of CHAs to CHSS
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 233, territory_id, 1 as period_id, @p_month, @p_year, 
+       round( min( if( a.fraction_part like 'numerator',  a.value, null ) ) -- numerator
+              / 
+              min( if( a.fraction_part like 'denominator',      a.value, null ) )  -- denominator
+              , 3 ) as rate
+from ( 
+
+      select 
+            'numerator' as fraction_part, 
+            territory_id,
+            min( value )      as value
+      from lastmile_dataportal.tbl_values 
+      where ind_id = 28                                                 and           
+            ( territory_id like '1\\_%' or territory_id like '6\\_27' ) and 
+            `year` = @p_year                                            and 
+            `month` = @p_month                                          and 
+            period_id = 1
+      group by territory_id
+ 
+      union all
+      
+      select 
+            'denominator' as fraction_part,  
+            territory_id,
+            min( value )  as value
+      from lastmile_dataportal.tbl_values 
+      where ind_id = 29                                                 and 
+            ( territory_id like '1\\_%' or territory_id like '6\\_27' ) and 
+            `year` = @p_year                                            and 
+            `month` = @p_month                                          and 
+            period_id = 1
+      group by territory_id
+      
+) as a
+group by territory_id;
+
 -- 235. Number of children screened for malnutrition (MUAC)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 235, territory_id, 1, @p_month, @p_year, COALESCE(num_muac_red,0)+COALESCE(num_muac_yellow,0)+COALESCE(num_muac_green,0)
@@ -1206,29 +1244,6 @@ WHERE month_reported=@p_month AND year_reported=@p_year AND a.territory_id IS NO
 UNION SELECT 302, '6_16', 1, @p_month, @p_year, ROUND(COUNT(1)/num_chss,3)
 FROM lastmile_report.view_chss_msr a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
 WHERE month_reported=@p_month AND year_reported=@p_year AND a.territory_id IS NOT NULL;
-
--- For the national number use all dhis2 numbers.  LMH's collection of CHSS MSRs has been spotted at best.
--- Also, note 432 values are brought in via the dhis2 upload mechanism
-replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
-select 302, '6_27', 1, @p_month, @p_year, 
-        round( 
-              min( if( a.fraction_part like 'number_chss_msr',  a.value, null ) ) -- numerator
-              / 
-              min( if( a.fraction_part like 'number_chss',      a.value, null ) )  -- denominator
-              , 3 )
-from (
-      select 
-            'number_chss_msr' as fraction_part, sum( coalesce( value, 0 ) )  as value
-      from lastmile_dataportal.tbl_values 
-      where ind_id = 432 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1
- 
-      union all
-    
-      select 'number_chss' as fraction_part, min( value ) as value
-      from lastmile_dataportal.tbl_values 
-      where ind_id = 29 and territory_id like '6\\_27' and `year` = @p_year and `month` = @p_month and period_id = 1
- 
-) as a;
 
 -- 305. Percent of expected CHSS mHealth supervision visit logs received
 -- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted
@@ -1360,6 +1375,28 @@ from (
                             from tbl_values where ( ind_id = 381 ) and ( territory_id like '6_27' ) and ( period_id = 1 ) and  ( `year` = @p_year )  and ( `month` = @p_month )
                     ) as p on ( s.territory_id like p.territory_id ) and ( s.`year` = p.`year` ) and ( s.`month` = p.`month` ) and ( s.period_id = p.period_id )
 ;    
+
+-- 324. QAO supervision rate
+
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 324, c.territory_id, 1 as period_id, @p_month,  @p_year,
+
+       round( coalesce( c.number_supervision_visit, 0 ) / coalesce( s.num_cha, 0 ), 3 ) as qao_supervision_rate
+      
+from lastmile_report.view_qao_supervision_rate_county as c
+    left outer join lastmile_report.mart_program_scale as s on trim( c.territory_id ) like trim( s.territory_id )
+where c.year_reported = @p_year and c.month_reported = @p_month
+
+union all
+
+select 324, '6_16', 1 as period_id, @p_month,  @p_year,
+
+       round( sum( coalesce(c.number_supervision_visit, 0 ) )/sum( coalesce( s.num_cha, 0 ) ), 3) as qao_supervision_rate
+       
+from lastmile_report.view_qao_supervision_rate_county as c
+    left outer join lastmile_report.mart_program_scale as s on trim( c.territory_id ) like trim( s.territory_id )
+where c.year_reported = @p_year and c.month_reported = @p_month
+;
 
 
 -- 325. National implementation fidelity reporting rate (LMH Assisted and Managed Networks)
@@ -2325,6 +2362,17 @@ from (
 ) as b;
 
 
+-- 412. Number of women with access to family planning services Definition: Total population served 
+-- of reproductive age (i.e. population served * 24%)
+
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`,value)
+select 412, territory_id,  1 as period_id, @p_month, @p_year, round( coalesce(value, 0 ) * 0.24, 0 ) as number_women
+from lastmile_dataportal.tbl_values
+where ind_id = 45 and period_id = 1 and `month` = @p_month and `year` = @p_year and
+      ( territory_id like '6\\_16' or territory_id like '6\\_27' or territory_id like '6\\_32' )
+;
+
+
 /* 415. Number of referrals for HIV / TB / CM-NTD / mental health per 1,000 population.
 
 For territories 1_14 (Rivercess), 6_31 (GG LMH), and 6_16 (Total LMH) we calculate values from the data collected in the LMD CHA MSRs.
@@ -2904,6 +2952,74 @@ select 432, '6_27', 1, @p_month, @p_year, sum( coalesce( value, 0 ) )  as value
 from lastmile_dataportal.tbl_values 
 where ind_id = 432 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1;
  
+ 
+/*
+456. CHSS reporting rate by MOH and CHTs
+
+In a sense, 456 is the same as 302, except that 302 is calculated from lastmile_upload.de_chss_monthly_service_report records, which only
+collects the supervision portion of the CHSS MSR, while 456 comes from the dhis2 MOH instance and the monthly scale values for number of CHSSs
+that are collected by the NCHAS team (William.)  It is the only MSR (not CHA) the CHTs are collecting and entering into the dhis2 
+instance at this time.
+
+For the national number use all dhis2 numbers.  LMH's collection of CHSS MSRs has been spotty at best.
+Also, note 432 values are brought in via the dhis2 upload mechanism.
+*/
+
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`,`year`,value )
+select 456, territory_id, 1 as period_id, @p_month, @p_year, 
+       round( min( if( a.fraction_part like 'number_chss_msr',  a.value, null ) ) -- numerator
+              / 
+              min( if( a.fraction_part like 'number_chss',      a.value, null ) )  -- denominator
+              , 3 ) as rate
+from (  
+      select 
+            'number_chss_msr' as fraction_part, 
+            territory_id,
+            min( value )      as value
+      from lastmile_dataportal.tbl_values 
+      where ind_id = 432 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1
+      group by territory_id
+      
+      union all
+      
+      select 
+            'number_chss' as fraction_part,  
+            territory_id,
+            min( value )  as value
+      from lastmile_dataportal.tbl_values 
+      where ind_id = 29 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1
+      group by territory_id
+      
+) as a
+group by territory_id;
+
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`,`year`,value )
+select 456, '6_27',1 as period_id, @p_month, @p_year, 
+       round( sum( if( a.fraction_part like 'number_chss_msr',  a.value, null ) ) -- numerator
+              / 
+              sum( if( a.fraction_part like 'number_chss',      a.value, null ) )  -- denominator
+              , 3 ) as rate
+from ( 
+      select 
+            'number_chss_msr' as fraction_part, 
+            territory_id,
+            min( value )  as value
+      from lastmile_dataportal.tbl_values 
+      where ind_id = 432 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1
+      group by territory_id
+      
+      union all
+      
+      select 
+            'number_chss' as fraction_part,  
+            territory_id,
+            min( value )  as value
+      from lastmile_dataportal.tbl_values 
+      where ind_id = 29 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1
+      group by territory_id
+     
+) as a
+; 
 
 -- ------ --
 -- Finish --

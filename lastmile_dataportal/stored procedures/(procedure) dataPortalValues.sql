@@ -380,14 +380,44 @@ FROM lastmile_report.mart_view_base_odk_supervision WHERE manualMonth=@p_month A
 
 -- 14. Estimated facility-based delivery rate
 -- Updated quarterly
-REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 14, territory_id, 1, @p_month, @p_year, ROUND(SUM(COALESCE(num_births_facility,0))/(SUM(COALESCE(num_births_facility,0))+SUM(COALESCE(num_births_home,0))),3)
-FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL AND @isEndOfQuarter AND
-((year_reported=@p_year AND month_reported=@p_month) OR (year_reported=@p_yearMinus1 AND month_reported=@p_monthMinus1) OR (year_reported=@p_yearMinus2 AND month_reported=@p_monthMinus2)) GROUP BY territory_id
-UNION SELECT 14, '6_16', 1, @p_month, @p_year, ROUND(SUM(COALESCE(num_births_facility,0))/(SUM(COALESCE(num_births_facility,0))+SUM(COALESCE(num_births_home,0))),3)
-FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL AND @isEndOfQuarter AND
-((year_reported=@p_year AND month_reported=@p_month) OR (year_reported=@p_yearMinus1 AND month_reported=@p_monthMinus1) OR (year_reported=@p_yearMinus2 AND month_reported=@p_monthMinus2));
 
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select  14, territory_id, 1, @p_month, @p_year, 
+        round(  ( sum( coalesce( num_births_facility,0 ) ) ) /
+                ( sum( coalesce( num_births_facility, 0 ) ) + sum( coalesce( num_births_home, 0 ) ) ), 
+                3 
+              )
+
+FROM lastmile_report.mart_view_base_msr_county 
+where not ( county_id is null ) and
+      ( @isEndOfQuarter         and
+        ( 
+          ( year_reported = @p_year  and month_reported =  @p_month        )   or 
+          ( year_reported = @p_year  and month_reported =  @p_monthMinus1  )   or 
+          ( year_reported = @p_year  and month_reported =  @p_monthMinus2  ) 
+        ) 
+      )
+group by territory_id
+
+union all 
+ 
+select  14, '6_16', 1, @p_month, @p_year, 
+        round(  ( sum( coalesce( num_births_facility,0 ) ) ) /
+                ( sum( coalesce( num_births_facility, 0 ) ) + sum( coalesce( num_births_home, 0 ) ) ), 
+                3 
+              )
+
+from lastmile_report.mart_view_base_msr_county 
+
+where not ( county_id is null ) and
+      ( @isEndOfQuarter         and
+        ( 
+          ( year_reported = @p_year  and month_reported =  @p_month        )   or 
+          ( year_reported = @p_year  and month_reported =  @p_monthMinus1  )   or 
+          ( year_reported = @p_year  and month_reported =  @p_monthMinus2  ) 
+        ) 
+      )
+;
 
 -- 17. Number of attempted supervision visits
 -- Currently based off of ODK data
@@ -1163,40 +1193,39 @@ UNION SELECT 238, '6_16', 1, @p_month, @p_year, ROUND(COALESCE(COUNT(1),0)/num_c
 FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
 WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
 
+
 -- 245. Estimated facility-based delivery rate n-value, which is the sum of the number of births in home and the number of births in facility.
 replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
-select 245, territory_id, 1, @p_month, @p_year, min( coalesce( num_births_facility, 0 ) ) + min( coalesce( num_births_home, 0 ) ) as n_value
-from lastmile_report.mart_view_base_msr_county 
-where month_reported =  @p_month  and 
-      year_reported =   @p_year   and 
-      not ( county_id is null )   and   
-      @isEndOfQuarter             and
-      ( 
-        ( year_reported = @p_year       and month_reported =  @p_month        )   or 
-        ( year_reported = @p_yearMinus1 and month_reported =  @p_monthMinus1  )   or 
-        ( year_reported = @p_yearMinus2 and month_reported =  @p_monthMinus2  ) 
-      ) 
+select  245, territory_id, 1, @p_month, @p_year, 
+        sum( coalesce( num_births_facility, 0 ) ) + sum( coalesce( num_births_home, 0 ) ) as n_value
+FROM lastmile_report.mart_view_base_msr_county 
+where not ( county_id is null ) and
+      ( @isEndOfQuarter         and
+        ( 
+          ( year_reported = @p_year  and month_reported =  @p_month        )   or 
+          ( year_reported = @p_year  and month_reported =  @p_monthMinus1  )   or 
+          ( year_reported = @p_year  and month_reported =  @p_monthMinus2  ) 
+        ) 
+      )
 group by territory_id
 
-union all
+union all 
+ 
+select  245, '6_16', 1, @p_month, @p_year, 
+        sum( coalesce( num_births_facility, 0 ) ) + sum( coalesce( num_births_home, 0 ) ) as n_value
 
-select 245, '6_16', 1, @p_month, @p_year,  sum( coalesce( a.n_value, 0 ) )  as n_value
-from (
-
-select min( coalesce( num_births_facility, 0 ) ) + min( coalesce( num_births_home, 0 ) )  as n_value
 from lastmile_report.mart_view_base_msr_county 
-where month_reported =  @p_month  and 
-      year_reported =   @p_year   and 
-      not ( county_id is null )   and  
-      @isEndOfQuarter             and
-      ( 
-        ( year_reported = @p_year       and month_reported =  @p_month        )   or 
-        ( year_reported = @p_yearMinus1 and month_reported =  @p_monthMinus1  )   or 
-        ( year_reported = @p_yearMinus2 and month_reported =  @p_monthMinus2  ) 
-      ) 
-group by territory_id
-) as a
+
+where not ( county_id is null ) and
+      ( @isEndOfQuarter         and
+        ( 
+          ( year_reported = @p_year  and month_reported =  @p_month        )   or 
+          ( year_reported = @p_year  and month_reported =  @p_monthMinus1  )   or 
+          ( year_reported = @p_year  and month_reported =  @p_monthMinus2  ) 
+        ) 
+      )
 ;
+
 
 -- 247. Numerator (indID 104)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)

@@ -239,7 +239,7 @@ where territory_id like '1\\_14'
 ;
 
 -- Grand Bassa 1_4
-/*
+
 update lastmile_report.mart_program_scale s
     set s.num_people = ( 
                           select 
@@ -254,14 +254,8 @@ update lastmile_report.mart_program_scale s
                         )
 where territory_id like '1\\_4'
 ;
-*/
--- Again, we are hacking around Grand Bassa not having position_community data
-set @number_people_bassa = ( select min( if( num_cha is null, num_cha, round( num_cha * @cha_population_ratio, 0 ) ) ) from lastmile_report.mart_program_scale where territory_id like '1\\_4' );
-update lastmile_report.mart_program_scale set num_people = @number_people_bassa where territory_id like '1\\_4';
 
-
-
--- GG LMH 6_16
+-- Total (LMH) 6_16
 update lastmile_report.mart_program_scale s
     set s.num_people = (
                           select sum( a.population ) as population
@@ -301,12 +295,7 @@ update lastmile_report.mart_program_scale s
                                         ( trim( c.cohort ) like '%Rivercess%' ) 
                                         
                                   union all 
-                                  
-                                  
-                                  /* Delete above line when position/community data comes in */
-                                  select @number_people_bassa as population
-                                  
- /* Again work around hack for GB.  This code should (would/could) work when Bassa position/community data comes in.                            
+                                 
                                   select 
                                         ifnull( if( min( coalesce( c.population, 0 ) ) = 0, 
                                                     min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
@@ -316,22 +305,124 @@ update lastmile_report.mart_program_scale s
                                   where ( year( c.snapshot_date   ) = @p_year   )       and 
                                         ( month( c.snapshot_date  ) = @p_month  )       and
                                         ( trim( c.cohort ) like '%Grand%Bassa%' )         
-*/
+
 
                               ) as a
                        )
 where territory_id like '6\\_16'
 ;
 
--- Note to self: This needs to be recoded to draw from the snapshot data mart, like the population values above. 
+
 -- 50. Number of communities served
--- !!!!! TEMP until we start collecting UNICEF HHR data !!!!!
-UPDATE lastmile_report.mart_program_scale SET num_communities = 58 WHERE territory_id = '6_31';
-UPDATE lastmile_report.mart_program_scale SET num_communities = 157 WHERE territory_id = '6_26';
-UPDATE lastmile_report.mart_program_scale SET num_communities = 240 WHERE territory_id = '1_14';
-UPDATE lastmile_report.mart_program_scale SET num_communities = 0 WHERE territory_id = '1_4';
-UPDATE lastmile_report.mart_program_scale SET num_communities = 215 WHERE territory_id = '1_6';
-UPDATE lastmile_report.mart_program_scale SET num_communities = 455 WHERE territory_id = '6_16';
+-- Pull these from the snapshot data mart for the year/month.
+
+-- GG LMH 6_31
+update lastmile_report.mart_program_scale s
+    set s.num_communities = ( select ifnull( min( coalesce( c.community_count, 0 ) ), 0 ) as community_count
+                              from lastmile_report.view_snapshot_position_cha as c
+                              where ( year( c.snapshot_date   ) = @p_year   ) and 
+                                    ( month( c.snapshot_date  ) = @p_month  ) and    
+                                    ( trim( c.cohort ) like '%Grand%Gedeh%LMH%' )                             
+                            )
+where territory_id like '6\\_31'
+;
+
+-- GG LMH 6_26
+update lastmile_report.mart_program_scale s
+    set s.num_communities = ( select ifnull( min( coalesce( c.community_count, 0 ) ), 0 ) as community_count
+                              from lastmile_report.view_snapshot_position_cha as c
+                              where ( year( c.snapshot_date   ) = @p_year   ) and 
+                                    ( month( c.snapshot_date  ) = @p_month  ) and    
+                                    ( trim( c.cohort ) like '%Grand%Gedeh%UNICEF%' )                                                            
+                            )
+where territory_id like '6\\_26'
+;
+
+-- GG LMH 1_6
+update lastmile_report.mart_program_scale s
+    set s.num_communities = (
+                              select sum( a.community_count ) as community_count
+                              from ( 
+                                    select ifnull( min( coalesce( c.community_count, 0 ) ), 0 ) as community_count
+                                    from lastmile_report.view_snapshot_position_cha as c
+                                    where ( year( c.snapshot_date   ) = @p_year   ) and 
+                                          ( month( c.snapshot_date  ) = @p_month  ) and   
+                                          ( trim( c.cohort ) like '%Grand%Gedeh%LMH%' )  
+                                
+                                    union all
+                                    
+                                    select ifnull( min( coalesce( c.community_count, 0 ) ), 0 ) as community_count
+                                    from lastmile_report.view_snapshot_position_cha as c
+                                    where ( year( c.snapshot_date   ) = @p_year   ) and 
+                                          ( month( c.snapshot_date  ) = @p_month  ) and   
+                                        ( trim( c.cohort ) like '%Grand%Gedeh%UNICEF%' )   
+                          
+                              ) as a
+                        )
+where territory_id like '1\\_6'
+;
+
+-- Rivercess 1_14
+update lastmile_report.mart_program_scale s
+    set s.num_communities = ( select ifnull( min( coalesce( c.community_count, 0 ) ), 0 ) as community_count
+                              from lastmile_report.view_snapshot_position_cha as c
+                              where ( year( c.snapshot_date   ) = @p_year   ) and 
+                                    ( month( c.snapshot_date  ) = @p_month  ) and    
+                                    ( trim( c.cohort ) like '%Rivercess%' )                                                            
+                            )
+where territory_id like '1\\_14'
+;
+
+-- Grand Bassa 1_4
+update lastmile_report.mart_program_scale s
+    set s.num_communities = ( select ifnull( min( coalesce( c.community_count, 0 ) ), 0 ) as community_count
+                              from lastmile_report.view_snapshot_position_cha as c
+                              where ( year( c.snapshot_date   ) = @p_year   ) and 
+                                    ( month( c.snapshot_date  ) = @p_month  ) and                              
+                                    ( trim( c.cohort ) like '%Grand%Bassa%' )    
+                            )
+where territory_id like '1\\_4'
+;
+
+-- Total (LMH) 6_16
+update lastmile_report.mart_program_scale s
+    set s.num_communities = (
+                              select sum( a.community_count ) as community_count
+                              from ( 
+                                    select ifnull( min( coalesce( c.community_count, 0 ) ), 0 ) as community_count
+                                    from lastmile_report.view_snapshot_position_cha as c
+                                    where ( year( c.snapshot_date   ) = @p_year   ) and 
+                                          ( month( c.snapshot_date  ) = @p_month  ) and   
+                                          ( trim( c.cohort ) like '%Grand%Gedeh%LMH%' )  
+                                
+                                    union all
+                                    
+                                    select ifnull( min( coalesce( c.community_count, 0 ) ), 0 ) as community_count
+                                    from lastmile_report.view_snapshot_position_cha as c
+                                    where ( year( c.snapshot_date   ) = @p_year   ) and 
+                                          ( month( c.snapshot_date  ) = @p_month  ) and   
+                                          ( trim( c.cohort ) like '%Grand%Gedeh%UNICEF%' )   
+                          
+                                    union all
+                                    
+                                    select ifnull( min( coalesce( c.community_count, 0 ) ), 0 ) as community_count
+                                    from lastmile_report.view_snapshot_position_cha as c
+                                    where ( year( c.snapshot_date   ) = @p_year   ) and 
+                                          ( month( c.snapshot_date  ) = @p_month  ) and   
+                                          ( trim( c.cohort ) like '%Rivercess%' )   
+                          
+                                    union all
+                                    
+                                    select ifnull( min( coalesce( c.community_count, 0 ) ), 0 ) as community_count
+                                    from lastmile_report.view_snapshot_position_cha as c
+                                    where ( year( c.snapshot_date   ) = @p_year   ) and 
+                                          ( month( c.snapshot_date  ) = @p_month  ) and   
+                                          ( trim( c.cohort ) like '%Grand%Bassa%' ) 
+                                                
+                              ) as a
+                        )
+where territory_id like '6\\_16'
+;
 
 
 -- X. Misc GG UNICEF + Grand Bassa

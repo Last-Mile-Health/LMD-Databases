@@ -3034,64 +3034,116 @@ where (
 
 -- 430. Percent of CHAs with all life-saving commodities in stock
 -- The if-clause suppresses the results if the reporting rate is below 25% (here and below)
-
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select  430, a.territory_id, 1, @p_month, @p_year, 
-        if( ( coalesce( count( 1 ), 0 ) / b.num_cha ) >= 0.25, 
-              round( ( coalesce( count( 1 ), 0 ) - coalesce( sum( a.any_stockout_life_saving ), 0 ) ) / coalesce( COUNT( 1 ), 0 ), 3 ),
+select  
+        430, a.territory_id, 1, @p_month, @p_year, 
+        
+        if( ( coalesce( a.number_restock, 0 ) / b.num_cha ) >= 0.25, 
+              round( ( coalesce( a.number_restock, 0 ) - coalesce( a.number_any_stockout_life_saving, 0 ) ) / coalesce( a.number_restock, 0 ), 3 ),
               null
-          )
-from lastmile_report.mart_view_base_restock_cha as a 
-left outer join lastmile_report.mart_program_scale as b on a.territory_id = b.territory_id 
-where a.`month`=@p_month and a.`year`=@p_year and a.county_id is not null 
-group by a.county_id
-
+          ) as rate
+from (
+        select
+              territory_id,
+              count( 1 )                      as number_restock, 
+              sum( any_stockout_life_saving ) as number_any_stockout_life_saving
+        from lastmile_report.mart_view_base_restock_cha
+        where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+        group by territory_id
+      ) as a
+          left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+    
 union all
 
-select  430, '6_16', 1, @p_month, @p_year, 
-        if( ( coalesce( count( 1 ), 0 ) / b.num_cha ) >= 0.25,
-              round( ( coalesce( count( 1 ), 0 ) - coalesce( sum( a.any_stockout_life_saving ), 0 ) ) / coalesce( count( 1 ), 0 ), 3 ),
-              null 
-           )
-from lastmile_report.mart_view_base_restock_cha as a 
-    left outer join lastmile_report.mart_program_scale as b on '6\\_16' = b.territory_id
-where a.`month`=@p_month and a.`year`=@p_year and a.county_id is not null;
+-- Note: For 6_16, Total LMH, we can't use the num_cha in the mart_program_scale because it includes UNICEF CHAs and that will
+--       inflate the denomminator when we are calculating whether there is a 25% restock for month.
+select 
+        430, '6_16', 1, @p_month, @p_year, 
+        
+        if( ( coalesce( c.number_restock, 0 ) / c.num_cha ) >= 0.25, 
+              round( ( coalesce( c.number_restock, 0 ) - coalesce( c.number_any_stockout_life_saving, 0 ) ) / coalesce( c.number_restock, 0 ), 3 ),
+              null
+          ) as rate
+from (
+        select 
+              sum( coalesce( a.number_restock, 0 ) )                  as number_restock,
+              sum( coalesce( a.number_any_stockout_life_saving, 0 ) ) as number_any_stockout_life_saving,
+              sum( coalesce( b.num_cha, 0 ) )                         as num_cha                 
+        from (
+                select
+                      territory_id,
+                      count( 1 )                      as number_restock, 
+                      sum( any_stockout_life_saving ) as number_any_stockout_life_saving
+                from lastmile_report.mart_view_base_restock_cha
+                where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+                group by territory_id
+                
+              ) as a
+                  left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+      ) as c
+;
+
 
 -- Note: For assisted areas (6_32, we are not suppressing values under any conditions.  This is IFI sample data, so
 -- the denominator is the number of CHAs sampled during the month.  We could suppress is number of CHAs is too low.
-
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 430, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_life_saving_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
 from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year and NOT ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' );
 
+
 -- 431. Percent of CHAs with ACT 25mg in stock
 -- The if-clause suppresses the results if the reporting rate is below 25% (here and below)
-
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select  431, a.territory_id, 1, @p_month, @p_year, 
-        if( ( coalesce( count( 1 ), 0 ) / b.num_cha ) >= 0.25, 
-              round( ( coalesce( count( 1 ), 0 ) - coalesce( sum( a.stockout_ACT25mg ), 0 ) ) / coalesce( COUNT( 1 ), 0 ), 3 ),
+select  
+        431, a.territory_id, 1, @p_month, @p_year, 
+        
+        if( ( coalesce( a.number_restock, 0 ) / b.num_cha ) >= 0.25, 
+              round( ( coalesce( a.number_restock, 0 ) - coalesce( a.number_stockout_ACT25mg, 0 ) ) / coalesce( a.number_restock, 0 ), 3 ),
               null
-          )
-from lastmile_report.mart_view_base_restock_cha as a 
-left outer join lastmile_report.mart_program_scale as b on a.territory_id = b.territory_id 
-where a.`month`=@p_month and a.`year`=@p_year and a.county_id is not null 
-group by a.county_id
-
+          ) as rate
+from (
+        select
+              territory_id,
+              count( 1 )                      as number_restock, 
+              sum( stockout_ACT25mg )         as number_stockout_ACT25mg
+        from lastmile_report.mart_view_base_restock_cha
+        where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+        group by territory_id
+      ) as a
+          left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+    
 union all
 
-select  431, '6_16', 1, @p_month, @p_year, 
-        if( ( coalesce( count( 1 ), 0 ) / b.num_cha ) >= 0.25,
-              round( ( coalesce( count( 1 ), 0 ) - coalesce( sum( a.stockout_ACT25mg ), 0 ) ) / coalesce( count( 1 ), 0 ), 3 ),
-              null 
-           )
-from lastmile_report.mart_view_base_restock_cha as a 
-    left outer join lastmile_report.mart_program_scale as b on '6\\_16' = b.territory_id
-where a.`month`=@p_month and a.`year`=@p_year and a.county_id is not null;
+select 
+        431, '6_16', 1, @p_month, @p_year, 
+        
+        if( ( coalesce( c.number_restock, 0 ) / c.num_cha ) >= 0.25, 
+              round( ( coalesce( c.number_restock, 0 ) - coalesce( c.number_stockout_ACT25mg, 0 ) ) / coalesce( c.number_restock, 0 ), 3 ),
+              null
+          ) as rate
+from (
+        select 
+              sum( coalesce( a.number_restock, 0 ) )                  as number_restock,
+              sum( coalesce( a.number_stockout_ACT25mg, 0 ) )         as number_stockout_ACT25mg,
+              sum( coalesce( b.num_cha, 0 ) )                         as num_cha                 
+        from (
+                select
+                      territory_id,
+                      count( 1 )                      as number_restock, 
+                      sum( stockout_ACT25mg )         as number_stockout_ACT25mg
+                from lastmile_report.mart_view_base_restock_cha
+                where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+                group by territory_id
+                
+              ) as a
+                  left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+      ) as c
+;
+
 
 -- Note: For assisted areas (6_32, we are not suppressing values under any conditions.  This is IFI sample data, so
--- the denominator is the number of CHAs sampled during the month.  We could suppress is number of CHAs is too low.
+-- the denominator is the number of CHAs sampled during the month.  We could suppress if number of CHAs is too low.
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 431, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )

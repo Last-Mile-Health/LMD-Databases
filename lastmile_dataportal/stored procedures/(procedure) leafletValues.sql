@@ -223,6 +223,93 @@ UNION SELECT 347, CONCAT('1_',county_id), 2, SUM(COALESCE(num_community_triggers
 UNION SELECT 347, CONCAT('1_',county_id), 3, SUM(COALESCE(num_community_triggers,0)) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY county_id;
 
 
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+-- 356. Number of women currently using a modern method of family planning
+-- ----------------------------------------------------------------------------------------------------------------------------------------
+
+replace into lastmile_dataportal.tbl_values_leaflet ( ind_id, territory_id, period_id, value )
+
+-- community
+
+-- last month
+select 356, concat( '5_', community_id ), 1, coalesce( num_clients_modern_fp, 0) 
+from lastmile_report.mart_view_base_msr_community 
+where month_reported = @p_month and year_reported = @p_year
+
+union 
+
+-- last 3 months
+
+select 356, concat( '5_', community_id ), 2, sum( coalesce( num_clients_modern_fp, 0 ) ) 
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths and (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by community_id
+
+union 
+
+-- last 6 months
+
+select 356, concat( '5_', community_id ), 3, sum( coalesce( num_clients_modern_fp, 0 ) ) 
+from lastmile_report.mart_view_base_msr_community 
+where ( month_reported+(12*year_reported) ) <= @p_totalMonths and ( month_reported + ( 12 * year_reported ) ) >= @p_totalMonthsMinus5 
+group by community_id
+
+union 
+
+-- health district, last month
+
+select 356, concat( '2_', health_district_id ), 1, coalesce( num_clients_modern_fp, 0 ) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where month_reported = @p_month and year_reported = @p_year
+
+union 
+
+-- health district, last 3 months
+
+select 356, concat( '2_', health_district_id ), 2, sum( coalesce( num_clients_modern_fp, 0 ) ) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where ( month_reported + ( 12 * year_reported ) ) <= @p_totalMonths and ( month_reported + ( 12 * year_reported ) ) >= @p_totalMonthsMinus2 
+group by health_district_id
+
+union 
+
+-- health district, last 6 months
+
+select 356, concat( '2_', health_district_id ), 3, sum( coalesce( num_clients_modern_fp, 0 ) ) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where ( month_reported + ( 12 * year_reported ) ) <= @p_totalMonths and ( month_reported + ( 12 * year_reported ) ) >= @p_totalMonthsMinus5 
+group by health_district_id
+
+union 
+
+-- county, last month
+
+select 356, concat( '1_', county_id ), 1, coalesce( num_clients_modern_fp, 0 ) 
+from lastmile_report.mart_view_base_msr_county 
+where month_reported = @p_month and year_reported = @p_year
+
+union 
+
+-- county, last 3 months
+
+select 356, concat( '1_', county_id ), 2, sum( coalesce( num_clients_modern_fp, 0 ) ) 
+from lastmile_report.mart_view_base_msr_county 
+where ( month_reported + ( 12 * year_reported ) ) <= @p_totalMonths and ( month_reported + ( 12 * year_reported ) ) >= @p_totalMonthsMinus2 
+group by county_id
+
+union 
+
+-- county, last 6 months
+
+select 356, concat( '1_', county_id ), 3, sum( coalesce( num_clients_modern_fp, 0 ) ) 
+from lastmile_report.mart_view_base_msr_county 
+where ( month_reported + ( 12 * year_reported ) ) <= @p_totalMonths and ( month_reported + ( 12 * year_reported ) ) >= @p_totalMonthsMinus5 
+group by county_id
+;
+
+
+
+
 -- 382. Number of children with moderate acute malnutrition (yellow MUAC)
 REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
 SELECT 382, CONCAT('5_',community_id), 1, num_muac_yellow FROM lastmile_report.mart_view_base_msr_community WHERE month_reported=@p_month AND year_reported=@p_year

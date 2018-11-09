@@ -119,6 +119,135 @@ SELECT 29, CONCAT('2_',health_district_id), 1, COUNT(*) FROM lastmile_cha.view_b
 UNION SELECT 29, CONCAT('1_',county_id), 1, COUNT(*) FROM lastmile_cha.view_base_chss GROUP BY county_id;
 
 
+
+-- 31. Number of deaths (neonatal)
+
+replace into lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
+
+select 31, concat('5_',community_id), 1, coalesce(num_deaths_neonatal,0) 
+from lastmile_report.mart_view_base_msr_community 
+where month_reported=@p_month and year_reported=@p_year
+
+union 
+
+select 31, concat('5_',community_id), 2, sum(coalesce(num_deaths_neonatal,0)) 
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths and (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by community_id
+
+union 
+
+select 31, concat('5_',community_id), 3, sum(coalesce(num_deaths_neonatal,0)) 
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths and (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by community_id
+
+union 
+
+select 31, concat('2_',health_district_id), 1, coalesce(num_deaths_neonatal,0) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where month_reported=@p_month and year_reported=@p_year
+
+union 
+
+select 31, concat('2_',health_district_id), 2, sum(coalesce(num_deaths_neonatal,0)) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths and (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by health_district_id
+
+union 
+
+select 31, concat('2_',health_district_id), 3, sum(coalesce(num_deaths_neonatal,0)) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths and (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by health_district_id
+
+union 
+
+select 31, concat('1_',county_id), 1, coalesce(num_deaths_neonatal,0) 
+from lastmile_report.mart_view_base_msr_county 
+where month_reported=@p_month and year_reported=@p_year
+
+union 
+
+select 31, concat('1_',county_id), 2, sum(coalesce(num_deaths_neonatal,0)) 
+from lastmile_report.mart_view_base_msr_county 
+where (month_reported+(12*year_reported))<=@p_totalMonths and (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by county_id
+
+union 
+
+select 31, concat('1_',county_id), 3, sum(coalesce(num_deaths_neonatal,0)) 
+from lastmile_report.mart_view_base_msr_county 
+where (month_reported+(12*year_reported))<=@p_totalMonths and (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by county_id
+;
+
+
+-- 33. Number of deaths (post-neonatal)
+
+replace into lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
+
+select 33, concat('5_',community_id), 1, coalesce(num_deaths_postneonatal,0) 
+from lastmile_report.mart_view_base_msr_community 
+where month_reported=@p_month and year_reported=@p_year
+
+union 
+
+select 33, concat('5_',community_id), 2, sum(coalesce(num_deaths_postneonatal,0)) 
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths and (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by community_id
+
+union 
+
+select 33, concat('5_',community_id), 3, sum(coalesce(num_deaths_postneonatal,0)) 
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths and (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by community_id
+
+union 
+
+select 33, concat('2_',health_district_id), 1, coalesce(num_deaths_postneonatal,0) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where month_reported=@p_month and year_reported=@p_year
+
+union 
+
+select 33, concat('2_',health_district_id), 2, sum(coalesce(num_deaths_postneonatal,0)) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths and (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by health_district_id
+
+union 
+
+select 33, concat('2_',health_district_id), 3, sum(coalesce(num_deaths_postneonatal,0)) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths and (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by health_district_id
+
+union 
+
+select 33, concat('1_',county_id), 1, coalesce(num_deaths_postneonatal,0) 
+from lastmile_report.mart_view_base_msr_county 
+where month_reported=@p_month and year_reported=@p_year
+
+union 
+
+select 33, concat('1_',county_id), 2, sum(coalesce(num_deaths_postneonatal,0)) 
+from lastmile_report.mart_view_base_msr_county 
+where (month_reported+(12*year_reported))<=@p_totalMonths and (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by county_id
+
+union 
+
+select 33, concat('1_',county_id), 3, sum(coalesce(num_deaths_postneonatal,0)) 
+from lastmile_report.mart_view_base_msr_county 
+where (month_reported+(12*year_reported))<=@p_totalMonths and (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by county_id
+;
+
+
 -- 34. Number of deaths (under-five)
 REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
 SELECT 34, CONCAT('5_',community_id), 1, COALESCE(num_deaths_neonatal,0)+COALESCE(num_deaths_postneonatal,0)+COALESCE(num_deaths_child,0) FROM lastmile_report.mart_view_base_msr_community WHERE month_reported=@p_month AND year_reported=@p_year

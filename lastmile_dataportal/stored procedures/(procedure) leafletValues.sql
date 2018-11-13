@@ -87,6 +87,192 @@ UNION SELECT 18, CONCAT('1_',county_id), 2, SUM(num_births) FROM lastmile_report
 UNION SELECT 18, CONCAT('1_',county_id), 3, SUM(num_births) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY county_id;
 
 
+-- 19. Number of child cases of ARI treated
+
+replace into lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
+
+select 19, concat('5_',community_id), 1, coalesce(num_tx_ari,0) 
+from lastmile_report.mart_view_base_msr_community 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 19, concat('5_',community_id), 2, sum(coalesce(num_tx_ari,0)) 
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by community_id
+
+union 
+
+select 19, concat('5_',community_id), 3, sum(coalesce(num_tx_ari,0)) 
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by community_id
+
+union 
+
+select 19, concat('2_',health_district_id), 1, coalesce(num_tx_ari,0) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 19, concat('2_',health_district_id), 2, sum(coalesce(num_tx_ari,0))
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by health_district_id
+
+union 
+
+select 19, concat('2_',health_district_id), 3, sum(coalesce(num_tx_ari,0)) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by health_district_id
+
+union 
+
+select 19, concat('1_',county_id), 1, coalesce(num_tx_ari,0) 
+from lastmile_report.mart_view_base_msr_county 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 19, concat('1_',county_id), 2, sum(coalesce(num_tx_ari,0))
+from lastmile_report.mart_view_base_msr_county 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by county_id
+
+union 
+
+select 19, concat('1_',county_id), 3, sum(coalesce(num_tx_ari,0)) 
+from lastmile_report.mart_view_base_msr_county 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by county_id
+;
+
+
+-- 21. Number of child cases of diarrhea treated
+
+replace into lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
+
+select 21, concat('5_',community_id), 1, coalesce(num_tx_diarrhea,0) 
+from lastmile_report.mart_view_base_msr_community 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 21, concat('5_',community_id), 2, sum(coalesce(num_tx_diarrhea,0)) 
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by community_id
+
+union 
+
+select 21, concat('5_',community_id), 3, sum(coalesce(num_tx_diarrhea,0)) 
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by community_id
+
+union 
+
+select 21, concat('2_',health_district_id), 1, coalesce(num_tx_diarrhea,0) 
+from lastmile_report.mart_view_base_msr_healthdistrict where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 21, concat('2_',health_district_id), 2, sum(coalesce(num_tx_diarrhea,0)) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by health_district_id
+
+union select 21, concat('2_',health_district_id), 3, sum(coalesce(num_tx_diarrhea,0)) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by health_district_id
+
+union 
+
+select 21, concat('1_',county_id), 1, coalesce(num_tx_diarrhea,0)
+from lastmile_report.mart_view_base_msr_county 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 21, concat('1_',county_id), 2, sum(coalesce(num_tx_diarrhea,0)) 
+from lastmile_report.mart_view_base_msr_county 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by county_id
+
+union 
+
+select 21, concat('1_',county_id), 3, sum(coalesce(num_tx_diarrhea,0))
+from lastmile_report.mart_view_base_msr_county 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by county_id
+;
+
+
+-- 23. Number of child cases of malaria treated
+replace into lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
+
+select 23, concat('5_',community_id), 1, num_tx_malaria
+from lastmile_report.mart_view_base_msr_community 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 23, concat('5_',community_id), 2, SUM(num_tx_malaria)
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by community_id
+
+union 
+
+select 23, concat('5_',community_id), 3, SUM(num_tx_malaria) 
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by community_id
+
+union 
+
+select 23, concat('2_',health_district_id), 1, num_tx_malaria
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 23, concat('2_',health_district_id), 2, SUM(num_tx_malaria)
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by health_district_id
+
+union 
+
+select 23, concat('2_',health_district_id), 3, SUM(num_tx_malaria) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by health_district_id
+
+union 
+
+select 23, concat('1_',county_id), 1, num_tx_malaria
+from lastmile_report.mart_view_base_msr_county 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 23, concat('1_',county_id), 2, SUM(num_tx_malaria) 
+from lastmile_report.mart_view_base_msr_county where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by county_id
+
+union 
+
+select 23, concat('1_',county_id), 3, SUM(num_tx_malaria) 
+from lastmile_report.mart_view_base_msr_county where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by county_id
+;
+
+
 -- 28. Number of CHAs deployed (LMH)
 REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
 SELECT 28, CONCAT('2_',health_district_id), 1, COUNT(*) FROM lastmile_cha.view_base_cha GROUP BY health_district_id
@@ -117,6 +303,7 @@ REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`territory_id`,`period_id`,
 REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
 SELECT 29, CONCAT('2_',health_district_id), 1, COUNT(*) FROM lastmile_cha.view_base_chss GROUP BY health_district_id
 UNION SELECT 29, CONCAT('1_',county_id), 1, COUNT(*) FROM lastmile_cha.view_base_chss GROUP BY county_id;
+
 
 
 
@@ -248,6 +435,7 @@ group by county_id
 ;
 
 
+
 -- 34. Number of deaths (under-five)
 REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
 SELECT 34, CONCAT('5_',community_id), 1, COALESCE(num_deaths_neonatal,0)+COALESCE(num_deaths_postneonatal,0)+COALESCE(num_deaths_child,0) FROM lastmile_report.mart_view_base_msr_community WHERE month_reported=@p_month AND year_reported=@p_year
@@ -352,9 +540,7 @@ UNION SELECT 347, CONCAT('1_',county_id), 2, SUM(COALESCE(num_community_triggers
 UNION SELECT 347, CONCAT('1_',county_id), 3, SUM(COALESCE(num_community_triggers,0)) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY county_id;
 
 
--- ----------------------------------------------------------------------------------------------------------------------------------------
 -- 356. Number of women currently using a modern method of family planning
--- ----------------------------------------------------------------------------------------------------------------------------------------
 
 replace into lastmile_dataportal.tbl_values_leaflet ( ind_id, territory_id, period_id, value )
 
@@ -437,8 +623,6 @@ group by county_id
 ;
 
 
-
-
 -- 382. Number of children with moderate acute malnutrition (yellow MUAC)
 REPLACE INTO lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
 SELECT 382, CONCAT('5_',community_id), 1, num_muac_yellow FROM lastmile_report.mart_view_base_msr_community WHERE month_reported=@p_month AND year_reported=@p_year
@@ -464,6 +648,156 @@ UNION SELECT 383, CONCAT('1_',county_id), 1, num_muac_red FROM lastmile_report.m
 UNION SELECT 383, CONCAT('1_',county_id), 2, SUM(num_muac_red) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY county_id
 UNION SELECT 383, CONCAT('1_',county_id), 3, SUM(num_muac_red) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY county_id;
 
+
+ 
+-- 457. Number of child cases of malaria treated in less than 24 hours
+
+replace into lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
+
+select 457, concat('5_',community_id), 1, num_tx_malaria_under24
+from lastmile_report.mart_view_base_msr_community 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 457, concat('5_',community_id), 2, SUM(num_tx_malaria_under24)
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by community_id
+
+union 
+
+select 457, concat('5_',community_id), 3, SUM(num_tx_malaria_under24) 
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by community_id
+
+union 
+
+select 457, concat('2_',health_district_id), 1, num_tx_malaria_under24
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 457, concat('2_',health_district_id), 2, SUM(num_tx_malaria_under24)
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by health_district_id
+
+union 
+
+select 457, concat('2_',health_district_id), 3, SUM(num_tx_malaria_under24) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by health_district_id
+
+union 
+
+select 457, concat('1_',county_id), 1, num_tx_malaria_under24
+from lastmile_report.mart_view_base_msr_county 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 457, concat('1_',county_id), 2, SUM(num_tx_malaria_under24) 
+from lastmile_report.mart_view_base_msr_county where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by county_id
+
+union 
+
+select 457, concat('1_',county_id), 3, SUM(num_tx_malaria_under24) 
+from lastmile_report.mart_view_base_msr_county where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by county_id
+;
+
+
+-- 458. Number of child cases of malaria treated in more than 24 hours
+
+replace into lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
+
+select 458, concat('5_',community_id), 1, num_tx_malaria_over24
+from lastmile_report.mart_view_base_msr_community 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 458, concat('5_',community_id), 2, SUM(num_tx_malaria_over24)
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by community_id
+
+union 
+
+select 458, concat('5_',community_id), 3, SUM(num_tx_malaria_over24) 
+from lastmile_report.mart_view_base_msr_community 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by community_id
+
+union 
+
+select 458, concat('2_',health_district_id), 1, num_tx_malaria_over24
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 458, concat('2_',health_district_id), 2, SUM(num_tx_malaria_over24)
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by health_district_id
+
+union 
+
+select 458, concat('2_',health_district_id), 3, SUM(num_tx_malaria_over24) 
+from lastmile_report.mart_view_base_msr_healthdistrict 
+where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by health_district_id
+
+union 
+
+select 458, concat('1_',county_id), 1, num_tx_malaria_over24
+from lastmile_report.mart_view_base_msr_county 
+where month_reported=@p_month AND year_reported=@p_year
+
+union 
+
+select 458, concat('1_',county_id), 2, SUM(num_tx_malaria_over24) 
+from lastmile_report.mart_view_base_msr_county where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 
+group by county_id
+
+union 
+
+select 458, concat('1_',county_id), 3, SUM(num_tx_malaria_over24) 
+from lastmile_report.mart_view_base_msr_county where (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 
+group by county_id
+;
+
+
+-- 459. Number of in-home births
+replace into lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
+SELECT 459, CONCAT('5_',community_id), 1, num_births_home FROM lastmile_report.mart_view_base_msr_community WHERE month_reported=@p_month AND year_reported=@p_year
+UNION SELECT 459, CONCAT('5_',community_id), 2, SUM(num_births_home) FROM lastmile_report.mart_view_base_msr_community WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY community_id
+UNION SELECT 459, CONCAT('5_',community_id), 3, SUM(num_births_home) FROM lastmile_report.mart_view_base_msr_community WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY community_id
+UNION SELECT 459, CONCAT('2_',health_district_id), 1, num_births_home FROM lastmile_report.mart_view_base_msr_healthdistrict WHERE month_reported=@p_month AND year_reported=@p_year
+UNION SELECT 459, CONCAT('2_',health_district_id), 2, SUM(num_births_home) FROM lastmile_report.mart_view_base_msr_healthdistrict WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY health_district_id
+UNION SELECT 459, CONCAT('2_',health_district_id), 3, SUM(num_births_home) FROM lastmile_report.mart_view_base_msr_healthdistrict WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY health_district_id
+UNION SELECT 459, CONCAT('1_',county_id), 1, num_births_home FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year
+UNION SELECT 459, CONCAT('1_',county_id), 2, SUM(num_births_home) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY county_id
+UNION SELECT 459, CONCAT('1_',county_id), 3, SUM(num_births_home) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY county_id;
+
+
+-- 460. Number of in-facility births
+replace into lastmile_dataportal.tbl_values_leaflet (`ind_id`,`territory_id`,`period_id`,`value`)
+SELECT 460, CONCAT('5_',community_id), 1, num_births_facility FROM lastmile_report.mart_view_base_msr_community WHERE month_reported=@p_month AND year_reported=@p_year
+UNION SELECT 460, CONCAT('5_',community_id), 2, SUM(num_births_facility) FROM lastmile_report.mart_view_base_msr_community WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY community_id
+UNION SELECT 460, CONCAT('5_',community_id), 3, SUM(num_births_facility) FROM lastmile_report.mart_view_base_msr_community WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY community_id
+UNION SELECT 460, CONCAT('2_',health_district_id), 1, num_births_facility FROM lastmile_report.mart_view_base_msr_healthdistrict WHERE month_reported=@p_month AND year_reported=@p_year
+UNION SELECT 460, CONCAT('2_',health_district_id), 2, SUM(num_births_facility) FROM lastmile_report.mart_view_base_msr_healthdistrict WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY health_district_id
+UNION SELECT 460, CONCAT('2_',health_district_id), 3, SUM(num_births_facility) FROM lastmile_report.mart_view_base_msr_healthdistrict WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY health_district_id
+UNION SELECT 460, CONCAT('1_',county_id), 1, num_births_facility FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year
+UNION SELECT 460, CONCAT('1_',county_id), 2, SUM(num_births_facility) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus2 GROUP BY county_id
+UNION SELECT 460, CONCAT('1_',county_id), 3, SUM(num_births_facility) FROM lastmile_report.mart_view_base_msr_county WHERE (month_reported+(12*year_reported))<=@p_totalMonths AND (month_reported+(12*year_reported))>=@p_totalMonthsMinus5 GROUP BY county_id;
 
 
 -- ------ --

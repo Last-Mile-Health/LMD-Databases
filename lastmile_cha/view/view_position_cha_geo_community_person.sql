@@ -13,7 +13,10 @@ select
       -- cha health facility and geographical info
       p.health_facility_id,
       f.health_facility,
-      f.cohort,
+      
+      -- f.cohort, stop pulling cohort from health facility and pull from position
+      p.cohort,
+      
       f.health_district_id,
       f.health_district,
       f.county_id,

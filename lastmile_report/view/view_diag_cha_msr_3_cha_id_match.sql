@@ -8,6 +8,9 @@ select
       trim( m.year_reported )   as msr_year_reported,
       trim( m.month_reported )  as msr_month_reported,
       
+      m.meta_insert_date_time   as msr_insert_date_time,
+      m.meta_de_init            as msr_meta_de_init,
+      
       v.county                  as db_county,    
       v.health_district         as db_health_district,
       trim( m.district )        as msr_health_district,

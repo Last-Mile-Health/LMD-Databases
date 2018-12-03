@@ -75,16 +75,66 @@ set @cha_population_ratio = 235;
 -- ------------ --
 
 
--- Delete blank values from tbl_values
-DELETE FROM lastmile_dataportal.tbl_values WHERE `value`='';
-
-
 
 -- --------------- --
 -- Set scale table --
 -- --------------- --
 
--- TO DO: Description
+-- Delete blank values from tbl_values
+delete from  lastmile_dataportal.tbl_values where trim( value ) like '';
+
+
+/*  dhis2 upload of CHSS MSR data aggregated by counties
+    
+    This code "replicates" the Excel spreadsheet we were using to upload the dhis2 CHSS MSR data, although
+    has been expeanded to accomodate all 43 CHSS MSR indicators.
+    
+    First, run the pivot table "LMH NCHA CHSS MSR Monthly Totals" for prior month and uploaded it
+    into the table lastmile_dataportal.tbl_moh_dhis2_chss_msr_upload.
+    
+    If dhis2 indicator has been mapped to a portal ind_id, then there will be an entry for it in the table
+    lastmile_dataportal.tbl_moh_dhis2_chss_msr_map_indicator_id.  Otherwise, the ind_id is null for a dhis2
+    indicator.
+    
+    The upload table can hold multiple months of data and aggregate and sum it by months, years, and county.
+    
+*/
+
+-- Bring  all the CHSS MSR indicators that that have been mapped to a ind_id in tbl_values
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select ind_id, territory_id, 1 as period_id, month_report, year_report, value   
+from lastmile_dataportal.view_moh_dhis2_chss_msr
+where not ( ind_id is null ) and  month_report = @p_month and year_report = @p_year 
+;
+
+
+-- ind_id 18, 23, 235 were all being summed in the Excel spread sheet before we run this stored procedure,
+-- so they are being summed here at the top of the stored procedure.
+-- 18. Number of births tracked.
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 18, territory_id, 1 as period_id, month_report, year_report, sum( value ) as value   
+from lastmile_dataportal.view_moh_dhis2_chss_msr
+where ind_id in ( 459, 460 ) and  month_report = @p_month and year_report = @p_year 
+group by territory_id
+;
+
+-- 23. Number of child cases of malaria treated.
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 23, territory_id, 1 as period_id, month_report, year_report, sum( value ) as value   
+from lastmile_dataportal.view_moh_dhis2_chss_msr
+where ind_id in ( 461, 462) and  month_report = @p_month and year_report = @p_year 
+group by territory_id
+;
+
+-- 235. Number of malnutrition screenings (MUAC) conducted for children under-five
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 235, territory_id, 1 as period_id, month_report, year_report, sum( value ) as value   
+from lastmile_dataportal.view_moh_dhis2_chss_msr
+where ind_id in ( 382, 383, 463 ) and  month_report = @p_month and year_report = @p_year 
+group by territory_id
+;
+
+/* end of dhis2 upload code */
 
 
 -- Create table
@@ -3173,6 +3223,8 @@ Also, note 432 values are brought in via the dhis2 upload mechanism.
 
 replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`,`year`,value )
 select 456, territory_id, 1 as period_id, @p_month, @p_year, 
+
+      
        round( min( if( a.fraction_part like 'number_chss_msr',  a.value, null ) ) -- numerator
               / 
               min( if( a.fraction_part like 'number_chss',      a.value, null ) )  -- denominator
@@ -3226,6 +3278,8 @@ from (
      
 ) as a
 ; 
+
+
 
 -- ------ --
 -- Finish --

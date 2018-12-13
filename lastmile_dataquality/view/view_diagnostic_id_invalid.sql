@@ -10,7 +10,7 @@ select
       d.id_type, 
       d.id_name, 
       d.id_original_value             as id_original, 
-      d.id_inserted_value             as id_repaired, 
+      d.id_inserted_value             as id_repair, 
       d.id_inserted_format_value      as id_formatted, 
       d.id_value, 
       
@@ -29,6 +29,6 @@ select
       d.meta_form_version
 
 from lastmile_upload.view_diagnostic_id as d
-    left outer join lastmile_cha.`position` as p on trim( d.id_original_value ) like p.position_id and d.id_type like if( p.job_id = 1, 'cha',  if( p.job_id = 3, 'chss', null ) )
+    left outer join lastmile_cha.`position` as p on trim( d.id_inserted_value ) like p.position_id and d.id_type like if( p.job_id = 1, 'cha',  if( p.job_id = 3, 'chss', null ) )
 where p.position_id is null
 ;

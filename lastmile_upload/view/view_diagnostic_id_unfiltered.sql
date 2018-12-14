@@ -17,16 +17,17 @@ select
         a.chss_id_inserted_format               as id_inserted_format_value, 
         a.chss_id                               as id_value, 
 
-        null 		                                as meta_cha,
-        null		                                as meta_cha_id,
-        null		                                as meta_chss,
+        a.cha                                   as meta_cha,
+        a.cha_id_original		                    as meta_cha_id,
+        a.chss		                              as meta_chss,
         null 	                                  as meta_chss_id,
-        null		                                as meta_facility,
+        a.health_facility		                    as meta_facility,
         null                                    as meta_facility_id,
         null		                                as meta_health_district,
-        null                                    as meta_county,
-        null		                                as meta_community,
-        null		                                as meta_community_id,
+        a.county                                as meta_county,
+        a.community		                          as meta_community,
+        a.community_id		                      as meta_community_id,
+        a.date_form                             as meta_form_date,
        
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -46,17 +47,18 @@ select
         a.cha_id_inserted_format                as id_inserted_format_value, 
         a.cha_id                                as id_value,
 
-        null 		                                as meta_cha,
+        a.cha                                   as meta_cha,
         null		                                as meta_cha_id,
-        null		                                as meta_chss,
-        null 	                                  as meta_chss_id,
-        null		                                as meta_facility,
+        a.chss		                              as meta_chss,
+        a.chss_id_original 	                    as meta_chss_id,
+        a.health_facility		                    as meta_facility,
         null                                    as meta_facility_id,
         null		                                as meta_health_district,
-        null                                    as meta_county,
-        null		                                as meta_community,
-        null		                                as meta_community_id,
- 
+        a.county                                as meta_county,
+        a.community		                          as meta_community,
+        a.community_id		                      as meta_community_id,
+        a.date_form                             as meta_form_date,
+       
         a.meta_insert_date_time, 
         a.meta_form_version
                 
@@ -77,16 +79,17 @@ select
         a.cha_id_inserted_format                as id_inserted_format_value,
         a.chaID                                 as id_value, 
 
-        null 		                                as meta_cha,
+        a.chaName 		                          as meta_cha,
         null		                                as meta_cha_id,
-        null		                                as meta_chss,
-        null 	                                  as meta_chss_id,
-        null		                                as meta_facility,
+        a.chssName		                          as meta_chss,
+        a.chss_id_original 	                    as meta_chss_id,
+        a.healthFacility		                    as meta_facility,
         null                                    as meta_facility_id,
-        null		                                as meta_health_district,
+        a.healthDistrict		                    as meta_health_district,
         null                                    as meta_county,
-        null		                                as meta_community,
-        null		                                as meta_community_id,
+        a.community		                          as meta_community,
+        a.communityID		                        as meta_community_id,
+        a.registrationDate                      as meta_form_date,
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
@@ -106,17 +109,18 @@ select
         a.chss_id_inserted_format               as id_inserted_format_value,
         a.chssID                                as id_value,
 
-        null 		                                as meta_cha,
-        null		                                as meta_cha_id,
-        null		                                as meta_chss,
+        a.chaName 		                          as meta_cha,
+        a.cha_id_original		                    as meta_cha_id,
+        a.chssName		                          as meta_chss,
         null 	                                  as meta_chss_id,
-        null		                                as meta_facility,
+        a.healthFacility		                    as meta_facility,
         null                                    as meta_facility_id,
-        null		                                as meta_health_district,
+        a.healthDistrict		                    as meta_health_district,
         null                                    as meta_county,
-        null		                                as meta_community,
-        null		                                as meta_community_id,
- 
+        a.community		                          as meta_community,
+        a.communityID		                        as meta_community_id,
+        a.registrationDate                      as meta_form_date,
+   
         a.meta_insertDatetime, 
         a.meta_formVersion 
                 
@@ -139,7 +143,7 @@ select
         a.cha_id                                as id_value,   
           
         a.cha_name 		                          as meta_cha,
-        a.cha_id_original		                    as meta_cha_id,
+        null		                                as meta_cha_id,
         a.chss_name		                          as meta_chss,
         a.chss_id_original 	                    as meta_chss_id,
         a.health_facility		                    as meta_facility, 
@@ -149,6 +153,8 @@ select
         a.community		                          as meta_community,
         a.community_id		                      as meta_community_id,
         
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+         
         a.meta_insert_date_time, 
         a.meta_form_version
             
@@ -171,7 +177,7 @@ select
         a.cha_name 		                          as meta_cha,
         a.cha_id_original		                    as meta_cha_id,
         a.chss_name		                          as meta_chss,
-        a.chss_id_original 	                    as meta_chss_id,
+        null 	                                  as meta_chss_id,
         a.health_facility		                    as meta_facility, 
         null                                    as meta_facility_id,
         a.district		                          as meta_health_district,
@@ -179,6 +185,8 @@ select
         a.community		                          as meta_community,
         a.community_id		                      as meta_community_id,
         
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+         
         a.meta_insert_date_time, 
         a.meta_form_version
         
@@ -203,14 +211,15 @@ select
 
         null 		                                as meta_cha,
         null		                                as meta_cha_id,
-        null		                                as meta_chss,
+        a.chss		                              as meta_chss,
         null 	                                  as meta_chss_id,
-        null		                                as meta_facility,
+        a.health_facility		                    as meta_facility,
         null                                    as meta_facility_id,
         null		                                as meta_health_district,
-        null                                    as meta_county,
+        a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        null		                                as meta_community_id, 
+        a.restock_date                          as meta_form_date,
  
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -237,14 +246,16 @@ select
         null 		                                as meta_cha,
         null		                                as meta_cha_id,
         a.chss_name		                          as meta_chss,
-        a.chss_id_original 	                    as meta_chss_id,
+        null 	                                  as meta_chss_id,
         a.health_facility		                    as meta_facility, 
         a.health_facility_id                    as meta_facility_id,
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
-          
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+ 
         a.meta_insert_date_time, 
         a.meta_form_version
    
@@ -273,7 +284,10 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+ 
  
         a.meta_insert_date_time, 
         a.meta_form_version as form_version
@@ -303,7 +317,9 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        null		                                as meta_community_id, 
+                
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
  
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -333,8 +349,10 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
- 
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+  
         a.meta_insert_date_time, 
         a.meta_form_version
        
@@ -363,8 +381,10 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
- 
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+  
         a.meta_insert_date_time, 
         a.meta_form_version
        
@@ -393,8 +413,10 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
- 
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+  
         a.meta_insert_date_time, 
         a.meta_form_version
        
@@ -423,7 +445,9 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
  
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -453,7 +477,9 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
  
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -483,8 +509,10 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
- 
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+  
         a.meta_insert_date_time, 
         a.meta_form_version
        
@@ -513,7 +541,9 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
  
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -543,8 +573,10 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
- 
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+  
         a.meta_insert_date_time, 
         a.meta_form_version
        
@@ -573,7 +605,9 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
  
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -603,8 +637,10 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
- 
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+  
         a.meta_insert_date_time, 
         a.meta_form_version
        
@@ -633,8 +669,10 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
- 
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+  
         a.meta_insert_date_time, 
         a.meta_form_version
        
@@ -663,8 +701,10 @@ select
         a.district		                          as meta_health_district,
         a.county                                as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
- 
+        null		                                as meta_community_id, 
+        
+        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+  
         a.meta_insert_date_time, 
         a.meta_form_version
        
@@ -674,32 +714,72 @@ union all
 
 -- 6. odk_chaRestock --------------------------------------------------------------------------------------------------
 
+/*
+meta_formVersion  chaID_count supervisedChaID_count user_id_count chssID_count
+
+3.1.1	                0	          1376	                  0	        1376
+3.3.1	                1	          600	                    1	         600
+3.2.2	              1817	          0	                  1817	        0
+*/
+
 select  
         'odk_chaRestock'                        as table_name,
         a.chaRestockID                          as pk_id,
 
         'cha'                                   as id_type,
-        'supervisedChaID'                       as id_name,
+        'supervisedChaID'                       as id_name, -- matched with chssID
 
         a.supervised_cha_id_original            as id_original_value, 
         a.supervised_cha_id_inserted            as id_inserted_value, 
         a.supervised_cha_id_inserted_format     as id_inserted_format_value,
         a.supervisedChaID                       as id_value,
 
-        null 		                                as meta_cha,
+        a.chaName 		                          as meta_cha,
         null		                                as meta_cha_id,
-        null		                                as meta_chss,
+        a.chssName		                          as meta_chss,
+        a.chss_id_original 	                    as meta_chss_id,
+        null		                                as meta_facility,
+        null                                    as meta_facility_id,
+        null		                                as meta_health_district,
+        null                                    as meta_county,
+        null		                                as meta_community,
+        a.communityID	                          as meta_community_id, 
+        a.manualDate                            as meta_form_date,
+ 
+        a.meta_insertDatetime, 
+        a.meta_formVersion 
+         
+from lastmile_upload.odk_chaRestock as a
+
+union all
+
+select  
+        'odk_chaRestock'                        as table_name,
+        a.chaRestockID                          as pk_id,
+
+        'chss'                                  as id_type,
+        'chssID'                                as id_name, -- matched with supervisedChaID
+        
+        a.chss_id_original                      as id_original_value,
+        a.chss_id_inserted                      as id_inserted_value, 
+        a.chss_id_inserted_format               as id_inserted_format_value,
+        a.chssID                                as id_value,
+
+        a.chaName 		                          as meta_cha,
+        a.cha_id_original		                    as meta_cha_id,
+        a.chssName		                          as meta_chss,
         null 	                                  as meta_chss_id,
         null		                                as meta_facility,
         null                                    as meta_facility_id,
         null		                                as meta_health_district,
         null                                    as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        a.communityID	                          as meta_community_id, 
+        a.manualDate                            as meta_form_date,
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
-         
+        
 from lastmile_upload.odk_chaRestock as a
 
 union all
@@ -716,51 +796,23 @@ select
         a.cha_id_inserted_format                as id_inserted_format_value, 
         a.chaID                                 as id_value, 
 
-        null 		                                as meta_cha,
+        a.chaName 		                          as meta_cha,
         null		                                as meta_cha_id,
-        null		                                as meta_chss,
-        null 	                                  as meta_chss_id,
+        a.user_name		                          as meta_chss,
+        a.user_id_original 	                    as meta_chss_id,
         null		                                as meta_facility,
         null                                    as meta_facility_id,
         null		                                as meta_health_district,
         null                                    as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
- 
+        a.communityID	                          as meta_community_id, 
+        a.manualDate                            as meta_form_date,
+  
         a.meta_insertDatetime, 
         a.meta_formVersion 
           
 from lastmile_upload.odk_chaRestock as a
 
-union all
-
-select  
-        'odk_chaRestock'                        as table_name,
-        a.chaRestockID                          as pk_id,
-
-        'chss'                                  as id_type,
-        'chssID'                                as id_name,
-        
-        a.chss_id_original                      as id_original_value,
-        a.chss_id_inserted                      as id_inserted_value, 
-        a.chss_id_inserted_format               as id_inserted_format_value,
-        a.chssID                                as id_value,
-
-        null 		                                as meta_cha,
-        null		                                as meta_cha_id,
-        null		                                as meta_chss,
-        null 	                                  as meta_chss_id,
-        null		                                as meta_facility,
-        null                                    as meta_facility_id,
-        null		                                as meta_health_district,
-        null                                    as meta_county,
-        null		                                as meta_community,
-        null		                                as meta_community_id,
- 
-        a.meta_insertDatetime, 
-        a.meta_formVersion 
-        
-from lastmile_upload.odk_chaRestock as a
 
 union all
 
@@ -776,17 +828,19 @@ select
         a.user_id_inserted_format               as id_inserted_format_value,
         a.user_id                               as id_value,
 
-        null 		                                as meta_cha,
-        null		                                as meta_cha_id,
-        null		                                as meta_chss,
+        a.chaName 		                          as meta_cha,
+        a.cha_id_original		                    as meta_cha_id,
+        a.user_name		                          as meta_chss,
         null 	                                  as meta_chss_id,
         null		                                as meta_facility,
         null                                    as meta_facility_id,
         null		                                as meta_health_district,
         null                                    as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
- 
+        
+        a.communityID	                          as meta_community_id, 
+        a.manualDate                            as meta_form_date,
+  
         a.meta_insertDatetime, 
         a.meta_formVersion 
         
@@ -809,7 +863,7 @@ select
         a.cha_id_inserted_format                as id_inserted_format_value,
         a.chaID                                 as id_value, 
 
-        null 		                                as meta_cha,
+        a.full_name 		                        as meta_cha,
         null		                                as meta_cha_id,
         null		                                as meta_chss,
         null 	                                  as meta_chss_id,
@@ -818,7 +872,8 @@ select
         null		                                as meta_health_district,
         null                                    as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        null		                                as meta_community_id, 
+        a.visitDate                             as meta_form_date,
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
@@ -851,7 +906,8 @@ select
         null		                                as meta_health_district,
         null                                    as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        a.communityID		                        as meta_community_id,
+        a.manualDate                            as meta_form_date,
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
@@ -876,14 +932,15 @@ select
 
         null 		                                as meta_cha,
         null		                                as meta_cha_id,
-        null		                                as meta_chss,
-        null 	                                  as meta_chss_id,
+        a.chss_name		                          as meta_chss,
+        a.chss_id_orig_original 	              as meta_chss_id,
         null		                                as meta_facility,
         null                                    as meta_facility_id,
         null		                                as meta_health_district,
         null                                    as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        a.communityID		                        as meta_community_id, 
+        a.manualDate                            as meta_form_date,
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
@@ -904,7 +961,7 @@ select
         a.chss_id_orig_inserted_format          as id_inserted_format_value,
         a.chssID                                as id_value, 
 
-        null 		                                as meta_cha,
+        a.chss_name 		                        as meta_cha,
         null		                                as meta_cha_id,
         null		                                as meta_chss,
         null 	                                  as meta_chss_id,
@@ -913,8 +970,9 @@ select
         null		                                as meta_health_district,
         null                                    as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
- 
+        a.communityID		                        as meta_community_id, 
+        a.manualDate                            as meta_form_date,
+  
         a.meta_insertDatetime, 
         a.meta_formVersion 
          
@@ -937,14 +995,15 @@ select
 
         null 		                                as meta_cha,
         null		                                as meta_cha_id,
-        null		                                as meta_chss,
-        null 	                                  as meta_chss_id,
+        a.chss_name		                          as meta_chss,
+        a.chss_id_original 	                    as meta_chss_id,
         null		                                as meta_facility,
         null                                    as meta_facility_id,
         null		                                as meta_health_district,
         null                                    as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        a.communityID		                        as meta_community_id, 
+        a.manualDate                            as meta_form_date,
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
@@ -965,7 +1024,7 @@ select
         a.chssID                                as id_value, 
 
         null 		                                as meta_cha,
-        null		                                as meta_cha_id,
+        a.cha_id_original		                    as meta_cha_id,
         null		                                as meta_chss,
         null 	                                  as meta_chss_id,
         null		                                as meta_facility,
@@ -973,7 +1032,8 @@ select
         null		                                as meta_health_district,
         null                                    as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        a.communityID		                        as meta_community_id, 
+        a.manualDate                            as meta_form_date,
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
@@ -997,7 +1057,7 @@ select
         a.CHSSID                                as id_value, 
 
         null 		                                as meta_cha,
-        null		                                as meta_cha_id,
+        a.cha_id_original		                    as meta_cha_id,
         null		                                as meta_chss,
         null 	                                  as meta_chss_id,
         null		                                as meta_facility,
@@ -1005,7 +1065,8 @@ select
         null		                                as meta_health_district,
         null                                    as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        null		                                as meta_community_id, 
+        a.TodayDate                             as meta_form_date,
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
@@ -1028,19 +1089,17 @@ select
         null 		                                as meta_cha,
         null		                                as meta_cha_id,
         null		                                as meta_chss,
-        null 	                                  as meta_chss_id,
+        a.chss_id_original 	                    as meta_chss_id,
         null		                                as meta_facility,
         null                                    as meta_facility_id,
         null		                                as meta_health_district,
         null                                    as meta_county,
         null		                                as meta_community,
-        null		                                as meta_community_id,
+        null		                                as meta_community_id, 
+        a.TodayDate                             as meta_form_date,
          
         a.meta_insertDatetime, 
         a.meta_formVersion 
         
 from lastmile_upload.odk_QAOSupervisionChecklistForm as a
 ;
-
-
-

@@ -24,6 +24,7 @@ select
       meta_county,
       meta_community,
       meta_community_id,
+      meta_form_date,
        
       meta_insert_date_time, 
       meta_form_version

@@ -26,6 +26,7 @@ create table lastmile_dataquality.id_invalid_cleanup (
   meta_county                     varchar( 100 )  default null,
   meta_community                  varchar( 100 )  default null,
   meta_community_id               varchar( 100 )  default null,
+  meta_form_date                  varchar( 100 )  default null,
   
   meta_insert_date_time_original  varchar( 100 )  default null,
   meta_form_version               varchar( 100 )  default null,

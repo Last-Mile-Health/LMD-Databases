@@ -299,7 +299,7 @@ case
     
     when  trim( new.table_name )  like 'odk_chaRestock'                 and 
           trim( new.id_type )     like 'chss'                           and 
-          trim( new.id_name )     like 'user_id'                         and 
+          trim( new.id_name )     like 'user_id'                        and 
           not ( new.id_repair is null )                                 and
           not ( new.pk_id     is null )
          

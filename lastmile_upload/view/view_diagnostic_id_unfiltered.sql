@@ -986,7 +986,7 @@ union all
 
 select
         'odk_QAOSupervisionChecklistForm'       as table_name,
-        odk_QAOSupervisionChecklistForm_id      as pk_id,
+        a.odk_QAOSupervisionChecklistForm_id    as pk_id,
        
         'chss'                                  as id_type,       
         'CHSSID'                                as id_name,
@@ -1016,7 +1016,7 @@ union all
 
 select  
         'odk_QAOSupervisionChecklistForm'       as table_name,
-        odk_QAOSupervisionChecklistForm_id      as pk_id,
+        a.odk_QAOSupervisionChecklistForm_id    as pk_id,
         'cha'                                   as id_type,
         'CHAID'                                 as id_name,
 

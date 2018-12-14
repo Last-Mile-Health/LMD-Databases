@@ -153,7 +153,7 @@ select
         a.community		                          as meta_community,
         a.community_id		                      as meta_community_id,
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
          
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -185,7 +185,7 @@ select
         a.community		                          as meta_community,
         a.community_id		                      as meta_community_id,
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
          
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -254,7 +254,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
  
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -286,7 +286,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
  
  
         a.meta_insert_date_time, 
@@ -319,7 +319,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
                 
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
  
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -351,7 +351,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
   
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -383,7 +383,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
   
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -415,7 +415,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
   
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -447,7 +447,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
  
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -479,7 +479,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
  
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -511,7 +511,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
   
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -543,7 +543,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
  
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -575,7 +575,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
   
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -607,7 +607,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
  
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -639,7 +639,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
   
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -671,7 +671,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
   
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -703,7 +703,7 @@ select
         null		                                as meta_community,
         null		                                as meta_community_id, 
         
-        concat( a.year_reported, '-', a.month_reported ) as meta_form_date,
+        date_format( concat( a.year_reported, '-', a.month_reported, '-01' ), '%Y-%m-%d' )  as meta_form_date,
   
         a.meta_insert_date_time, 
         a.meta_form_version
@@ -713,14 +713,6 @@ from lastmile_upload.de_chss_monthly_service_report as a
 union all
 
 -- 6. odk_chaRestock --------------------------------------------------------------------------------------------------
-
-/*
-meta_formVersion  chaID_count supervisedChaID_count user_id_count chssID_count
-
-3.1.1	                0	          1376	                  0	        1376
-3.3.1	                1	          600	                    1	         600
-3.2.2	              1817	          0	                  1817	        0
-*/
 
 select  
         'odk_chaRestock'                        as table_name,

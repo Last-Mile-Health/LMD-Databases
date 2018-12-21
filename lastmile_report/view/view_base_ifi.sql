@@ -17,7 +17,8 @@ select
       sum( receivedLastIncentiveOnTime )                                  as receivedLastIncentiveOnTime,
       
       sum( coalesce( life_saving_in_stock, 0 ) )                          as number_life_saving_in_stock,
-      sum( coalesce( act_50_135_mg_tablet_in_stock, 0 ) )                 as number_act_50_135_mg_tablet_in_stock
+      sum( coalesce( act_50_135_mg_tablet_in_stock, 0 ) )                 as number_act_50_135_mg_tablet_in_stock,
+      sum( coalesce( act_25_67_5_mg_tablet_in_stock, 0 ) )                as number_act_25_67_5_mg_tablet_in_stock
       
 from lastmile_report.view_ifi_calculations
 group by county , `month`, `year`

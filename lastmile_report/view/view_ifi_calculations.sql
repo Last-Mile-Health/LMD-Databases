@@ -80,7 +80,9 @@ select
             1,
             0 ) as life_saving_in_stock,
                    
-        if( trim( a.2_1_g_supply_act_50_135_mg_tablet_in_stock ) like 'Y', 1, 0 ) as act_50_135_mg_tablet_in_stock        
+        if( trim( a.2_1_g_supply_act_50_135_mg_tablet_in_stock )  like 'Y', 1, 0 ) as act_50_135_mg_tablet_in_stock,
+        if( trim( a.2_1_f_supply_act_25_67_5_mg_tablet_in_stock ) like 'Y', 1, 0 ) as act_25_67_5_mg_tablet_in_stock
+        
    
     from lastmile_report.mart_de_integrated_supervision_tool_community as a
         left outer join lastmile_cha.county as b on  convert( a.county using UTF8) = b.county

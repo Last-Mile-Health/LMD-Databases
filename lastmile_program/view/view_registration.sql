@@ -1,7 +1,3 @@
--- The view lastmile_program.view_registration "bubbles" registration records from previous years to the "top" of 
--- the self-join of lastmile_program.view_registration_year.  It is record of the latest registration data for a
--- cha_id and community_id pair.  
-
 use lastmile_program;
   
 drop view if exists view_registration;
@@ -9,34 +5,33 @@ drop view if exists view_registration;
 create view view_registration as 
 
 select
-      g1.community_id, 
-      g1.position_id, 
-      g1.registration_year,
+      m.community_id, 
+      m.position_id, 
+      m.registration_year,
       
-      g1.registration_date,
+      y.registration_date,
       
-      g1.total_household,
-      g1.total_household_member,
+      y.total_household,
+      y.total_household_member,
       
-      g1.total_zero_eleven_month_male,
-      g1.total_zero_eleven_month_female,
+      y.total_zero_eleven_month_male,
+      y.total_zero_eleven_month_female,
   
-      g1.total_one_five_year_male,
-      g1.total_one_five_year_female,
+      y.total_one_five_year_male,
+      y.total_one_five_year_female,
   
-      g1.total_six_fourteen_year_male,
-      g1.total_six_fourteen_year_female,
+      y.total_six_fourteen_year_male,
+      y.total_six_fourteen_year_female,
   
-      g1.total_fifteen_forty_nine_year_male,
-      g1.total_fifteen_forty_nine_year_female,
+      y.total_fifteen_forty_nine_year_male,
+      y.total_fifteen_forty_nine_year_female,
   
-      g1.total_fifty_plus_year_male,
-      g1.total_fifty_plus_year_female
+      y.total_fifty_plus_year_male,
+      y.total_fifty_plus_year_female
       
-from view_registration_year as g1
-    left outer join view_registration_year as g2 on ( trim( g1.community_id ) like trim( g2.community_id  )  ) and 
-                                                    ( trim( g1.position_id )  like trim( g2.position_id   )  ) and
-                                                    ( g1.registration_year    > g2.registration_year      )
-group by trim( g1.community_id ), trim( g1.position_id )
-having count( * ) >= 1
+from view_registration_year_max as m
+    left outer join view_registration_year as y on m.community_id       like  y.community_id        and 
+                                                   m.position_id        like  y.position_id         and
+                                                   m.registration_year  =     y.registration_year
+
 ;

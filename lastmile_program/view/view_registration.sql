@@ -29,9 +29,8 @@ select
       y.total_fifty_plus_year_male,
       y.total_fifty_plus_year_female
       
-from view_registration_year_max as m
-    left outer join view_registration_year as y on m.community_id       like  y.community_id        and 
-                                                   m.position_id        like  y.position_id         and
-                                                   m.registration_year  =     y.registration_year
-
+from lastmile_program.view_registration_year_max as m
+    left outer join lastmile_program.view_registration_year as y on m.community_id       like  y.community_id        and 
+                                                                    m.position_id        like  y.position_id         and
+                                                                    m.registration_year  =     y.registration_year
 ;

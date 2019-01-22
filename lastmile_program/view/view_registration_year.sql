@@ -1,5 +1,5 @@
 use lastmile_program;
-  
+
 drop view if exists view_registration_year;
 
 create view view_registration_year as 
@@ -30,5 +30,5 @@ select
       sum( cast( g.1_1_L_total_fifty_plus_years_female as unsigned ) )          as total_fifty_plus_year_female
   
 from lastmile_upload.de_chaHouseholdRegistration as g
-group by registration_year, community_id, cha_id
+group by registration_year, community_id, position_id
 ;

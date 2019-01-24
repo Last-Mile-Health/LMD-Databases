@@ -11,6 +11,7 @@ select
       p.health_facility_id,
       p.health_facility,
       p.health_facility_description,
+      p.cohort,
 
       pr.position_person_begin_date,
       pr.person_id,

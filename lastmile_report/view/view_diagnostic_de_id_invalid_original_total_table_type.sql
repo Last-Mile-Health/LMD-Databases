@@ -15,6 +15,8 @@ select
       -- total number of IDs
       count( * )                                                                                  as id_total,
       sum( if( p.position_id is null, 0, 1 ) )                                                    as id_valid,
+      
+      count( * ) - sum( if( p.position_id is null, 0, 1 ) )                                       as id_invalid,
        
       -- Number of 999 IDs (Specifically, any string that only contains the number 9 and spaces)
       sum( replace( d.id_original_value, ' ', '' ) regexp '^[9]+$' )                              as id_invalid_999,

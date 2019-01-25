@@ -149,7 +149,9 @@ select
         a.health_facility		                    as meta_facility, 
         null                                    as meta_facility_id,
         a.district		                          as meta_health_district,
-        null                                    as meta_county,
+        
+        h.county                                as meta_county,
+        
         a.community		                          as meta_community,
         a.community_id		                      as meta_community_id,
         
@@ -159,6 +161,8 @@ select
         a.meta_form_version
             
 from lastmile_upload.de_cha_monthly_service_report as a
+    left outer join lastmile_cha.view_geo_health_district as h on trim( a.district ) like trim( h.health_district )
+where not( trim( a.district ) like '%Commonwealth%' and trim( h.county ) like '%Grand%Cape%Mount%' )
     
 union all
 
@@ -181,7 +185,9 @@ select
         a.health_facility		                    as meta_facility, 
         null                                    as meta_facility_id,
         a.district		                          as meta_health_district,
-        null                                    as meta_county,
+        
+        h.county                                as meta_county,
+        
         a.community		                          as meta_community,
         a.community_id		                      as meta_community_id,
         
@@ -191,8 +197,9 @@ select
         a.meta_form_version
         
 from lastmile_upload.de_cha_monthly_service_report as a
-
-
+    left outer join lastmile_cha.view_geo_health_district as h on trim( a.district ) like trim( h.health_district )
+where not( trim( a.district ) like '%Commonwealth%' and trim( h.county ) like '%Grand%Cape%Mount%' )
+ 
 union all
 
 

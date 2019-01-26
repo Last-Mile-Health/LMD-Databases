@@ -12,6 +12,8 @@ select
       d.table_name, 
       d.id_type,
       
+      if( d.meta_county is null, 'unknown', d.meta_county )                                       as county,
+      
       -- total number of IDs
       count( * )                                                                                  as id_total,
       sum( if( p.position_id is null, 0, 1 ) )                                                    as id_valid,
@@ -42,5 +44,5 @@ select
 from lastmile_upload.view_diagnostic_de_id as d
     left outer join lastmile_cha.`position` as p on replace( d.id_original_value, ' ', '' ) like p.position_id and d.id_type like if( p.job_id = 1, 'cha',  if( p.job_id = 3, 'chss', null ) )
 where d.meta_form_date >= '2018-08-01'
-group by year( d.meta_form_date ), month( d.meta_form_date ), d.table_name, d.id_type
+group by year( d.meta_form_date ), month( d.meta_form_date ), d.table_name, d.id_type, d.meta_county
 ;

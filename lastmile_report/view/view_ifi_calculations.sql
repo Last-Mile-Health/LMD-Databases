@@ -80,10 +80,16 @@ select
             1,
             0 ) as life_saving_in_stock,
                    
-        if( trim( a.2_1_g_supply_act_50_135_mg_tablet_in_stock )  like 'Y', 1, 0 ) as act_50_135_mg_tablet_in_stock,
-        if( trim( a.2_1_f_supply_act_25_67_5_mg_tablet_in_stock ) like 'Y', 1, 0 ) as act_25_67_5_mg_tablet_in_stock
-        
+        if( trim( a.2_1_g_supply_act_50_135_mg_tablet_in_stock )  like 'Y', 1, 0 )            as act_50_135_mg_tablet_in_stock,
+        if( trim( a.2_1_f_supply_act_25_67_5_mg_tablet_in_stock ) like 'Y', 1, 0 )            as act_25_67_5_mg_tablet_in_stock,      
+        if( trim( a.2_1_f_supply_act_25_67_5_mg_tablet_in_stock ) like 'Y' or 
+            trim( a.2_1_g_supply_act_50_135_mg_tablet_in_stock )  like 'Y', 1, 0 )            as act_25_or_50_mg_tablet_in_stock,
+            
+        if( trim( a.2_1_i_supply_amox_250_mg_dispersible_tablet_in_stock ) like 'Y', 1, 0 )   as amox_250_mg_dispersible_tablet_in_stock,
+        if( trim( a.2_1_j_supply_ors_20_6_1l_sachet_in_stock ) like 'Y', 1, 0 )               as ors_20_6_1l_sachet_in_stock,
+        if( trim( a.2_1_k_supply_zinc_sulfate_20_mg_scored_tablet_in_stock ) like 'Y', 1, 0 ) as zinc_sulfate_20_mg_scored_tablet_in_stock
+       
    
     from lastmile_report.mart_de_integrated_supervision_tool_community as a
-        left outer join lastmile_cha.county as b on  convert( a.county using UTF8) = b.county
+        left outer join lastmile_cha.county as b on  convert( a.county using UTF8 ) = b.county
 ;

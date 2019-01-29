@@ -1,8 +1,8 @@
-use lastmile_upload;
+use lastmile_report;
 
-drop view if exists lastmile_upload.view_diagnostic_de_id;
+drop view if exists lastmile_report.view_diagnostic_de_id;
 
-create view lastmile_upload.view_diagnostic_de_id as
+create view lastmile_report.view_diagnostic_de_id as
 
 select  
       table_name, 
@@ -29,7 +29,7 @@ select
       meta_insert_date_time, 
       meta_form_version
           
-from lastmile_upload.view_diagnostic_de_id_unfiltered
+from lastmile_report.view_diagnostic_de_id_unfiltered
 where 
       -- filter out valid null ID values
 

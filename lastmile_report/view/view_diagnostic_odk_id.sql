@@ -1,8 +1,8 @@
-use lastmile_upload;
+use lastmile_report;
 
-drop view if exists lastmile_upload.view_diagnostic_odk_id;
+drop view if exists lastmile_report.view_diagnostic_odk_id;
 
-create view lastmile_upload.view_diagnostic_odk_id as
+create view lastmile_report.view_diagnostic_odk_id as
 
 select  
       table_name, 
@@ -29,7 +29,7 @@ select
       meta_insert_date_time, 
       meta_form_version
           
-from lastmile_upload.view_diagnostic_odk_id_unfiltered
+from lastmile_report.view_diagnostic_odk_id_unfiltered
 where 
       -- filter out valid null ID values
       not ( table_name like 'odk_chaRestock'                  and id_type like 'cha'  and id_name like 'chaID'            and ( meta_form_version like '3.1.1' or meta_form_version like '3.3.1' )  and id_original_value is null )

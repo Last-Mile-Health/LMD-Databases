@@ -41,7 +41,7 @@ select
       )                                                                                           as id_invalid_other
    
          
-from lastmile_upload.view_diagnostic_de_id as d
+from lastmile_report.view_diagnostic_de_id as d
     left outer join lastmile_cha.`position` as p on replace( d.id_value, ' ', '' ) like p.position_id and d.id_type like if( p.job_id = 1, 'cha',  if( p.job_id = 3, 'chss', null ) )
 where d.meta_form_date >= '2018-08-01'
 group by year( d.meta_form_date ), month( d.meta_form_date ), d.table_name, d.id_type, d.meta_county

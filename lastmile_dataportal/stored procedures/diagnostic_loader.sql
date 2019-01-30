@@ -70,9 +70,8 @@ set @cha_population_ratio = 235;
 -- Delete blank values from tbl_values
 -- delete from  lastmile_dataportal.tbl_values where trim( value ) like '';
 
-/*
- * 501. CHA MSR original CHA position ID total
-*/
+
+-- 501. CHA MSR original CHA position ID total
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 501, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
@@ -104,15 +103,8 @@ from lastmile_report.mart_view_diagnostic_de_id_invalid_original_total_table_typ
 where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_monthly_service_report' and id_type like 'cha' and county like '%Unknown%'
 ;
 
-/*
- * 502. CHA MSR original CHA position ID valid
 
-replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 502, '6_16', 1, @p_month, @p_year, id_valid  
-from lastmile_report.mart_view_diagnostic_de_id_invalid_original_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_monthly_service_report' and id_type like 'cha'
-;
-*/
+-- 502. CHA MSR original CHA position ID valid
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 502, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
@@ -145,15 +137,7 @@ where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_
 ;
 
 
-/*
- * 503. CHA MSR original CHA position ID invalid
-
-replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 503, '6_16', 1, @p_month, @p_year, id_invalid  
-from lastmile_report.mart_view_diagnostic_de_id_invalid_original_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_monthly_service_report' and id_type like 'cha'
-;
-*/
+-- 503. CHA MSR original CHA position ID invalid
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 503, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
@@ -186,15 +170,7 @@ where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_
 ;
 
 
-/*
- * 504. CHA MSR original CHA position ID invalid 999
-
-replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 504, '6_16', 1, @p_month, @p_year, id_invalid_999  
-from lastmile_report.mart_view_diagnostic_de_id_invalid_original_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_monthly_service_report' and id_type like 'cha'
-;
-*/
+-- 504. CHA MSR original CHA position ID invalid 999
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 504, '6_16', 1, @p_month, @p_year, sum( id_invalid_999 ) as value
@@ -227,15 +203,7 @@ where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_
 ;
 
 
-/*
- * 505. CHA MSR original CHA position ID invalid LMH integer 
-
-replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 505, '6_16', 1, @p_month, @p_year, id_invalid_lmh_integer  
-from lastmile_report.mart_view_diagnostic_de_id_invalid_original_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_monthly_service_report' and id_type like 'cha'
-;
-*/
+-- 505. CHA MSR original CHA position ID invalid LMH integer 
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 505, '6_16', 1, @p_month, @p_year, sum( id_invalid_lmh_integer ) as value
@@ -268,15 +236,7 @@ where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_
 ;
 
 
-/*
- * 506. CHA MSR original CHA position ID invalid other
-
-replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 506, '6_16', 1, @p_month, @p_year, id_invalid_other  
-from lastmile_report.mart_view_diagnostic_de_id_invalid_original_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_monthly_service_report' and id_type like 'cha'
-;
-*/
+-- 506. CHA MSR original CHA position ID invalid other
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 506, '6_16', 1, @p_month, @p_year, sum( id_invalid_other ) as value
@@ -309,15 +269,7 @@ where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_
 ;
 
 
-/*
- * 507. CHA MSR repaired CHA position ID total
-
-replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 507, '6_16', 1, @p_month, @p_year, id_total  
-from lastmile_report.mart_view_diagnostic_de_id_invalid_repair_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_monthly_service_report' and id_type like 'cha'
-;
-*/
+-- 507. CHA MSR repaired CHA position ID total
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 507, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
@@ -350,16 +302,7 @@ where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_
 ;
 
 
-
-/*
- * 508. CHA MSR repaired CHA position ID valid
-
-replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 508, '6_16', 1, @p_month, @p_year, id_valid  
-from lastmile_report.mart_view_diagnostic_de_id_invalid_repair_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_monthly_service_report' and id_type like 'cha'
-;
-*/
+-- 508. CHA MSR repaired CHA position ID valid
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 508, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
@@ -392,16 +335,7 @@ where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_
 ;
 
 
-
-/*
- * 509. CHA MSR repaired CHA position ID invalid
-
-replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 509, '6_16', 1, @p_month, @p_year, id_invalid
-from lastmile_report.mart_view_diagnostic_de_id_invalid_repair_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_monthly_service_report' and id_type like 'cha'
-;
-*/
+-- 509. CHA MSR repaired CHA position ID invalid
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 509, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
@@ -434,15 +368,7 @@ where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_
 ;
 
 
-/*
- * 510. CHA MSR repaired CHA position ID invalid 999
-
-replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 510, '6_16', 1, @p_month, @p_year, id_invalid_999  
-from lastmile_report.mart_view_diagnostic_de_id_invalid_repair_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_monthly_service_report' and id_type like 'cha'
-;
-*/
+-- 510. CHA MSR repaired CHA position ID invalid 999
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 510, '6_16', 1, @p_month, @p_year, sum( id_invalid_999 ) as value
@@ -475,14 +401,7 @@ where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_
 ;
 
 
-/*
- * 511. CHA MSR repaired CHA position ID invalid LMH integer
-replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 511, '6_16', 1, @p_month, @p_year, id_invalid_lmh_integer  
-from lastmile_report.mart_view_diagnostic_de_id_invalid_repair_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_monthly_service_report' and id_type like 'cha'
-;
-*/
+-- 511. CHA MSR repaired CHA position ID invalid LMH integer
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 511, '6_16', 1, @p_month, @p_year, sum( id_invalid_lmh_integer ) as value
@@ -515,15 +434,7 @@ where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_
 ;
 
 
-
-/*
- * 512. CHA MSR repaired CHA position ID invalid other
-replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 512, '6_16', 1, @p_month, @p_year, id_invalid_other  
-from lastmile_report.mart_view_diagnostic_de_id_invalid_repair_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_monthly_service_report' and id_type like 'cha'
-;
-*/
+-- 512. CHA MSR repaired CHA position ID invalid other
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 512, '6_16', 1, @p_month, @p_year, sum( id_invalid_other ) as value
@@ -554,7 +465,6 @@ select 512, '6_36', 1, @p_month, @p_year, id_invalid_other as value
 from lastmile_report.mart_view_diagnostic_de_id_invalid_repair_total_table_type
 where month_form = @p_month and year_form = @p_year and table_name like 'de_cha_monthly_service_report' and id_type like 'cha' and county like '%Unknown%'
 ;
-
 
 
 /*
@@ -624,6 +534,41 @@ from (
 ) as a
 ;
 
+-- 601. ODK original CHA position ID total
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 601, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'cha';
+
+-- 602. ODK original CHA position ID valid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 602, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'cha';
+
+-- 603. ODK original CHA position ID invalid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 603, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'cha';
+
+-- 604. ODK original CHA position ID invalid 999
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 604, '6_16', 1, @p_month, @p_year, sum( id_invalid_999 ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'cha';
+
+-- 605. ODK original CHA position ID invalid LMH integer 
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 605, '6_16', 1, @p_month, @p_year, sum( id_invalid_lmh_integer ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'cha';
+
+-- 606. ODK original CHA position ID invalid other
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 606, '6_16', 1, @p_month, @p_year, sum( id_invalid_other ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'cha';
 
 
 -- ------ --

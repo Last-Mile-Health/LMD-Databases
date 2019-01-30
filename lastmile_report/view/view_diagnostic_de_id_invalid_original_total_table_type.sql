@@ -12,7 +12,7 @@ select
       d.table_name, 
       d.id_type,
       
-      if( d.meta_county is null, 'unknown', d.meta_county )                                       as county,
+      if( d.meta_county is null, 'Unknown', d.meta_county )                                       as county,
       
       -- total number of IDs
       count( * )                                                                                  as id_total,

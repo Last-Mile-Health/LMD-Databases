@@ -25,12 +25,20 @@ INSERT INTO lastmile_dataportal.tbl_stored_procedure_log (`proc_name`, `paramete
 drop table if exists lastmile_report.mart_view_diagnostic_de_id_invalid_original_total_table_type;
 drop table if exists lastmile_report.mart_view_diagnostic_de_id_invalid_repair_total_table_type;
 
+drop table if exists lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type;
+drop table if exists lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type;
+
 create table lastmile_report.mart_view_diagnostic_de_id_invalid_original_total_table_type as
 select * from lastmile_report.view_diagnostic_de_id_invalid_original_total_table_type;
 
 create table lastmile_report.mart_view_diagnostic_de_id_invalid_repair_total_table_type as
 select * from lastmile_report.view_diagnostic_de_id_invalid_repair_total_table_type;
 
+create table lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type as
+select * from lastmile_report.view_diagnostic_odk_id_invalid_original_total_table_type;
+
+create table lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type as
+select * from lastmile_report.view_diagnostic_odk_id_invalid_repair_total_table_type;
 
 END$$
 

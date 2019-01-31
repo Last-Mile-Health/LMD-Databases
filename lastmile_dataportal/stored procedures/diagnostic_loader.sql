@@ -534,6 +534,9 @@ from (
 ) as a
 ;
 
+
+
+
 -- 601. ODK original CHA position ID total
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 601, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
@@ -569,6 +572,155 @@ replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`
 select 606, '6_16', 1, @p_month, @p_year, sum( id_invalid_other ) as value
 from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
 where month_form = @p_month and year_form = @p_year and id_type like 'cha';
+
+
+-- 607. ODK repaired CHA position ID total
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 607, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'cha';
+
+-- 608. ODK repaired CHA position ID valid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 608, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'cha';
+
+-- 609. ODK repaired CHA position ID invalid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 609, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'cha';
+
+-- 610. ODK repaired CHA position ID invalid 999
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 610, '6_16', 1, @p_month, @p_year, sum( id_invalid_999 ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'cha';
+
+-- 611. ODK repaired CHA position ID invalid LMH integer 
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 611, '6_16', 1, @p_month, @p_year, sum( id_invalid_lmh_integer ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'cha';
+
+-- 612. ODK repaired CHA position ID invalid other
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 612, '6_16', 1, @p_month, @p_year, sum( id_invalid_other ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'cha';
+
+/*
+ * 613. Total number of invalid CHA position IDs repaired across all the ODK tables.
+ *      It is possible for this code to return a negative number.  In those cases the repair process
+ *      created fewer valid IDs than were originally there.  This should never happen, but could if the
+ *      person doing the cleanup made things worst.  So allow for negative numbers.   
+*/
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 613, '6_16', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select sum( id_valid ) as id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'cha'
+
+      union all
+
+      select sum( 0 - id_valid ) as id_valid  -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'cha'
+) as a;
+
+
+
+/*
+ * 614. Total number of invalid 999 CHA position IDs repaired across all the ODK tables.
+ *      It is possible for this code to return a negative number.  In those cases the repair process
+ *      created fewer valid IDs than were originally there.  This should never happen, but could if the
+ *      person doing the cleanup made things worst.  So allow for negative numbers.   
+*/
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 614, '6_16', 1, @p_month, @p_year, sum( a.id_invalid_999 ) as number_id_repaired
+from (
+
+      select sum( id_invalid_999 ) as id_invalid_999  -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'cha'
+      
+      union all
+      
+      select sum( 0 - id_invalid_999 ) as id_invalid_999
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'cha'
+
+) as a;
+
+/*
+ * 615. Total number of invalid LMH Integer CHA position IDs repaired across all the ODK tables.
+ *      It is possible for this code to return a negative number.  In those cases the repair process
+ *      created fewer valid IDs than were originally there.  This should never happen, but could if the
+ *      person doing the cleanup made things worst.  So allow for negative numbers.   
+*/
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 615, '6_16', 1, @p_month, @p_year, sum( a.id_invalid_lmh_integer ) as number_id_repaired
+from (
+
+      select sum( id_invalid_lmh_integer ) as id_invalid_lmh_integer  -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'cha'
+      
+      union all
+      
+      select sum( 0 - id_invalid_lmh_integer ) as id_invalid_lmh_integer
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'cha'
+
+) as a;
+
+/*
+ * 616. Total number of invalid CHA position IDs other than 999 or LMH Integer repaired across all the ODK tables.
+ *      It is possible for this code to return a negative number.  In those cases the repair process
+ *      created fewer valid IDs than were originally there.  This should never happen, but could if the
+ *      person doing the cleanup made things worst.  So allow for negative numbers.   
+*/
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 616, '6_16', 1, @p_month, @p_year, sum( a.id_invalid_other ) as number_id_repaired
+from (
+
+      select sum( id_invalid_other ) as id_invalid_other  -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'cha'
+
+      union all
+      
+      select sum( 0 - id_invalid_other ) as id_invalid_other
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'cha'
+
+) as a;
+
+
+-- 630. ODK Routine Visit repaired CHA position ID total
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 630, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_routineVisit' and id_type like 'cha';
+
+-- 631. ODK Routine Visit repaired CHA position ID valid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 631, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_routineVisit' and id_type like 'cha';
+
+-- 632. ODK Routine Visit repaired CHA position ID invalid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 632, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_routineVisit' and id_type like 'cha';
+
 
 
 -- ------ --

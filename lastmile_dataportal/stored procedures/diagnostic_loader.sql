@@ -723,6 +723,306 @@ where month_form = @p_month and year_form = @p_year and table_name like 'odk_rou
 
 
 
+-- 640. ODK Sick Child repaired CHA position ID total
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 640, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha';
+
+-- 641. ODK Sick Child repaired CHA position ID valid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 641, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha';
+
+-- 642. ODK Sick Child repaired CHA position ID invalid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 642, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha';
+
+
+-- 650. ODK Supervision Visit Log repaired CHA position ID total
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 650, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha';
+
+-- 651. ODK Supervision Visit Log repaired CHA position ID valid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 651, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha';
+
+-- 652. ODK Supervision Visit Log repaired CHA position ID invalid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 652, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha';
+
+
+-- 660. ODK CHA Restock repaired CHA position ID total
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 660, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_chaRestock' and id_type like 'cha';
+
+-- 661. ODK Supervision Visit Log repaired CHA position ID valid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 661, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_chaRestock' and id_type like 'cha';
+
+-- 662. ODK Supervision Visit Log repaired CHA position ID invalid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 662, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_chaRestock' and id_type like 'cha';
+
+
+-- 670. ODK QAO Supervision Checklist repaired CHA position ID total
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 670, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_QAOSupervisionChecklistForm' and id_type like 'cha';
+
+-- 671. ODK QAO Supervision Checklist repaired CHA position ID valid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 671, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_QAOSupervisionChecklistForm' and id_type like 'cha';
+
+-- 672. ODK QAO Supervision Checklist repaired CHA position ID invalid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 672, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_QAOSupervisionChecklistForm' and id_type like 'cha';
+
+
+-- 701. ODK original CHSS position ID total
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 701, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'chss';
+
+-- 702. ODK original CHSS position ID valid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 702, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'chss';
+
+-- 703. ODK original CHSS position ID invalid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 703, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'chss';
+
+-- 704. ODK original CHSS position ID invalid 999
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 704, '6_16', 1, @p_month, @p_year, sum( id_invalid_999 ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'chss';
+
+-- 705. ODK original CHSS position ID invalid LMH integer 
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 705, '6_16', 1, @p_month, @p_year, sum( id_invalid_lmh_integer ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'chss';
+
+-- 706. ODK original CHSS position ID invalid other
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 706, '6_16', 1, @p_month, @p_year, sum( id_invalid_other ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'chss';
+
+
+-- 707. ODK repaired CHSS position ID total
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 707, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'chss';
+
+-- 708. ODK repaired CHSS position ID valid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 708, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'chss';
+
+-- 709. ODK repaired CHSS position ID invalid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 709, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'chss';
+
+-- 710. ODK repaired CHSS position ID invalid 999
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 710, '6_16', 1, @p_month, @p_year, sum( id_invalid_999 ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'chss';
+
+-- 711. ODK repaired CHSS position ID invalid LMH integer 
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 711, '6_16', 1, @p_month, @p_year, sum( id_invalid_lmh_integer ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'chss';
+
+-- 712. ODK repaired CHSS position ID invalid other
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 712, '6_16', 1, @p_month, @p_year, sum( id_invalid_other ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and id_type like 'chss';
+
+/*
+ * 713. Total number of invalid CHSS position IDs repaired across all the ODK tables.
+ *      It is possible for this code to return a negative number.  In those cases the repair process
+ *      created fewer valid IDs than were originally there.  This should never happen, but could if the
+ *      person doing the cleanup made things worst.  So allow for negative numbers.   
+*/
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 713, '6_16', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select sum( id_valid ) as id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'chss'
+
+      union all
+
+      select sum( 0 - id_valid ) as id_valid  -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'chss'
+) as a;
+
+
+
+/*
+ * 714. Total number of invalid 999 CHSS position IDs repaired across all the ODK tables.
+ *      It is possible for this code to return a negative number.  In those cases the repair process
+ *      created fewer valid IDs than were originally there.  This should never happen, but could if the
+ *      person doing the cleanup made things worst.  So allow for negative numbers.   
+*/
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 714, '6_16', 1, @p_month, @p_year, sum( a.id_invalid_999 ) as number_id_repaired
+from (
+
+      select sum( id_invalid_999 ) as id_invalid_999  -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'chss'
+      
+      union all
+      
+      select sum( 0 - id_invalid_999 ) as id_invalid_999
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'chss'
+
+) as a;
+
+/*
+ * 715. Total number of invalid LMH Integer CHSS position IDs repaired across all the ODK tables.
+ *      It is possible for this code to return a negative number.  In those cases the repair process
+ *      created fewer valid IDs than were originally there.  This should never happen, but could if the
+ *      person doing the cleanup made things worst.  So allow for negative numbers.   
+*/
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 715, '6_16', 1, @p_month, @p_year, sum( a.id_invalid_lmh_integer ) as number_id_repaired
+from (
+
+      select sum( id_invalid_lmh_integer ) as id_invalid_lmh_integer  -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'chss'
+      
+      union all
+      
+      select sum( 0 - id_invalid_lmh_integer ) as id_invalid_lmh_integer
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'chss'
+
+) as a;
+
+/*
+ * 716. Total number of invalid CHSS position IDs other than 999 or LMH Integer repaired across all the ODK tables.
+ *      It is possible for this code to return a negative number.  In those cases the repair process
+ *      created fewer valid IDs than were originally there.  This should never happen, but could if the
+ *      person doing the cleanup made things worst.  So allow for negative numbers.   
+*/
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 716, '6_16', 1, @p_month, @p_year, sum( a.id_invalid_other ) as number_id_repaired
+from (
+
+      select sum( id_invalid_other ) as id_invalid_other  -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'chss'
+
+      union all
+      
+      select sum( 0 - id_invalid_other ) as id_invalid_other
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and id_type like 'chss'
+
+) as a;
+
+
+-- 750. ODK Supervision Visit Log repaired CHSS position ID total
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 750, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss';
+
+-- 751. ODK Supervision Visit Log repaired CHSS position ID valid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 751, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss';
+
+-- 752. ODK Supervision Visit Log repaired CHSS position ID invalid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 752, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss';
+
+
+-- 760. ODK CHA Restock repaired CHSS position ID total
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 760, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_chaRestock' and id_type like 'chss';
+
+-- 761. ODK Supervision Visit Log repaired CHSS position ID valid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 761, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_chaRestock' and id_type like 'chss';
+
+-- 762. ODK Supervision Visit Log repaired CHSS position ID invalid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 762, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_chaRestock' and id_type like 'chss';
+
+
+-- 770. ODK QAO Supervision Checklist repaired CHSS position ID total
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 770, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_QAOSupervisionChecklistForm' and id_type like 'chss';
+
+-- 771. ODK QAO Supervision Checklist repaired CHSS position ID valid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 771, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_QAOSupervisionChecklistForm' and id_type like 'chss';
+
+-- 772. ODK QAO Supervision Checklist repaired CHSS position ID invalid
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 772, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_QAOSupervisionChecklistForm' and id_type like 'chss';
+
+
+
 -- ------ --
 -- Finish --
 -- ------ --

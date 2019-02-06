@@ -1,6 +1,7 @@
 /* 
 	Author:			Avi Kenny
-	Last modified:	2018-02-02
+	Last modified:	2019-02-06
+  By: Owen Eddins
 	Description:	This script schedules two MySQL events, described below
 */
 
@@ -89,5 +90,21 @@ BEGIN
 	CALL `lastmile_dataportal`.`leafletValues`(@currMonthMinus1, @currYearMinus1);
 	
 END $$
+
+
+-- Create `event_diagnostic_loader`
+-- Runs `diagnostic_loader` every morning
+-- See the procedure code for further documentation
+
+create event event_diagnostic_loader
+on schedule every 1 day
+starts '2019-02-07 04:45:00'
+do 
+begin
+
+  -- 2018-11-01 is the earliest date for valid ID data
+  call lastmile_dataportal.diagnostic_loader( '2018-11-01', now() );
+
+end $$
 
 DELIMITER ;

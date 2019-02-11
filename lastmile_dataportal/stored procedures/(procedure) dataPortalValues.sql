@@ -1539,6 +1539,18 @@ UNION SELECT 320, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_tx_ari,0) + COA
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
 
+-- 322. Number of people served by LMH Primary Health Center activities
+-- Before 1/2019 we manually entered these values.
+if @p_year >= 2019 then
+  replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+  select 322, '1_4',  1, @p_month, @p_year, 26418 union all
+  select 322, '1_6',  1, @p_month, @p_year, 50000 union all
+  select 322, '1_14', 1, @p_month, @p_year, 25246 union all
+  select 322, '6_16', 1, @p_month, @p_year, 75246 
+;
+end if;
+
+
 -- 323. Number of child cases treated per 1,000 population
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 323, territory_id, 1, @p_month, @p_year, ROUND(1000*((COALESCE(num_tx_malaria,0)+COALESCE(num_tx_diarrhea,0)+COALESCE(num_tx_ari,0))/COALESCE(num_catchment_people_iccm,0)),1)

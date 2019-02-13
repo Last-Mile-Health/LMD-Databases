@@ -17,9 +17,15 @@ select
       sum( receivedLastIncentiveOnTime )                                  as receivedLastIncentiveOnTime,
       
       sum( coalesce( life_saving_in_stock, 0 ) )                          as number_life_saving_in_stock,
-      sum( coalesce( act_50_135_mg_tablet_in_stock, 0 ) )                 as number_act_50_135_mg_tablet_in_stock,
-      sum( coalesce( act_25_67_5_mg_tablet_in_stock, 0 ) )                as number_act_25_67_5_mg_tablet_in_stock
       
+      sum( coalesce( act_50_135_mg_tablet_in_stock, 0 ) )                 as number_act_50_135_mg_tablet_in_stock,
+      sum( coalesce( act_25_67_5_mg_tablet_in_stock, 0 ) )                as number_act_25_67_5_mg_tablet_in_stock,
+      
+      sum( coalesce( act_25_or_50_mg_tablet_in_stock, 0 ) )               as number_act_25_or_50_mg_tablet_in_stock,
+      sum( coalesce( amox_250_mg_dispersible_tablet_in_stock, 0 ) )       as number_amox_250_mg_dispersible_tablet_in_stock,
+      sum( coalesce( ors_20_6_1l_sachet_in_stock, 0 ) )                   as number_ors_20_6_1l_sachet_in_stock,
+      sum( coalesce( zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) )     as number_zinc_sulfate_20_mg_scored_tablet_in_stock
+   
 from lastmile_report.view_ifi_calculations
 group by county , `month`, `year`
 ;

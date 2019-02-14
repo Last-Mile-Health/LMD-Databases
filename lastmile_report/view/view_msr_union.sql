@@ -44,6 +44,7 @@ select
         1_2_j_hiv_tb_cm_ntd_mh_suspect_referrals                  as num_referrals_suspect_hiv_tb_cm_ntd_mh,
         2_1_a_pregnant_woman_visits                               as num_pregnant_woman_visits,
         
+        3_1_A_active_case_finds                                   as num_active_case_finds,
         3_1_b_muac_red                                            as num_muac_red,
         3_1_c_muac_yellow                                         as num_muac_yellow,
         3_1_d_muac_green                                          as num_muac_green,
@@ -129,6 +130,7 @@ select
         null                                                    as num_triggers,
         null                                                    as num_referrals_suspect_hiv_tb_cm_ntd_mh,
         null                                                    as num_pregnant_woman_visits,
+        iCCMNutritionActiveCaseFindsTotal                       as num_active_case_finds,
         iCCMNutritionMUACRedTotal                               as iCCMNutritionMUACRedTotal,
         iCCMNutritionMUACYellowTotal                            as iCCMNutritionMUACYellowTotal,
         null                                                    as num_muac_green,

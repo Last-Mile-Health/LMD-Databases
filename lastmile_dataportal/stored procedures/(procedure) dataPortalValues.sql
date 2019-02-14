@@ -3220,27 +3220,42 @@ select 432, '6_27', 1, @p_month, @p_year, sum( coalesce( value, 0 ) )  as value
 from lastmile_dataportal.tbl_values 
 where ind_id = 432 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1;
  
+
+
+-- 464. Number of facilities
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`,`year`,value )
+select 464 as ind_id, t.territory_id, 1 as period_id, @p_month, @p_year, v.health_facility_number as value
+from lastmile_dataportal.tbl_nchap_scale_chss_cha as v
+    left outer join lastmile_dataportal.view_territories as t on  ( trim( v.county )          like trim( t.territory_name ) ) and 
+                                                                  ( trim( t.territory_type )  like 'county' )
+where ( v.year_report = @p_year ) and ( v.month_report = @p_month )    
+;
  
 /*
 456. CHSS reporting rate by MOH and CHTs
 
 In a sense, 456 is the same as 302, except that 302 is calculated from lastmile_upload.de_chss_monthly_service_report records, which only
 collects the supervision portion of the CHSS MSR, while 456 comes from the dhis2 MOH instance and the monthly scale values for number of CHSSs
-that are collected by the NCHAS team (William.)  It is the only MSR (not CHA) the CHTs are collecting and entering into the dhis2 
-instance at this time.
-
-For the national number use all dhis2 numbers.  LMH's collection of CHSS MSRs has been spotty at best.
+that are collected by the NCHA team.  For the national number use all dhis2 numbers.  LMH's collection of CHSS MSRs has been spotty at best.
 Also, note 432 values are brought in via the dhis2 upload mechanism.
+
+Lastly, if the number of facilities 464 is greater than the number of CHSSs in a county, use the number of facilites as the denominator
+when calculating the rate.  Otherwise, use the number of CHSSs.
 */
 
 replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`,`year`,value )
-select 456, territory_id, 1 as period_id, @p_month, @p_year, 
+select  456, territory_id, 1 as period_id, @p_month, @p_year,
 
-      
-       round( min( if( a.fraction_part like 'number_chss_msr',  a.value, null ) ) -- numerator
-              / 
-              min( if( a.fraction_part like 'number_chss',      a.value, null ) )  -- denominator
-              , 3 ) as rate
+        round(  min( if( a.fraction_part like 'number_chss_msr',  a.value, null ) ) /     -- numerator
+        
+                if( min( if( a.fraction_part like 'number_facility', a.value, null ) ) >= 
+                    min( if( a.fraction_part like 'number_chss', a.value, null ) ),
+                    
+                    min( if( a.fraction_part like 'number_facility', a.value, null ) ),
+                    min( if( a.fraction_part like 'number_chss', a.value, null ) )        -- denominator
+                  ),
+                  
+                3 ) as rate
 from (  
       select 
             'number_chss_msr' as fraction_part, 
@@ -3260,14 +3275,25 @@ from (
       where ind_id = 29 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1
       group by territory_id
       
+      union all 
+      
+      select 
+            'number_facility' as fraction_part,  
+            territory_id,
+            min( value )  as value
+      from lastmile_dataportal.tbl_values 
+      where ind_id = 464 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1
+      group by territory_id
+      
 ) as a
 group by territory_id;
 
+-- Now add up the totals by county and calculate the Liberia-wide rate
 replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`,`year`,value )
 select 456, '6_27',1 as period_id, @p_month, @p_year, 
        round( sum( if( a.fraction_part like 'number_chss_msr',  a.value, null ) ) -- numerator
               / 
-              sum( if( a.fraction_part like 'number_chss',      a.value, null ) )  -- denominator
+              sum( if( a.fraction_part like 'denominator',      a.value, null ) )
               , 3 ) as rate
 from ( 
       select 
@@ -3279,17 +3305,335 @@ from (
       group by territory_id
       
       union all
+   
+      select 'denominator' as fraction_part,
+              b.territory_id,
+              
+              if( min( if( b.fraction_part like 'number_facility', b.value, null ) ) >= 
+                    min( if( b.fraction_part like 'number_chss', b.value, null ) ),
+                    
+                    min( if( b.fraction_part like 'number_facility', b.value, null ) ),
+                    min( if( b.fraction_part like 'number_chss', b.value, null ) )
+                  ) as value
+             
+      from (
+
+              select 
+                    'number_chss' as fraction_part,  
+                    territory_id,
+                    min( value )  as value
+              from lastmile_dataportal.tbl_values 
+              where ind_id = 29 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1
+              group by territory_id
       
-      select 
-            'number_chss' as fraction_part,  
-            territory_id,
-            min( value )  as value
-      from lastmile_dataportal.tbl_values 
-      where ind_id = 29 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1
-      group by territory_id
-     
+              union all
+      
+              select 
+                  'number_facility' as fraction_part,  
+                  territory_id,
+                  min( value )  as value
+            from lastmile_dataportal.tbl_values 
+            where ind_id = 464 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1
+            group by territory_id
+ 
+      ) as b
+      group by b.territory_id
 ) as a
-; 
+;
+
+
+/* 
+ * 465.	Percent of CHAs with ACT 50mg in stock
+ * 466.	Percent of CHAs with ACT 25 or 50mg in stock
+ * 467.	Percent of CHAs with Amoxicillin 250mg dispersible tablet in stock	
+ * 468.	Percent of CHAs with ORS sachet in stock
+ * 469	Percent of CHAs with Zinc Sulfate 20mg scored tablet in stock
+ *
+ * Note: these five are all based on the code for 431. ACT 25mg and 430. all life-saving commodities.
+*/
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 465, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year
+
+union all
+
+select 466, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year
+
+union all
+
+select 467, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year
+
+union all 
+
+select 468, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year
+
+union all
+
+select 469, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year
+;
+
+
+-- 465. Percent of CHAs with ACT 50mg in stock
+-- The if-clause suppresses the results if the reporting rate is below 25% (here and below)
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select  
+        465, a.territory_id, 1, @p_month, @p_year, 
+        
+        if( ( coalesce( a.number_restock, 0 ) / b.num_cha ) >= 0.25, 
+              round( ( coalesce( a.number_restock, 0 ) - coalesce( a.number_stockout_ACT50mg, 0 ) ) / coalesce( a.number_restock, 0 ), 3 ),
+              null
+          ) as rate
+from (
+        select
+              territory_id,
+              count( 1 )                      as number_restock, 
+              sum( stockout_ACT50mg )         as number_stockout_ACT50mg
+        from lastmile_report.mart_view_base_restock_cha
+        where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+        group by territory_id
+      ) as a
+          left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+    
+union all
+
+select 
+        465, '6_16', 1, @p_month, @p_year, 
+        
+        if( ( coalesce( c.number_restock, 0 ) / c.num_cha ) >= 0.25, 
+              round( ( coalesce( c.number_restock, 0 ) - coalesce( c.number_stockout_ACT50mg, 0 ) ) / coalesce( c.number_restock, 0 ), 3 ),
+              null
+          ) as rate
+from (
+        select 
+              sum( coalesce( a.number_restock, 0 ) )                  as number_restock,
+              sum( coalesce( a.number_stockout_ACT50mg, 0 ) )         as number_stockout_ACT50mg,
+              sum( coalesce( b.num_cha, 0 ) )                         as num_cha                 
+        from (
+                select
+                      territory_id,
+                      count( 1 )                      as number_restock, 
+                      sum( stockout_ACT50mg )         as number_stockout_ACT50mg
+                from lastmile_report.mart_view_base_restock_cha
+                where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+                group by territory_id
+                
+              ) as a
+                  left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+      ) as c
+;
+
+
+-- 466. Percent of CHAs with ACT 25 or 50mg in stock
+-- The if-clause suppresses the results if the reporting rate is below 25% (here and below)
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select  
+        466, a.territory_id, 1, @p_month, @p_year, 
+        
+        if( ( coalesce( a.number_restock, 0 ) / b.num_cha ) >= 0.25, 
+              round( ( coalesce( a.number_restock, 0 ) - coalesce( a.number_stockout_ACT_25mg_50mg, 0 ) ) / coalesce( a.number_restock, 0 ), 3 ),
+              null
+          ) as rate
+from (
+        select
+              territory_id,
+              count( 1 )                      as number_restock, 
+              sum( stockout_ACT_25mg_50mg )   as number_stockout_ACT_25mg_50mg
+        from lastmile_report.mart_view_base_restock_cha
+        where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+        group by territory_id
+      ) as a
+          left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+    
+union all
+
+select 
+        466, '6_16', 1, @p_month, @p_year, 
+        
+        if( ( coalesce( c.number_restock, 0 ) / c.num_cha ) >= 0.25, 
+              round( ( coalesce( c.number_restock, 0 ) - coalesce( c.number_stockout_ACT_25mg_50mg, 0 ) ) / coalesce( c.number_restock, 0 ), 3 ),
+              null
+          ) as rate
+from (
+        select 
+              sum( coalesce( a.number_restock, 0 ) )                  as number_restock,
+              sum( coalesce( a.number_stockout_ACT_25mg_50mg, 0 ) )   as number_stockout_ACT_25mg_50mg,
+              sum( coalesce( b.num_cha, 0 ) )                         as num_cha                 
+        from (
+                select
+                      territory_id,
+                      count( 1 )                      as number_restock, 
+                      sum( stockout_ACT_25mg_50mg )   as number_stockout_ACT_25mg_50mg
+                from lastmile_report.mart_view_base_restock_cha
+                where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+                group by territory_id
+                
+              ) as a
+                  left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+      ) as c
+;
+
+
+-- 467. Percent of CHAs with Percent of CHAs with Amoxocillin 250mg in stock
+-- The if-clause suppresses the results if the reporting rate is below 25% (here and below)
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select  
+        467, a.territory_id, 1, @p_month, @p_year, 
+        
+        if( ( coalesce( a.number_restock, 0 ) / b.num_cha ) >= 0.25, 
+              round( ( coalesce( a.number_restock, 0 ) - coalesce( a.number_stockout_Amoxicillin250mg, 0 ) ) / coalesce( a.number_restock, 0 ), 3 ),
+              null
+          ) as rate
+from (
+        select
+              territory_id,
+              count( 1 )                          as number_restock, 
+              sum( stockout_Amoxicillin250mg )    as number_stockout_Amoxicillin250mg
+        from lastmile_report.mart_view_base_restock_cha
+        where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+        group by territory_id
+      ) as a
+          left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+    
+union all
+
+select 
+        467, '6_16', 1, @p_month, @p_year, 
+        
+        if( ( coalesce( c.number_restock, 0 ) / c.num_cha ) >= 0.25, 
+              round( ( coalesce( c.number_restock, 0 ) - coalesce( c.number_stockout_Amoxicillin250mg, 0 ) ) / coalesce( c.number_restock, 0 ), 3 ),
+              null
+          ) as rate
+from (
+        select 
+              sum( coalesce( a.number_restock, 0 ) )                      as number_restock,
+              sum( coalesce( a.number_stockout_Amoxicillin250mg, 0 ) )    as number_stockout_Amoxicillin250mg,
+              sum( coalesce( b.num_cha, 0 ) )                             as num_cha                 
+        from (
+                select
+                      territory_id,
+                      count( 1 )                          as number_restock, 
+                      sum( stockout_Amoxicillin250mg )    as number_stockout_Amoxicillin250mg
+                from lastmile_report.mart_view_base_restock_cha
+                where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+                group by territory_id
+                
+              ) as a
+                  left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+      ) as c
+;
+
+
+
+
+-- 468. Percent of CHAs with ORS in stock
+-- The if-clause suppresses the results if the reporting rate is below 25% (here and below)
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select  
+        468, a.territory_id, 1, @p_month, @p_year, 
+        
+        if( ( coalesce( a.number_restock, 0 ) / b.num_cha ) >= 0.25, 
+              round( ( coalesce( a.number_restock, 0 ) - coalesce( a.number_stockout_ORS, 0 ) ) / coalesce( a.number_restock, 0 ), 3 ),
+              null
+          ) as rate
+from (
+        select
+              territory_id,
+              count( 1 )          as number_restock, 
+              sum( stockout_ORS ) as number_stockout_ORS
+        from lastmile_report.mart_view_base_restock_cha
+        where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+        group by territory_id
+      ) as a
+          left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+    
+union all
+
+select 
+        468, '6_16', 1, @p_month, @p_year, 
+        
+        if( ( coalesce( c.number_restock, 0 ) / c.num_cha ) >= 0.25, 
+              round( ( coalesce( c.number_restock, 0 ) - coalesce( c.number_stockout_ORS, 0 ) ) / coalesce( c.number_restock, 0 ), 3 ),
+              null
+          ) as rate
+from (
+        select 
+              sum( coalesce( a.number_restock, 0 ) )      as number_restock,
+              sum( coalesce( a.number_stockout_ORS, 0 ) ) as number_stockout_ORS,
+              sum( coalesce( b.num_cha, 0 ) )             as num_cha                 
+        from (
+                select
+                      territory_id,
+                      count( 1 )          as number_restock, 
+                      sum( stockout_ORS ) as number_stockout_ORS
+                from lastmile_report.mart_view_base_restock_cha
+                where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+                group by territory_id
+                
+              ) as a
+                  left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+      ) as c
+;
+
+
+
+-- 469. Percent of CHAs with Zinc Sulphate in stock
+-- The if-clause suppresses the results if the reporting rate is below 25% (here and below)
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select  
+        469, a.territory_id, 1, @p_month, @p_year, 
+        
+        if( ( coalesce( a.number_restock, 0 ) / b.num_cha ) >= 0.25, 
+              round( ( coalesce( a.number_restock, 0 ) - coalesce( a.number_stockout_ZincSulfate, 0 ) ) / coalesce( a.number_restock, 0 ), 3 ),
+              null
+          ) as rate
+from (
+        select
+              territory_id,
+              count( 1 )                  as number_restock, 
+              sum( stockout_ZincSulfate ) as number_stockout_ZincSulfate
+        from lastmile_report.mart_view_base_restock_cha
+        where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+        group by territory_id
+      ) as a
+          left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+    
+union all
+
+select 
+        469, '6_16', 1, @p_month, @p_year, 
+        
+        if( ( coalesce( c.number_restock, 0 ) / c.num_cha ) >= 0.25, 
+              round( ( coalesce( c.number_restock, 0 ) - coalesce( c.number_stockout_ZincSulfate, 0 ) ) / coalesce( c.number_restock, 0 ), 3 ),
+              null
+          ) as rate
+from (
+        select 
+              sum( coalesce( a.number_restock, 0 ) )              as number_restock,
+              sum( coalesce( a.number_stockout_ZincSulfate, 0 ) ) as number_stockout_ZincSulfate,
+              sum( coalesce( b.num_cha, 0 ) )                     as num_cha                 
+        from (
+                select
+                      territory_id,
+                      count( 1 )                  as number_restock, 
+                      sum( stockout_ZincSulfate ) as number_stockout_ZincSulfate
+                from lastmile_report.mart_view_base_restock_cha
+                where `month` = @p_month and `year`= @p_year and not ( territory_id is null )
+                group by territory_id
+                
+              ) as a
+                  left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+      ) as c
+;
 
 
 

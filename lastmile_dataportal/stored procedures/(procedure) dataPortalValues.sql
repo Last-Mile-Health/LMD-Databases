@@ -2899,7 +2899,6 @@ select
         @p_year, 
         round( ( coalesce( num_muac_yellow, 0 ) / ( coalesce( num_catchment_people_iccm, 0 ) * 0.16  ) ) * 1000, 1 )
       
-        
 from lastmile_report.mart_view_base_msr_county 
 where month_reported=@p_month and 
       year_reported=@p_year   and 
@@ -2916,14 +2915,12 @@ select
       round( ( sum( coalesce( num_muac_yellow, 0 ) ) / sum(  coalesce( num_catchment_people_iccm, 0 ) * 0.16  ) ) * 1000, 1 )
        
 from lastmile_report.mart_view_base_msr_county 
-where month_reported = @p_month and 
-      year_reported=@p_year     and 
-      not county_id is null
+where month_reported = @p_month and year_reported=@p_year and not county_id is null
 ;
 
 
 /*
- 421. Number of children with moderate acute malnutrition (yellow MUAC), per 1,000 children
+ 421. Number of children with moderate acute malnutrition (red MUAC), per 1,000 children
  
  Number of children with severe acute malnutrition (red MUAC), per 1,000 children under-five divided by the 
  number of children under 5.
@@ -2973,9 +2970,7 @@ select
       round( ( sum( coalesce( num_muac_red, 0 ) ) / sum(  coalesce( num_catchment_people_iccm, 0 ) * 0.16  ) ) * 1000, 1 )
        
 from lastmile_report.mart_view_base_msr_county 
-where month_reported = @p_month and 
-      year_reported=@p_year     and 
-      not county_id is null
+where month_reported = @p_month and year_reported=@p_year and not county_id is null
 ;
 
 
@@ -3633,6 +3628,35 @@ from (
               ) as a
                   left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
       ) as c
+;
+
+
+-- 470. Module 3: Number of active case finds
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 470, territory_id, 1, @p_month, @p_year, coalesce( num_active_case_finds ,0 )
+from lastmile_report.mart_view_base_msr_county 
+where month_reported=@p_month and year_reported=@p_year and county_id is not null
+
+union all 
+
+select 470, '6_16', 1, @p_month, @p_year, sum( coalesce( num_active_case_finds, 0 ) )
+from lastmile_report.mart_view_base_msr_county 
+where month_reported=@p_month and year_reported=@p_year and county_id is not null
+;
+
+-- 471.Module 3: Number of active case finds per 1,000 population
+replace INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select  471, territory_id, 1, @p_month, @p_year, 
+        round( ( coalesce( num_active_case_finds, 0 ) / ( coalesce( num_catchment_people_iccm, 0 ) ) ) * 1000, 1 )   
+from lastmile_report.mart_view_base_msr_county 
+where month_reported=@p_month and year_reported=@p_year and not county_id is null
+
+union
+
+select  471, '6_16', 1, @p_month, @p_year, 
+        round( ( sum( coalesce( num_active_case_finds, 0 ) ) / sum(  coalesce( num_catchment_people_iccm, 0 ) ) ) * 1000, 1 ) 
+from lastmile_report.mart_view_base_msr_county 
+where month_reported = @p_month and year_reported=@p_year and not county_id is null
 ;
 
 

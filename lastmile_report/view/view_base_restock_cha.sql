@@ -83,6 +83,9 @@ select
       if( a.stockOnHand_disposableGloves      = 0, 1, 0 ) as stockout_disposableGloves,
       if( a.stockOnHand_ACT25mg               = 0, 1, 0 ) as stockout_ACT25mg,   
       if( a.stockOnHand_ACT50mg               = 0, 1, 0 ) as stockout_ACT50mg,
+      
+      if( a.stockOnHand_ACT25mg = 0 or a.stockOnHand_ACT50mg = 0, 1, 0 ) as stockout_ACT_25mg_50mg,
+      
       if( a.stockOnHand_artesunateSuppository = 0, 1, 0 ) as stockout_artesunateSuppository,
             
       if( ( ( a.stockOnHand_Amoxicillin250mg = 0 )                  and 

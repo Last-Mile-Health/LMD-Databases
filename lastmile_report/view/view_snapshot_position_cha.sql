@@ -30,8 +30,8 @@ select
 
       count( * )                                                      as cha_count,
       round( sum( c.position_community_count_proportional ), 0 )      as community_count,
-      count( * ) * 235                                                as population,
-      sum( c.population )                                             as population_hhr_map,
+      sum( c.population )                                             as population,
+      count( * ) * 235                                                as population_estimate,
       sum( c.household) as household 
      
 from data_mart_snapshot_position_cha as c

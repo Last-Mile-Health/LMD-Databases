@@ -40,7 +40,7 @@ do begin
 	  set @current_month_minus_1  = month(  date_add( curdate(), interval -1 month ) );
 	  set @current_date_minus_1   = date(   concat(   @current_year_minus_1, '-', @current_month_minus_1, '-01' ) );
 
-	  call lastmile_report.data_mart_snapshot_position_cha('2012-10-01', @current_date_minus_1, 'MONTH', 'FILLED');
+	  call lastmile_report.data_mart_snapshot_position_cha('2012-10-01', @current_date_minus_1, 'MONTH', 'ALL');
 	
 end $$
 

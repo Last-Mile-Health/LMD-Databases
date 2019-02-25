@@ -709,26 +709,685 @@ select 632, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
 from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
 where month_form = @p_month and year_form = @p_year and table_name like 'odk_routineVisit' and id_type like 'cha';
 
+-- --------------------------------------------------------------------------------------------------------------------
+--                                            Begin: ODK Sick Child CHA ID
+-- --------------------------------------------------------------------------------------------------------------------
+ 
+
+-- 680. ODK Sick Child original CHA position ID total
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 680, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
+
+union all
+
+select 680, '1_4', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 680, '1_6', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 680, '1_14', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 680, '6_36', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 681. ODK Sick Child original CHA position ID valid
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 681, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
+
+union all
+
+select 681, '1_4', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 681, '1_6', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 681, '1_14', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 681, '6_36', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 682. ODK Sick Child original CHA position ID invalid
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 682, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
+
+union all
+
+select 682, '1_4', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 682, '1_6', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 682, '1_14', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 682, '6_36', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 683. ODK Sick Child original CHA position ID invalid 999
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 683, '6_16', 1, @p_month, @p_year, sum( id_invalid_999 ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
+
+union all
+
+select 683, '1_4', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 683, '1_6', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 683, '1_14', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 683, '6_36', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 684. ODK Sick Child original CHA position ID invalid LMH integer 
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 684, '6_16', 1, @p_month, @p_year, sum( id_invalid_lmh_integer ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
+
+union all
+
+select 684, '1_4', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 684, '1_6', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 684, '1_14', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 684, '6_36', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 685. ODK Sick Child original CHA position ID invalid other
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 685, '6_16', 1, @p_month, @p_year, sum( id_invalid_other ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
+
+union all
+
+select 685, '1_4', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 685, '1_6', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 685, '1_14', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 685, '6_36', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+;
 
 
 -- 640. ODK Sick Child repaired CHA position ID total
+
 replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 640, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
 from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha';
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
+
+union all
+
+select 640, '1_4', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 640, '1_6', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 640, '1_14', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 640, '6_36', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+;
+
 
 -- 641. ODK Sick Child repaired CHA position ID valid
+
 replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 641, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
 from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha';
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
+
+union all
+
+select 641, '1_4', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 641, '1_6', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 641, '1_14', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 641, '6_36', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+;
+
 
 -- 642. ODK Sick Child repaired CHA position ID invalid
+
 replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 642, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
 from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha';
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
 
+union all
+
+select 642, '1_4', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 642, '1_6', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 642, '1_14', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 642, '6_36', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 686. ODK Sick Child repaired CHA position ID invalid 999
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 686, '6_16', 1, @p_month, @p_year, sum( id_invalid_999 ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
+
+union all
+
+select 686, '1_4', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 686, '1_6', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 686, '1_14', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 686, '6_36', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 687. ODK Sick Child repaired CHA position ID invalid LMH integer
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 687, '6_16', 1, @p_month, @p_year, sum( id_invalid_lmh_integer ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
+
+union all
+
+select 687, '1_4', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 687, '1_6', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 687, '1_14', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 687, '6_36', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 688. ODK Sick Child repaired CHA position ID invalid other
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 688, '6_16', 1, @p_month, @p_year, sum( id_invalid_other ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
+
+union all
+
+select 688, '1_4', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 688, '1_6', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 688, '1_14', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 688, '6_36', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+/*
+ * 689. ODK Sick Child total number of invalid CHA position IDs repaired
+ *      It is possible for this code to return a negative number.  In those cases the repair process
+ *      created fewer valid IDs than were originally there.  This should never happen but could if the
+ *      person doing the cleanup made things worst.  So allow for negative numbers.   
+*/
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 689, '6_16', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select sum( id_valid ) as id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
+
+      union all
+
+      select sum( 0 - id_valid ) as id_valid  -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha'
+) as a
+
+union all
+
+select 689, '1_6', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+      union all
+
+      select 0 - id_valid -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Grand%Gedeh%'
+) as a
+
+union all
+
+select 689, '1_14', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+
+      union all
+
+      select 0 - id_valid -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Rivercess%'
+) as a
+
+union all
+
+select 689, '6_36', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+
+      union all
+
+      select 0 - id_valid -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_sickChildForm' and id_type like 'cha' and county like '%Unknown%'
+) as a
+;
+
+
+-- --------------------------------------------------------------------------------------------------------------------
+--                                            End: ODK Sick Child
+-- --------------------------------------------------------------------------------------------------------------------
+ 
+
+
+-- --------------------------------------------------------------------------------------------------------------------
+--                                            Begin: ODK Supervision Visit Log CHA ID
+-- --------------------------------------------------------------------------------------------------------------------
+ 
+
+-- 690. ODK Supervision Visit Log original CHA position ID total
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 690, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+
+union all
+
+select 690, '1_4', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 690, '1_6', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 690, '1_14', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 690, '6_36', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 691. ODK Supervision Visit Log original CHA position ID valid
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 691, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+
+union all
+
+select 691, '1_4', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 691, '1_6', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 691, '1_14', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 691, '6_36', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 692. ODK Supervision Visit Log original CHA position ID invalid
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 692, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+
+union all
+
+select 692, '1_4', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 692, '1_6', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 692, '1_14', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 692, '6_36', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 693. ODK Supervision Visit Log original CHA position ID invalid 999
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 693, '6_16', 1, @p_month, @p_year, sum( id_invalid_999 ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+
+union all
+
+select 693, '1_4', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 693, '1_6', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 693, '1_14', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 693, '6_36', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 694. ODK Supervision Visit Log original CHA position ID invalid LMH integer 
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 694, '6_16', 1, @p_month, @p_year, sum( id_invalid_lmh_integer ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+
+union all
+
+select 694, '1_4', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 694, '1_6', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 694, '1_14', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 694, '6_36', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 695. ODK Supervision Visit Log original CHA position ID invalid other
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 695, '6_16', 1, @p_month, @p_year, sum( id_invalid_other ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+
+union all
+
+select 695, '1_4', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 695, '1_6', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 695, '1_14', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 695, '6_36', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+/*
 
 -- 650. ODK Supervision Visit Log repaired CHA position ID total
 replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -747,6 +1406,283 @@ replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,
 select 652, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
 from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
 where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha';
+
+
+*/
+
+
+
+-- 650. ODK Supervision Visit Log repaired CHA position ID total
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 650, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+
+union all
+
+select 650, '1_4', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 650, '1_6', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 650, '1_14', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 650, '6_36', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 651. ODK Supervision Visit Log repaired CHA position ID valid
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 651, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+
+union all
+
+select 651, '1_4', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 651, '1_6', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 651, '1_14', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 651, '6_36', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 652. ODK Supervision Visit Log repaired CHA position ID invalid
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 652, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+
+union all
+
+select 652, '1_4', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 652, '1_6', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 652, '1_14', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 652, '6_36', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 696. ODK Supervision Visit Log repaired CHA position ID invalid 999
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 696, '6_16', 1, @p_month, @p_year, sum( id_invalid_999 ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+
+union all
+
+select 696, '1_4', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 696, '1_6', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 696, '1_14', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 696, '6_36', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 697. ODK Supervision Visit Log repaired CHA position ID invalid LMH integer
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 697, '6_16', 1, @p_month, @p_year, sum( id_invalid_lmh_integer ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+
+union all
+
+select 697, '1_4', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 697, '1_6', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 697, '1_14', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 697, '6_36', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+-- 698. ODK Supervision Visit Log repaired CHA position ID invalid other
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 698, '6_16', 1, @p_month, @p_year, sum( id_invalid_other ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+
+union all
+
+select 698, '1_4', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Bassa%'
+
+union all
+
+select 698, '1_6', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+union all
+
+select 698, '1_14', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+
+union all
+
+select 698, '6_36', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+;
+
+
+/*
+ * 699. ODK Supervision Visit Log total number of invalid CHA position IDs repaired
+ *      It is possible for this code to return a negative number.  In those cases the repair process
+ *      created fewer valid IDs than were originally there.  This should never happen but could if the
+ *      person doing the cleanup made things worst.  So allow for negative numbers.   
+*/
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 699, '6_16', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select sum( id_valid ) as id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+
+      union all
+
+      select sum( 0 - id_valid ) as id_valid  -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha'
+) as a
+
+union all
+
+select 699, '1_6', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+
+      union all
+
+      select 0 - id_valid -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Grand%Gedeh%'
+) as a
+
+union all
+
+select 699, '1_14', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+
+      union all
+
+      select 0 - id_valid -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Rivercess%'
+) as a
+
+union all
+
+select 699, '6_36', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+
+      union all
+
+      select 0 - id_valid -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'cha' and county like '%Unknown%'
+) as a
+;
+
+
+-- --------------------------------------------------------------------------------------------------------------------
+--                                            End: ODK Supervision Visit Log CHA ID
+-- --------------------------------------------------------------------------------------------------------------------
+ 
+
 
 
 -- 660. ODK CHA Restock repaired CHA position ID total
@@ -953,24 +1889,477 @@ from (
 ) as a;
 
 
--- 750. ODK Supervision Visit Log repaired CHSS position ID total
+-- --------------------------------------------------------------------------------------------------------------------
+--                                            Begin: ODK Supervision Visit Log CHSS ID
+-- --------------------------------------------------------------------------------------------------------------------
+ 
+-- 790. ODK Supervision Visit Log original CHSS position ID total
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 790, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
+
+union all
+
+select 790, '1_4', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Bassa%'
+
+union all
+
+select 790, '1_6', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+
+union all
+
+select 790, '1_14', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+
+union all
+
+select 790, '6_36', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+;
+
+
+-- 791. ODK Supervision Visit Log original CHSS position ID valid
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 791, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
+
+union all
+
+select 791, '1_4', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Bassa%'
+
+union all
+
+select 791, '1_6', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+
+union all
+
+select 791, '1_14', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+
+union all
+
+select 791, '6_36', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+;
+
+
+-- 792. ODK Supervision Visit Log original CHSS position ID invalid
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 792, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
+
+union all
+
+select 792, '1_4', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Bassa%'
+
+union all
+
+select 792, '1_6', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+
+union all
+
+select 792, '1_14', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+
+union all
+
+select 792, '6_36', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+;
+
+
+-- 793. ODK Supervision Visit Log original CHSS position ID invalid 999
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 793, '6_16', 1, @p_month, @p_year, sum( id_invalid_999 ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
+
+union all
+
+select 793, '1_4', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Bassa%'
+
+union all
+
+select 793, '1_6', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+
+union all
+
+select 793, '1_14', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+
+union all
+
+select 793, '6_36', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+;
+
+
+-- 794. ODK Supervision Visit Log original CHSS position ID invalid LMH integer 
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 794, '6_16', 1, @p_month, @p_year, sum( id_invalid_lmh_integer ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
+
+union all
+
+select 794, '1_4', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Bassa%'
+
+union all
+
+select 794, '1_6', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+
+union all
+
+select 794, '1_14', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+
+union all
+
+select 794, '6_36', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+;
+
+
+-- 795. ODK Supervision Visit Log original CHSS position ID invalid other
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 795, '6_16', 1, @p_month, @p_year, sum( id_invalid_other ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
+
+union all
+
+select 795, '1_4', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Bassa%'
+
+union all
+
+select 795, '1_6', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+
+union all
+
+select 795, '1_14', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+
+union all
+
+select 795, '6_36', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+;
+
+-- 750. ODK Supervision Visit Log repaired CHA position ID total
+
 replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 750, '6_16', 1, @p_month, @p_year, sum( id_total ) as value
 from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss';
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
+
+union all
+
+select 750, '1_4', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Bassa%'
+
+union all
+
+select 750, '1_6', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+
+union all
+
+select 750, '1_14', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+
+union all
+
+select 750, '6_36', 1, @p_month, @p_year, id_total as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+;
+
 
 -- 751. ODK Supervision Visit Log repaired CHSS position ID valid
+
 replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 751, '6_16', 1, @p_month, @p_year, sum( id_valid ) as value
 from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss';
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
+
+union all
+
+select 751, '1_4', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Bassa%'
+
+union all
+
+select 751, '1_6', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+
+union all
+
+select 751, '1_14', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+
+union all
+
+select 751, '6_36', 1, @p_month, @p_year, id_valid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+;
+
 
 -- 752. ODK Supervision Visit Log repaired CHSS position ID invalid
+
 replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 752, '6_16', 1, @p_month, @p_year, sum( id_invalid ) as value
 from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
-where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss';
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
 
+union all
+
+select 752, '1_4', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Bassa%'
+
+union all
+
+select 752, '1_6', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+
+union all
+
+select 752, '1_14', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+
+union all
+
+select 752, '6_36', 1, @p_month, @p_year, id_invalid as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+;
+
+
+-- 796. ODK Supervision Visit Log repaired CHSS position ID invalid 999
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 796, '6_16', 1, @p_month, @p_year, sum( id_invalid_999 ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
+
+union all
+
+select 796, '1_4', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Bassa%'
+
+union all
+
+select 796, '1_6', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+
+union all
+
+select 796, '1_14', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+
+union all
+
+select 796, '6_36', 1, @p_month, @p_year, id_invalid_999 as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+;
+
+
+-- 797. ODK Supervision Visit Log repaired CHSS position ID invalid LMH integer
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 797, '6_16', 1, @p_month, @p_year, sum( id_invalid_lmh_integer ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
+
+union all
+
+select 797, '1_4', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Bassa%'
+
+union all
+
+select 797, '1_6', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+
+union all
+
+select 797, '1_14', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+
+union all
+
+select 797, '6_36', 1, @p_month, @p_year, id_invalid_lmh_integer as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+;
+
+
+-- 798. ODK Supervision Visit Log repaired CHSS position ID invalid other
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 798, '6_16', 1, @p_month, @p_year, sum( id_invalid_other ) as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
+
+union all
+
+select 798, '1_4', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Bassa%'
+
+union all
+
+select 798, '1_6', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+
+union all
+
+select 798, '1_14', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+
+union all
+
+select 798, '6_36', 1, @p_month, @p_year, id_invalid_other as value
+from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+;
+
+
+/*
+ * 799. ODK Supervision Visit Log total number of invalid CHSS position IDs repaired
+ *      It is possible for this code to return a negative number.  In those cases the repair process
+ *      created fewer valid IDs than were originally there.  This should never happen but could if the
+ *      person doing the cleanup made things worst.  So allow for negative numbers.   
+*/
+
+replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 799, '6_16', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select sum( id_valid ) as id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
+
+      union all
+
+      select sum( 0 - id_valid ) as id_valid  -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss'
+) as a
+
+union all
+
+select 799, '1_6', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+
+      union all
+
+      select 0 - id_valid -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Grand%Gedeh%'
+) as a
+
+union all
+
+select 799, '1_14', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+
+      union all
+
+      select 0 - id_valid -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Rivercess%'
+) as a
+
+union all
+
+select 799, '6_36', 1, @p_month, @p_year, sum( a.id_valid ) as number_id_repaired
+from (
+      select id_valid
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_repair_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+
+      union all
+
+      select 0 - id_valid -- Subtract value from zero, so when it is summed from the repaired value, it gives the difference, or the number of ID repaired
+      from lastmile_report.mart_view_diagnostic_odk_id_invalid_original_total_table_type
+      where month_form = @p_month and year_form = @p_year and table_name like 'odk_supervisionVisitLog' and id_type like 'chss' and county like '%Unknown%'
+) as a
+;
+
+
+-- --------------------------------------------------------------------------------------------------------------------
+--                                            End: ODK Supervision Visit Log CHSS ID
+-- --------------------------------------------------------------------------------------------------------------------
+ 
 
 -- 760. ODK CHA Restock repaired CHSS position ID total
 replace into lastmile_dataportal.tbl_values_diagnostic (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)

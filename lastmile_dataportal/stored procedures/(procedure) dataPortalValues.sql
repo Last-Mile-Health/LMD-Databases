@@ -2974,6 +2974,7 @@ where month_reported = @p_month and year_reported=@p_year and not county_id is n
 ;
 
 
+
 --
 -- 422. Cumulative number of routine visits conducted since January 2018
 -- 
@@ -2984,7 +2985,7 @@ select 422, '6_27', 1, @p_month, @p_year, sum( a.number_routine_visit ) as total
     -- Audacious cummulative routine visits in Liberia for previous month. 
     select coalesce( value, 0 ) as number_routine_visit 
     from lastmile_dataportal.tbl_values 
-    where ind_id = 422 and territory_id like '6\\_27' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    where ind_id = 422 and territory_id like '6\\_27' and `year` > 2017 and  `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
     
     union all
     
@@ -2997,21 +2998,20 @@ select 422, '6_27', 1, @p_month, @p_year, sum( a.number_routine_visit ) as total
  ) as a
  ;
  
-
  replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
  select 422, '6_16', 1, @p_month, @p_year, sum( a.number_routine_visit ) as total_routine_visit from (
 
     -- Audacious cummulative routine visits for LMH Total for previous month. 
     select coalesce( value, 0 ) as number_routine_visit 
     from lastmile_dataportal.tbl_values 
-    where ind_id = 422 and territory_id like '6\\_16' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    where ind_id = 422 and territory_id like '6\\_16' and `year` > 2017 and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
     
     union all
     
     -- Audacious routine visits for LMH Total for previous month. 
     select coalesce( value, 0 ) as number_routine_visit 
     from lastmile_dataportal.tbl_values 
-    where ind_id = 119 and ( territory_id like '1\\_14' or territory_id like '6\\_31' ) and `year` = @p_year and `month` = @p_month and period_id = 1
+    where ind_id = 119 and ( territory_id like '1\\_4' or territory_id like '1\\_14' or territory_id like '6\\_31' ) and `year` = @p_year and `month` = @p_month and period_id = 1
     
  ) as a
  ;
@@ -3022,7 +3022,7 @@ select 422, '6_27', 1, @p_month, @p_year, sum( a.number_routine_visit ) as total
     -- Audacious cummulative routine visits for LMH Assisted for previous month. 
     select coalesce( value, 0 ) as number_routine_visit 
     from lastmile_dataportal.tbl_values 
-    where ind_id = 422 and territory_id like '6\\_32' and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
+    where ind_id = 422 and territory_id like '6\\_32' and `year` > 2017 and `year` = @p_yearMinus1 and `month` = @p_monthMinus1 and period_id = 1
     
     union all
     
@@ -3035,8 +3035,8 @@ select 422, '6_27', 1, @p_month, @p_year, sum( a.number_routine_visit ) as total
     
  ) as a
  ;
- 
- 
+
+
 -- 423. Total number of CHAS and CHSSs deployed
 
 -- Total number of CHAS and CHSSs deployed in Assisted Areas

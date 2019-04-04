@@ -4,10 +4,12 @@ drop table if exists dimension_date;
 
 create table dimension_date (
 
+  -- Integer representation of unique date (e.g. 20190331 for March 31, 2019
   date_key                  int( 10 ) unsigned  not null,
-  date_lmh                  char( 10 )          not null, -- YYYY-mm-dd
-  date_full                 date                    null,
   
+  -- Real date in date format
+  date_full                 date                    null,
+  date_lmh                  char( 10 )          not null, -- YYYY-mm-dd
   date_name                 char( 10 )          not null, -- YYYY/mm/dd
   date_us                   char( 10 )          not null, -- mm/dd/YYYY
   date_eu                   char( 10 )          not null, -- dd/mm/YYYY

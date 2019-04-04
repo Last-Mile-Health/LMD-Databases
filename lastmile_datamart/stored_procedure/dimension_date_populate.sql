@@ -44,10 +44,11 @@ begin
     end if;
 
     -- add a record into the date dimension table for this date
-    insert into dimension_date (  date_key,
-                                  date_lmh,
-                                
+    insert into dimension_date (
+                                  date_key,
+                                  
                                   date_full,
+                                  date_lmh,
                                   date_name, 
                                   date_us, 
                                   date_eu,
@@ -71,17 +72,20 @@ begin
                                   fiscal_year_quarter
                                 
     ) values  ( 
-                ( year( date_counter ) * 10000 ) + ( month( date_counter ) * 100 ) + day( date_counter ),  -- calculate date_key
-                date_format( date_counter , '%Y-%m-%d' ),
-              
-                date_counter,              
-                date_format(  date_counter , '%Y/%m/%d' ),
-                date_format(  date_counter , '%m/%d/%Y' ),
-                date_format(  date_counter , '%d/%m/%Y' ),                    
-                dayofweek(    date_counter  ), 
-                dayname(      date_counter  ),
-                dayofmonth(   date_counter  ),
-                dayofyear(    date_counter  ),
+                -- Integer representation of date. (e.g. 20190331 for March 31, 2019
+                ( year( date_counter ) * 10000 ) + ( month( date_counter ) * 100 ) + day( date_counter ),
+                
+                -- Real date in date format
+                date_counter, 
+                
+                date_format(  date_counter , '%Y-%m-%d' ), -- "LMH" date format.  The format YYYY-MM-DD that we input dates   
+                date_format(  date_counter, '%Y/%m/%d' ),
+                date_format(  date_counter, '%m/%d/%Y' ),
+                date_format(  date_counter, '%d/%m/%Y' ),                    
+                dayofweek(    date_counter ), 
+                dayname(      date_counter ),
+                dayofmonth(   date_counter ),
+                dayofyear(    date_counter ),
               
                 case dayname( date_counter )           
                   when 'Saturday' then 'weekend'

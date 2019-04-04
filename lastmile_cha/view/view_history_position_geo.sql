@@ -9,7 +9,7 @@ select
       trim( f.county )                    as county,
       f.health_district_id,
       trim( f.health_district )           as health_district,
-      p.cohort,
+      trim( p.cohort )                    as cohort,
       p.health_facility_id,
       f.health_facility,
       

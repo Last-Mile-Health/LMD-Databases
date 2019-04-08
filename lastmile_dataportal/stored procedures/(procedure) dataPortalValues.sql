@@ -45,6 +45,9 @@ INSERT INTO lastmile_dataportal.tbl_stored_procedure_log (`proc_name`, `paramete
 SET @p_month := p_month;
 SET @p_year := p_year;
 
+-- Convert date to date_key, the integer representation for a date we are going to use for indexing dimension and fact table dates
+set @p_date_key = ( @p_year * 10000 ) + ( @p_month * 100 ) + 1;
+
 
 -- Set @variables for dates
 SET @p_date := DATE(CONCAT(@p_year,'-',@p_month,'-01'));

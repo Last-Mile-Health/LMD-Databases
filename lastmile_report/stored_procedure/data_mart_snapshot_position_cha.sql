@@ -40,6 +40,10 @@ begin
             select
                   null, -- placeholder for id, which is auto incremented
                   position_status, 
+                  
+                  -- Integer representation of date. (e.g. 20190331 for March 31, 2019
+                ( year( loop_date ) * 10000 ) + ( month( loop_date ) * 100 ) + day( loop_date ) as date_key,
+                
                   loop_date, 
                   t.*,
                   null  -- placeholder for meta_insert_date_time

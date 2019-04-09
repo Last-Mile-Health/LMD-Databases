@@ -1,8 +1,8 @@
 use lastmile_datamart;
 
-drop procedure if exists dimension_position_populate;
+drop procedure if exists lastmile_datamart.dimension_position_populate;
 
-create procedure dimension_position_populate( in  begin_date        date, 
+create procedure lastmile_datamart.dimension_position_populate( in  begin_date        date, 
                                               in  end_date          date,
                                               in  unit              varchar(10),
                                               in  position_status   varchar(10) )

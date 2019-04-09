@@ -11,6 +11,7 @@ use lastmile_dataportal;
 drop event if exists evt_dataMartTables;
 drop event if exists evt_dataPortalValues;
 drop event if exists event_data_mart_snapshot_position_cha;
+drop event if exists event_dimension_populate;
 drop event if exists event_diagnostic_loader;
 
 
@@ -55,7 +56,7 @@ do begin
   set @unit             = 'DAY';
   set @position_status  = 'ALL';
 
-  call dimension_position_populate( @begin_date, @end_date, @unit, @position_status );
+  call lastmile_datamart.dimension_position_populate( @begin_date, @end_date, @unit, @position_status );
 
 end $$
 

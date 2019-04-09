@@ -62,7 +62,8 @@ select
       r.position_person_end_date,
       r.reason_left,
       r.reason_left_description,
-      r.position_supervisor_id
+      
+      p.position_supervisor_id
      
 from lastmile_datamart.materialize_view_history_position_geo as p
     left outer join ( select
@@ -78,19 +79,18 @@ from lastmile_datamart.materialize_view_history_position_geo as p
                             pr.position_person_end_date,
       
                             pr.reason_left,
-                            pr.reason_left_description,
-                            pr.position_supervisor_id
-                       
+                            pr.reason_left_description
+                        
                       from lastmile_datamart.materialize_view_history_position_person_cha as pr
                       where 
                             ( pr.position_person_begin_date <= snapshot_date ) 
                             and 
-                            ( ( pr.position_person_end_date is null ) or ( pr.position_person_end_date > snapshot_date ) ) 
+                            ( ( pr.position_person_end_date is null ) or ( pr.position_person_end_date >= snapshot_date ) ) 
      
                     ) as r on p.position_id like r.position_id
        
 -- Conditional clause for positions active during snapshot date.                    
-where ( p.job like 'CHA' ) and ( ( p.position_begin_date <= snapshot_date ) and ( ( p.position_end_date is null ) or ( p.position_end_date > snapshot_date ) ) )
+where ( p.job like 'CHA' ) and ( ( p.position_begin_date <= snapshot_date ) and ( ( p.position_end_date is null ) or ( p.position_end_date >= snapshot_date ) ) )
 
 and case
         when  position_status like 'ALL'  then position_status        

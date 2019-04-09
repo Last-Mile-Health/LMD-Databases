@@ -35,7 +35,7 @@ create table dimension_date (
 
   primary key ( date_key )
   
-) engine = InnoDB default charset = utf8; 
+) engine = InnoDB default charset = utf8;
 
 
 

@@ -7,7 +7,7 @@ create table dimension_position (
   -- CHA position
  
   -- date_key and position id are the unique composite key
-  date_key                              int                     not null,
+  date_key                              int( 10 ) unsigned      not null,
   position_id                           varchar( 50 )           not null,
  
   position_begin_date                   date                    not null,
@@ -75,4 +75,6 @@ create table dimension_position (
 
 alter table lastmile_datamart.dimension_position add index index_dimension_chss_position_id_begin_end_date_key  ( date_key, chss_position_id );
 alter table lastmile_datamart.dimension_position add index index_dimension_qao_position_id_begin_end_date_key   ( date_key, qao_position_id );
+
+-- alter table lastmile_datamart.dimension_position add index index_dimension_date_key   ( date_key );
 

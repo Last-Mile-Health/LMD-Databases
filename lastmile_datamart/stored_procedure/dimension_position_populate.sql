@@ -39,11 +39,10 @@ call lastmile_datamart.dimension_date_populate('2012-10-01', current_date() );
 drop table if exists lastmile_datamart.materialize_view_history_position_person_cha;
 create table lastmile_datamart.materialize_view_history_position_person_cha as 
 select 
-      a.*,
-      s.position_supervisor_id
+      a.*
+      -- s.position_supervisor_id
       
 from lastmile_cha.view_history_position_person_cha as a
-    left outer join lastmile_cha.position_supervisor as s on a.position_id like trim( s.position_id )  
 ;
 
 create index index_begin_end_date on 
@@ -51,7 +50,12 @@ lastmile_datamart.materialize_view_history_position_person_cha( position_person_
  
 drop table if exists lastmile_datamart.materialize_view_history_position_geo;
 create table lastmile_datamart.materialize_view_history_position_geo as
-select * from lastmile_cha.view_history_position_geo;
+select
+      p.*,
+      s.position_supervisor_id
+from lastmile_cha.view_history_position_geo as p
+    left outer join lastmile_cha.position_supervisor as s on p.position_id like trim( s.position_id ) and  p.job like 'CHA'
+;
 
 create index index_job_begin_end_date on 
 lastmile_datamart.materialize_view_history_position_geo( job, position_begin_date, position_end_date );

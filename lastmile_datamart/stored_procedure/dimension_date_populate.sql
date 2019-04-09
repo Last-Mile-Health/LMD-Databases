@@ -1,8 +1,8 @@
 use lastmile_datamart;
 
-drop procedure if exists dimension_date_populate;
+drop procedure if exists lastmile_datamart.dimension_date_populate;
 
-create procedure dimension_date_populate( begin_date date, end_date date )
+create procedure lastmile_datamart.dimension_date_populate( begin_date date, end_date date )
 
 begin
 
@@ -26,7 +26,7 @@ begin
   set date_counter = begin_date;
  
   -- Truncate: remove all rows from table.
-  truncate dimension_date;
+  truncate lastmile_datamart.dimension_date;
 
   while date_counter <= end_date do
   
@@ -44,7 +44,8 @@ begin
     end if;
 
     -- add a record into the date dimension table for this date
-    insert into dimension_date (
+    insert into lastmile_datamart.dimension_date (
+    
                                   date_key,
                                   
                                   date_full,

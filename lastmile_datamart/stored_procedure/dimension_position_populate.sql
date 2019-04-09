@@ -10,14 +10,6 @@ create procedure dimension_position_populate( in  begin_date        date,
 begin
 
 /*
-declare first_date      date        default begin_date;
-declare last_date       date        default end_date;
-declare unit_time       varchar(10) default unit;
-declare status          varchar(10) default position_status;
-*/
-
-
-/*
  *
  * Step 1. populate the dimension_date table
  *
@@ -75,8 +67,7 @@ lastmile_datamart.materialize_view_history_position_geo( job, position_begin_dat
  * Populate dimenension_position with CHA position data
  *
 */
--- call lastmile_datamart.dimension_position_populate_cha( @begin_date, @end_date, @unit, @position_status );
--- call lastmile_datamart.dimension_position_populate_cha( first_date, last_date, unit_time, status );
+
 call lastmile_datamart.dimension_position_populate_cha( begin_date, end_date, unit, position_status );
 
 

@@ -1,6 +1,6 @@
 use lastmile_datamart;
 
-drop procedure if exists dimension_position_snapshot;
+drop procedure if exists lastmile_datamart.dimension_position_snapshot;
 
 /*  Returns a resultset of all CHA positions at a point in time, the persons assigned to the positions, 
  *  and the geographical information associated with the positions, including the health facility
@@ -15,8 +15,8 @@ drop procedure if exists dimension_position_snapshot;
  *
 */
           
-create procedure dimension_position_snapshot( in snapshot_date    date, 
-                                              in position_status  varchar(10) )
+create procedure lastmile_datamart.dimension_position_snapshot( in snapshot_date    date, 
+                                                                in position_status  varchar(10) )
 begin
 
 /* If position_status is anything other than 'FILLED' or 'OPEN' then set it to 'ALL'. */
@@ -32,9 +32,9 @@ end if;
  * a temporary table and storing the resultset in it is an acceptable workaround.
 */
 
-drop temporary table if exists faux_cursor_dimension_position;
+drop temporary table if exists lastmile_datamart.faux_cursor_dimension_position;
 
-create temporary table faux_cursor_dimension_position as
+create temporary table lastmile_datamart.faux_cursor_dimension_position as
 
 select 
 
@@ -101,6 +101,6 @@ and case
     like position_status 
 ;
 -- Use to debug this procedure.  Dump rows from temporary table.
--- select * from faux_cursor_dimension_position;
+-- select * from lastmile_datamart.faux_cursor_dimension_position;
 
 end;

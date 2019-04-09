@@ -1,11 +1,11 @@
 use lastmile_datamart;
 
-drop procedure if exists dimension_position_populate_cha;
+drop procedure if exists lastmile_datamart.dimension_position_populate_cha;
 
-create procedure dimension_position_populate_cha( in  begin_date        date, 
-                                                  in  end_date          date,
-                                                  in  unit              varchar(10),
-                                                  in  position_status   varchar(10) )
+create procedure lastmile_datamart.dimension_position_populate_cha( in  begin_date        date, 
+                                                                    in  end_date          date,
+                                                                    in  unit              varchar(10),
+                                                                    in  position_status   varchar(10) )
                                                                                            
 begin
 
@@ -28,15 +28,15 @@ begin
         -- Parameters are all valid.  Continue executing procedure.
 
         -- delete all records from data mart.
-        truncate dimension_position;
+        truncate lastmile_datamart.dimension_position;
 
         set loop_date = begin_date;
 
         while loop_date <= end_date do
 
-            call dimension_position_snapshot( loop_date, position_status );
+            call lastmile_datamart.dimension_position_snapshot( loop_date, position_status );
 
-            insert into dimension_position
+            insert into lastmile_datamart.dimension_position
             select
             
                   -- CHA position data
@@ -76,7 +76,7 @@ begin
                   -- meta_insert_date_time stub
                   null
   
-            from faux_cursor_dimension_position as t;
+            from lastmile_datamart.faux_cursor_dimension_position as t;
    
             case upper( unit )
         

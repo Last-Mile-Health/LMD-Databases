@@ -29,7 +29,7 @@ delimiter $$
 */
 create event event_data_mart_snapshot_position_cha
 on schedule every 1 month
-starts '2018-06-15 03:00:00'
+starts '2018-06-15 02:15:00'
 do begin
 
 	  -- Set date variables
@@ -42,6 +42,21 @@ do begin
 
 	  call lastmile_report.data_mart_snapshot_position_cha('2012-10-01', @current_date_minus_1, 'MONTH', 'ALL');
 	
+end $$
+
+
+create event event_dimension_populate
+on schedule every 1 day
+starts '2019-04-08 02:30:00'
+do begin
+
+  set @begin_date       = '2012-10-01';
+  set @end_date         = current_date();
+  set @unit             = 'DAY';
+  set @position_status  = 'ALL';
+
+  call dimension_position_populate( @begin_date, @end_date, @unit, @position_status );
+
 end $$
 
 

@@ -48,7 +48,9 @@ create view lastmile_dataportal.view_territories as
           if( q.position_id is null, 
               t.territory_name, 
               -- concat( trim( q.position_id ), ': ', trim( coalesce( concat( q.first_name, ' ', q.last_name ), 'Unassigned' ) ) ) 
-              concat( trim( q.position_id ), ': ', trim( coalesce( q.last_name, 'Unassigned' ) ) )
+              -- concat( trim( q.position_id ), ': ', trim( coalesce( q.last_name, 'Unassigned' ) ) )
+              -- concat( substring_index( trim( q.position_id ), '-', 1 ), ':', trim( coalesce( concat( q.first_name, ' ', q.last_name ), 'Unassigned' ) ) ) 
+              concat( trim( q.position_id ), ': ', trim( coalesce( concat( substring( q.first_name, 1, 1 ), '. ', q.last_name ), 'Unassigned' ) ) ) 
           ) as territory_name,
           
           'other' AS territory_type

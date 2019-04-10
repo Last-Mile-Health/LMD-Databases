@@ -55,6 +55,9 @@ CREATE TABLE lastmile_report.mart_view_base_odk_supervision SELECT * FROM lastmi
 DROP TABLE IF EXISTS lastmile_report.mart_view_base_ifi;
 CREATE TABLE lastmile_report.mart_view_base_ifi SELECT * FROM lastmile_report.view_base_ifi;
 
+drop table if exists lastmile_report.mart_view_msr;
+create table lastmile_report.mart_view_msr as select * from lastmile_report.view_msr;
+
 DROP TABLE IF EXISTS lastmile_report.mart_view_base_msr_county;
 CREATE TABLE lastmile_report.mart_view_base_msr_county SELECT * FROM lastmile_report.view_base_msr_county;
 DROP TABLE IF EXISTS lastmile_report.mart_view_base_msr_community;

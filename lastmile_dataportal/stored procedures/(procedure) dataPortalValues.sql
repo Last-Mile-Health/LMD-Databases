@@ -485,6 +485,118 @@ where territory_id like '6\\_16'
 
 
 
+/*
+ *
+ * QAO progam scale mart build
+ *
+*/
+
+drop table if exists lastmile_report.mart_program_scale_qao;
+
+create table lastmile_report.mart_program_scale_qao (
+
+  qao_position_id               varchar(50 )  not null, 
+  qao                           varchar(50 )      null, 
+  
+  num_cha                       int               null, 
+  num_chss                      int               null, 
+  num_communities               int               null, 
+  num_households                int               null,  
+  num_people                    int               null, 
+  
+  primary key ( qao_position_id )
+
+) default character set = utf8mb4;
+
+-- First, build list of QAO position IDs and names for a point in time (the first day of the month).
+
+insert into lastmile_report.mart_program_scale_qao ( qao_position_id, qao )
+select dp.qao_position_id, dp.qao_full_name
+from lastmile_datamart.dimension_position as dp
+where date_key = @p_date_key and not ( dp.qao_position_id is null )
+group by dp.qao_position_id, dp.qao_full_name
+;
+
+-- Calculate the number of active CHAs each QAO is supervising.
+update lastmile_report.mart_program_scale_qao q
+    left outer join (
+                      select dp.qao_position_id, sum( if( dp.person_id is null, 0, 1 ) ) as number_cha
+                      from lastmile_datamart.dimension_position dp
+                      where date_key = @p_date_key and not ( dp.qao_position_id is null )            
+                      group by dp.qao_position_id
+                    
+    ) as s on q.qao_position_id like s.qao_position_id
+  
+  set q.num_cha = s.number_cha
+;
+
+
+-- Calculate the number of active CHSSs each QAO is supervising.
+update lastmile_report.mart_program_scale_qao q
+    left outer join (
+                      select a.qao_position_id, sum( if( a.chss_person_id is null, 0, 1 ) ) as number_chss
+                      from ( 
+                            select dp.qao_position_id, dp.chss_position_id, dp.chss_person_id
+                            from lastmile_datamart.dimension_position dp
+                            where date_key = @p_date_key and not ( dp.qao_position_id is null )
+                            group by dp.qao_position_id, dp.chss_position_id
+                      ) as a
+                      group by a.qao_position_id 
+
+    ) as s on q.qao_position_id like s.qao_position_id
+    
+  set q.num_chss = s.number_chss
+;
+
+
+-- Calculate the number of communties with active CHAs that QAO is supervising.
+update lastmile_report.mart_program_scale_qao q
+    left outer join (
+                      select dp.qao_position_id, sum( coalesce( s.position_community_count, 0 ) ) as number_community
+                      from lastmile_datamart.dimension_position dp
+                          left outer join lastmile_report.data_mart_snapshot_position_cha as s on dp.date_key = s.date_key and dp.position_id like s.position_id
+                      where  dp.date_key = @p_date_key and not ( dp.qao_position_id is null )            
+                      group by dp.qao_position_id
+
+    ) as s on q.qao_position_id like s.qao_position_id
+    
+  set q.num_communities = s.number_community
+;
+
+-- Calculate the number of households with active CHAs that QAO is supervising.
+update lastmile_report.mart_program_scale_qao q
+    left outer join (
+                      select dp.qao_position_id, sum( coalesce( s.household, 0 ) ) as number_household
+                      from lastmile_datamart.dimension_position dp
+                          left outer join lastmile_report.data_mart_snapshot_position_cha as s on dp.date_key = s.date_key and dp.position_id like s.position_id
+                      where  dp.date_key = @p_date_key and not ( dp.qao_position_id is null )            
+                      group by dp.qao_position_id
+
+    ) as s on q.qao_position_id like s.qao_position_id
+    
+  set q.num_households = s.number_household
+;
+
+-- Calculate the population that active CHAs are serving that a QAO is supervising.
+update lastmile_report.mart_program_scale_qao q
+    left outer join (
+                      select dp.qao_position_id, sum( coalesce( s.population, 0 ) ) as population
+                      from lastmile_datamart.dimension_position dp
+                          left outer join lastmile_report.data_mart_snapshot_position_cha as s on dp.date_key = s.date_key and dp.position_id like s.position_id
+                      where  dp.date_key = @p_date_key and not ( dp.qao_position_id is null )            
+                      group by dp.qao_position_id
+
+    ) as s on q.qao_position_id like s.qao_position_id
+    
+  set q.num_people = s.population
+;
+
+/*
+ *
+ * End QAO progam scale mart build
+ *
+*/
+
 -- ------------ --
 -- Core updates --
 -- ------------ --
@@ -499,6 +611,28 @@ WHERE manualMonth=@p_month  AND manualYear=@p_year AND county_id IS NOT NULL GRO
 union SELECT 7, '6_16', 1, @p_month, @p_year, ROUND( SUM( supervisionAttendance ) / num_cha, 1 )
 FROM lastmile_report.mart_view_base_odk_supervision a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id 
 WHERE manualMonth=@p_month AND manualYear=@p_year AND county_id IS NOT NULL;
+
+
+-- 7. Monthly CHA supervision rate by QAO
+replace into lastmile_dataportal.tbl_values (ind_id,territory_id,period_id, `month`, `year`, value )
+select 
+      7 as ind_id, 
+      concat( '6_', o.territory_other_id ) as territory_id,
+      1 as period_id,  
+      @p_month, 
+      @p_year,
+      round( sum( q.supervisionAttendance ) / s.num_cha, 1 ) as rate
+      
+      -- ROUND( SUM( supervisionAttendance ) / num_cha, 1 )
+from lastmile_report.mart_view_base_odk_supervision as q
+    left outer join lastmile_datamart.dimension_position            as dp on q.date_key = dp.date_key and q.supervisedCHAID like dp.position_id
+        left outer join lastmile_dataportal.tbl_territories_other   as o on dp.qao_position_id like trim( o.territory_name ) 
+            left outer join lastmile_report.mart_program_scale_qao  as s on dp.qao_position_id like s.qao_position_id
+where q.date_key = @p_date_key and not ( dp.qao_position_id is null ) 
+group by dp.qao_position_id
+;
+
+
 
 -- For now, let's continue adding GG Unicef cha counts to denominator.  However, the Total rates in the table will all look
 -- like they are under water because numerator will only be the supervision counts for GG LMH and RI.  The code below will
@@ -1451,6 +1585,26 @@ WHERE month_reported=@p_month AND year_reported=@p_year AND a.territory_id IS NO
 UNION SELECT 302, '6_16', 1, @p_month, @p_year, ROUND(COUNT(1)/num_chss,3)
 FROM lastmile_report.view_chss_msr a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
 WHERE month_reported=@p_month AND year_reported=@p_year AND a.territory_id IS NOT NULL;
+
+
+-- 302. CHSS reporting rate by QAO
+replace into lastmile_dataportal.tbl_values (ind_id,territory_id,period_id, `month`, `year`, value )
+select 
+      302 as ind_id, 
+      concat( '6_', o.territory_other_id ) as territory_id,
+      1 as period_id, 
+      @p_month, 
+      @p_year, 
+      round( count( * ) / min( s.num_chss ), 3 ) as rate
+
+from lastmile_report.view_chss_msr_qao as q
+    left outer join lastmile_datamart.view_dimension_position_chss as v on q.date_key = v.date_key and q.chss_position_id like v.chss_position_id
+    left outer join lastmile_dataportal.tbl_territories_other as o on v.qao_position_id like trim( o.territory_name ) 
+        left outer join lastmile_report.mart_program_scale_qao as s on v.qao_position_id like s.qao_position_id
+where q.date_key = @p_date_key and not ( v.qao_position_id is null ) 
+group by v.qao_position_id
+;
+
 
 -- 305. Percent of expected CHSS mHealth supervision visit logs received
 -- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted

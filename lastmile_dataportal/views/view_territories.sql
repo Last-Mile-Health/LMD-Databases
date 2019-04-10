@@ -39,21 +39,20 @@ create view lastmile_dataportal.view_territories as
         'community' AS `territory_type`
     FROM
         `lastmile_cha`.`community` 
-    UNION SELECT 
-        CONCAT('6_',
-                `lastmile_dataportal`.`tbl_territories_other`.`territory_other_id`) AS `CONCAT('6_',territory_other_id)`,
-        `lastmile_dataportal`.`tbl_territories_other`.`territory_name` AS `territory_name`,
-        'other' AS `territory_type`
-    FROM
-        `lastmile_dataportal`.`tbl_territories_other`
     
-     union
-     
+    union
+    
     select 
-
-      concat( '7_', trim( q.position_id )  )                      as territory_id,
-      concat( trim( q.position_id ), ': ', trim( q.last_name ) )  as territory_name,
-      'QAO'                                                       as territory_type
+          concat('6_', t.territory_other_id) as `concat( '6_', territory_other_id )`,
       
-    from lastmile_cha.view_position_qao_person as q
-    ;
+          if( q.position_id is null, 
+              t.territory_name, 
+              -- concat( trim( q.position_id ), ': ', trim( coalesce( concat( q.first_name, ' ', q.last_name ), 'Unassigned' ) ) ) 
+              concat( trim( q.position_id ), ': ', trim( coalesce( q.last_name, 'Unassigned' ) ) )
+          ) as territory_name,
+          
+          'other' AS territory_type
+          
+from lastmile_dataportal.tbl_territories_other as t
+    left outer join lastmile_cha.view_position_qao_person as q on trim( t.territory_name ) like trim( q.position_id )
+;

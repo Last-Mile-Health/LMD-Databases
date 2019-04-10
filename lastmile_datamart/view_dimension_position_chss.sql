@@ -7,6 +7,7 @@ create view lastmile_datamart.view_dimension_position_chss as
 select
       dp.date_key, 
       dp.chss_position_id,
+      dp.qao_position_id,
       dp.chss_position_begin_date,
       dp.chss_position_end_date,
       dp.chss_person_id,

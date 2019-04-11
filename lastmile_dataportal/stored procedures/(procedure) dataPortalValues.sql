@@ -1330,6 +1330,23 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 UNION SELECT 222, '6_16', 1, @p_month, @p_year, ROUND(1000*(SUM(COALESCE(num_tx_malaria,0))/SUM(COALESCE(num_catchment_people_iccm,0))),1)
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
+-- 222. Number of child cases of malaria treated per 1,000 population by QAO
+replace into lastmile_dataportal.tbl_values (ind_id,territory_id,period_id, `month`, `year`, value )
+select 
+      222 as ind_id, 
+      concat( '6_', o.territory_other_id ) as territory_id,
+      1 as period_id,  
+      @p_month, 
+      @p_year,
+      round( ( sum( coalesce( q.num_tx_malaria, 0 ) ) / sum( coalesce( q.num_catchment_people_iccm, 0 ) * 0.16 ) ) * 1000, 1 ) as rate
+      
+from lastmile_report.mart_view_msr as q
+    left outer join lastmile_datamart.dimension_position   as dp on q.date_key = dp.date_key and q.cha_id like dp.position_id
+        left outer join lastmile_dataportal.tbl_territories_other   as o on dp.qao_position_id like trim( o.territory_name ) 
+where q.date_key = @p_date_key and not ( dp.qao_position_id is null ) 
+group by dp.qao_position_id
+;
+
 
 -- 223. Number of child cases of diarrhea treated per 1,000 population
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -1338,6 +1355,23 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 UNION SELECT 223, '6_16', 1, @p_month, @p_year, ROUND(1000*(SUM(COALESCE(num_tx_diarrhea,0))/SUM(COALESCE(num_catchment_people_iccm,0))),1)
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
+-- 223. Number of child cases of diarrhea treated per 1,000 population by QAO
+replace into lastmile_dataportal.tbl_values (ind_id,territory_id,period_id, `month`, `year`, value )
+select 
+      223 as ind_id, 
+      concat( '6_', o.territory_other_id ) as territory_id,
+      1 as period_id,  
+      @p_month, 
+      @p_year,
+      round( ( sum( coalesce( q.num_tx_diarrhea, 0 ) ) / sum( coalesce( q.num_catchment_people_iccm, 0 ) * 0.16 ) ) * 1000, 1 ) as rate
+      
+from lastmile_report.mart_view_msr as q
+    left outer join lastmile_datamart.dimension_position   as dp on q.date_key = dp.date_key and q.cha_id like dp.position_id
+        left outer join lastmile_dataportal.tbl_territories_other   as o on dp.qao_position_id like trim( o.territory_name ) 
+where q.date_key = @p_date_key and not ( dp.qao_position_id is null ) 
+group by dp.qao_position_id
+;
+
 
 -- 224. Number of child cases of ARI treated per 1,000 population
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -1345,6 +1379,23 @@ SELECT 224, territory_id, 1, @p_month, @p_year, ROUND(1000*(COALESCE(num_tx_ari,
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL
 UNION SELECT 224, '6_16', 1, @p_month, @p_year, ROUND(1000*(SUM(COALESCE(num_tx_ari,0))/SUM(COALESCE(num_catchment_people_iccm,0))),1)
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
+
+-- 224. Number of child cases of ARI treated per 1,000 population by QAO
+replace into lastmile_dataportal.tbl_values (ind_id,territory_id,period_id, `month`, `year`, value )
+select 
+      224 as ind_id, 
+      concat( '6_', o.territory_other_id ) as territory_id,
+      1 as period_id,  
+      @p_month, 
+      @p_year,
+      round( ( sum( coalesce( q.num_tx_ari, 0 ) ) / sum( coalesce( q.num_catchment_people_iccm, 0 ) * 0.16  ) ) * 1000, 1 ) as rate
+      
+from lastmile_report.mart_view_msr as q
+    left outer join lastmile_datamart.dimension_position   as dp on q.date_key = dp.date_key and q.cha_id like dp.position_id
+        left outer join lastmile_dataportal.tbl_territories_other   as o on dp.qao_position_id like trim( o.territory_name ) 
+where q.date_key = @p_date_key and not ( dp.qao_position_id is null ) 
+group by dp.qao_position_id
+;
 
 
 -- 226. Number of routine visits conducted per household
@@ -3934,6 +3985,23 @@ from lastmile_report.mart_view_base_msr_county
 where month_reported = @p_month and year_reported=@p_year and not county_id is null
 ;
 
+
+-- 472. Number of children screened for malnutrition (MUAC) per 1,000 population by QAO
+replace into lastmile_dataportal.tbl_values (ind_id,territory_id,period_id, `month`, `year`, value )
+select 
+      472 as ind_id, 
+      concat( '6_', o.territory_other_id ) as territory_id,
+      1 as period_id,  
+      @p_month, 
+      @p_year,
+      round( ( sum( coalesce( q.num_muac_red, 0 ) + coalesce( q.num_muac_yellow, 0 ) + coalesce( q.num_muac_green, 0 ) ) / sum( coalesce( q.num_catchment_people_iccm, 0 ) * 0.16  ) ) * 1000, 1 ) as rate
+      
+from lastmile_report.mart_view_msr as q
+    left outer join lastmile_datamart.dimension_position   as dp on q.date_key = dp.date_key and q.cha_id like dp.position_id
+        left outer join lastmile_dataportal.tbl_territories_other   as o on dp.qao_position_id like trim( o.territory_name ) 
+where q.date_key = @p_date_key and not ( dp.qao_position_id is null ) 
+group by dp.qao_position_id
+;
 
 
 -- ------ --

@@ -13,6 +13,8 @@ select
       a.`month`,
       a.`year`,
       
+      ( year( a.manualDate ) * 10000 ) + ( month( a.manualDate ) * 100 ) + 1 as date_key,
+      
       if( ( ( a.stockOnHand_ACT25mg = 0 ) 
             or         
             ( a.stockOnHand_ACT50mg = 0 )            

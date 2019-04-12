@@ -47,8 +47,10 @@ CREATE TABLE lastmile_report.mart_view_base_history_person SELECT * FROM lastmil
 
 DROP TABLE IF EXISTS lastmile_report.mart_view_base_history_person_position;
 CREATE TABLE lastmile_report.mart_view_base_history_person_position SELECT * FROM lastmile_cha.view_base_history_person_position;
+
 DROP TABLE IF EXISTS lastmile_report.mart_view_base_restock_cha;
 CREATE TABLE lastmile_report.mart_view_base_restock_cha SELECT * FROM lastmile_report.view_base_restock_cha;
+
 DROP TABLE IF EXISTS lastmile_report.mart_view_base_odk_supervision;
 CREATE TABLE lastmile_report.mart_view_base_odk_supervision SELECT * FROM lastmile_report.view_base_odk_supervision;
 

@@ -4056,6 +4056,49 @@ from lastmile_report.mart_program_scale_qao as s
                     ) as j on s.qao_position_id like j.qao_position_id
 ;
 
+
+-- 475. Number of stockout of life-saving commodities ACT25, ACT50, ORS, Zinc Sulfate, Amoxicillian per QAO
+replace into lastmile_dataportal.tbl_values (ind_id,territory_id,period_id, `month`, `year`, value )
+select
+      475 as ind_id, 
+      concat( '6_', o.territory_other_id ) as territory_id,
+      1 as period_id,  
+      @p_month, 
+      @p_year,
+      coalesce( jj.stockout_life_saving, '' )
+      
+from lastmile_report.mart_program_scale_qao as s
+    left outer join lastmile_dataportal.tbl_territories_other as o on s.qao_position_id like trim( o.territory_name )
+    left outer join (
+                      select 
+                            dp.qao_position_id,
+                            sum( j.stockout_life_saving ) as stockout_life_saving
+                      from (
+                              select
+                                    m.date_key,
+                                    m.cha_id                                            as position_id,
+              
+                                    sum( coalesce( stockout_ACT25mg,          0 ) ) +
+                                    sum( coalesce( stockout_ACT50mg,          0 ) ) +
+                                    sum( coalesce( stockout_ORS,              0 ) ) +
+                                    sum( coalesce( stockout_ZincSulfate,      0 ) ) +
+                                    sum( coalesce( stockout_Amoxicillin250mg, 0 ) )     as stockout_life_saving
+              
+                              from lastmile_report.mart_view_base_restock_cha as m
+                              where m.date_key = @p_date_key
+                              group by m.cha_id                     
+                    ) as j
+                    
+        left outer join lastmile_datamart.dimension_position as dp on j.date_key = dp.date_key and  j.position_id like dp.position_id 
+
+where not ( dp.qao_position_id is null )
+group by dp.qao_position_id
+
+) as jj on s.qao_position_id = jj.qao_position_id
+;
+
+
+
 -- ------ --
 -- Finish --
 -- ------ --

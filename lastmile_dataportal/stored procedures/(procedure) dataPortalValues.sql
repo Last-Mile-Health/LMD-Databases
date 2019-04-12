@@ -4016,7 +4016,6 @@ select
       @p_year,
       concat( coalesce( j.number_supervision, 0 ), '/', s.num_chss ) as rate
       
-
 from lastmile_report.mart_program_scale_qao as s
     left outer join lastmile_dataportal.tbl_territories_other as o on s.qao_position_id like trim( o.territory_name )
     left outer join (
@@ -4031,6 +4030,31 @@ from lastmile_report.mart_program_scale_qao as s
 ;
 
 
+-- 474. QAO number of correct treatment forms
+replace into lastmile_dataportal.tbl_values (ind_id,territory_id,period_id, `month`, `year`, value )
+select
+      474 as ind_id, 
+      concat( '6_', o.territory_other_id ) as territory_id,
+      1 as period_id,  
+      @p_month, 
+      @p_year,
+      coalesce( j.number_form, 0 )
+      
+from lastmile_report.mart_program_scale_qao as s
+    left outer join lastmile_dataportal.tbl_territories_other as o on s.qao_position_id like trim( o.territory_name ) 
+    left outer join (
+                      select
+                            dp.qao_position_id, 
+                            count( * ) as number_form
+      
+                      from lastmile_report.view_correct_treatment_cha as c
+                          left outer join lastmile_datamart.dimension_position as dp on c.date_key = dp.date_key and c.position_id like dp.position_id
+                      where c.date_key = @p_date_key and not ( dp.qao_position_id is null ) 
+                      
+                      group by dp.qao_position_id
+                      
+                    ) as j on s.qao_position_id like j.qao_position_id
+;
 
 -- ------ --
 -- Finish --

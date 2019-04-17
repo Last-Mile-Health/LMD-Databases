@@ -3547,9 +3547,171 @@ from (
 
 
 
+
+
 /* 
- * 430. Percent of CHAs with all life saving commodities in stock
- * 431. Percent of CHAs with ACT 25mg in stock
+ *
+ * Need the same indicators for Assisted numbers generated from IFI database because we are calcualting GB, RI, and GG values
+ * for Managed and Assisted and the Assisted numbers need to be generated from the IFI exclusively.
+ *
+ * 476. Percent of CHAs with all life saving commodities in stock
+ * 477. Percent of CHAs with ACT 25mg in stock
+ * 478.	Percent of CHAs with ACT 50mg in stock
+ * 479.	Percent of CHAs with ACT 25 or 50mg in stock
+ * 480.	Percent of CHAs with Amoxicillin 250mg dispersible tablet in stock	
+ * 481.	Percent of CHAs with ORS sachet in stock
+ * 482	Percent of CHAs with Zinc Sulfate 20mg scored tablet in stock
+ *
+ * Note: For assisted areas (6_32, we are not suppressing values under any conditions.  This is IFI sample data, so
+ * the denominator is the number of CHAs sampled during the month.  We could suppress if number of CHAs is too low.
+*/
+
+
+-- Beginning of code for ifi database
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 476, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_life_saving_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year 
+
+union all
+
+select 477, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year 
+
+union all
+
+select 478, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year 
+
+union all
+
+select 479, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year 
+
+union all
+
+select 480, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year 
+
+union all 
+
+select 481, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year 
+
+union all
+
+select 482, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year 
+
+union all
+
+-- For graph, generate period 2 quarterly totals for everything below
+
+select 477, territory_id, 1, @p_month, @p_year, round( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year 
+
+union all
+
+select 477, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where ( ( `year` = @p_year and `month` = @p_month             ) or 
+        ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
+        ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
+group by territory_id
+
+union all
+
+select 478, territory_id, 1, @p_month, @p_year, round( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year 
+
+union all
+
+select 478, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where ( ( `year` = @p_year and `month` = @p_month             ) or 
+        ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
+        ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
+group by territory_id
+
+union all
+
+select 479, territory_id, 1, @p_month, @p_year, round( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year 
+
+union all
+
+select 479, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where ( ( `year` = @p_year and `month` = @p_month             ) or 
+        ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
+        ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
+group by territory_id
+
+union all
+
+select 480, territory_id, 1, @p_month, @p_year, round( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year 
+
+union all
+
+select 480, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where ( ( `year` = @p_year and `month` = @p_month             ) or 
+        ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
+        ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
+group by territory_id
+
+union all 
+
+select 481, territory_id, 1, @p_month, @p_year, round( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value 
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year 
+
+union all
+
+select 481, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where ( ( `year` = @p_year and `month` = @p_month             ) or 
+        ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
+        ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
+group by territory_id
+
+union all
+
+select 482, territory_id, 1, @p_month, @p_year, round( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month and `year`=@p_year 
+
+union all
+
+select 482, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+from lastmile_report.mart_view_base_ifi 
+where ( ( `year` = @p_year and `month` = @p_month             ) or 
+        ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
+        ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
+group by territory_id
+;
+
+-- end of code from ifi database
+
+
+
+
+
+
+
+/* 
+
  * 465.	Percent of CHAs with ACT 50mg in stock
  * 466.	Percent of CHAs with ACT 25 or 50mg in stock
  * 467.	Percent of CHAs with Amoxicillin 250mg dispersible tablet in stock	
@@ -3559,150 +3721,6 @@ from (
  * Note: For assisted areas (6_32, we are not suppressing values under any conditions.  This is IFI sample data, so
  * the denominator is the number of CHAs sampled during the month.  We could suppress if number of CHAs is too low.
 */
-
-replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 430, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_life_saving_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month and `year`=@p_year and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-
-union all
-
-select 431, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month and `year`=@p_year and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-
-union all
-
-select 465, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month and `year`=@p_year and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-
-union all
-
-select 466, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month and `year`=@p_year and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-
-union all
-
-select 467, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month and `year`=@p_year and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-
-union all 
-
-select 468, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month and `year`=@p_year and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-
-union all
-
-select 469, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month and `year`=@p_year and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-
-union all
-
--- For graph, generate period 2 quarterly totals for everything below
-
-select 431, territory_id, 1, @p_month, @p_year, round( coalesce( number_act_25_67_5_mg_tablet_in_stock,             0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month and `year`=@p_year and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-
-union all
-
-select 431, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where ( ( `year` = @p_year and `month` = @p_month             ) or 
-        ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
-        ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) ) and 
-      not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-group by territory_id
-
-union all
-
-select 465, territory_id, 1, @p_month, @p_year, round( coalesce( number_act_50_135_mg_tablet_in_stock,              0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month and `year`=@p_year and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-
-union all
-
-select 465, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where ( ( `year` = @p_year and `month` = @p_month             ) or 
-        ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
-        ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) ) and 
-      not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-group by territory_id
-
-
-union all
-
-select 466, territory_id, 1, @p_month, @p_year, round( coalesce( number_act_25_or_50_mg_tablet_in_stock,            0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month and `year`=@p_year and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-
-union all
-
-select 466, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where ( ( `year` = @p_year and `month` = @p_month             ) or 
-        ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
-        ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) ) and 
-      not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-group by territory_id
-
-
-union all
-
-select 467, territory_id, 1, @p_month, @p_year, round( coalesce( number_amox_250_mg_dispersible_tablet_in_stock,    0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month and `year`=@p_year and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-
-union all
-
-select 467, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where ( ( `year` = @p_year and `month` = @p_month             ) or 
-        ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
-        ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) ) and 
-      not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-group by territory_id
-
-
-union all 
-
-select 468, territory_id, 1, @p_month, @p_year, round( coalesce( number_ors_20_6_1l_sachet_in_stock,                0 ) / coalesce( numReports, 0 ), 3 ) as value 
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month and `year`=@p_year and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-
-union all
-
-select 468, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where ( ( `year` = @p_year and `month` = @p_month             ) or 
-        ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
-        ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) ) and 
-      not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-group by territory_id
-
-
-union all
-
-select 469, territory_id, 1, @p_month, @p_year, round( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock,  0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month and `year`=@p_year and not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-
-union all
-
-select 469, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
-where ( ( `year` = @p_year and `month` = @p_month             ) or 
-        ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
-        ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) ) and 
-      not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
-group by territory_id
-;
 
 
 -- 465. Percent of CHAs with ACT 50mg in stock
@@ -3956,6 +3974,7 @@ from (
                   left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
       ) as c
 ;
+
 
 
 -- 470. Module 3: Number of active case finds

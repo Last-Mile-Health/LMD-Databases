@@ -50,11 +50,15 @@ create view lastmile_dataportal.view_territories as
               -- concat( trim( q.position_id ), ': ', trim( coalesce( concat( q.first_name, ' ', q.last_name ), 'Unassigned' ) ) ) 
               -- concat( trim( q.position_id ), ': ', trim( coalesce( q.last_name, 'Unassigned' ) ) )
               -- concat( substring_index( trim( q.position_id ), '-', 1 ), ':', trim( coalesce( concat( q.first_name, ' ', q.last_name ), 'Unassigned' ) ) ) 
-              concat( trim( q.position_id ), ': ', trim( coalesce( concat( substring( q.first_name, 1, 1 ), '. ', q.last_name ), 'Unassigned' ) ) ) 
+              -- concat( trim( q.position_id ), ': ', trim( coalesce( concat( substring( q.first_name, 1, 1 ), '. ', q.last_name ), 'Unassigned' ) ) ) 
+          
+              concat( trim( coalesce( concat( substring( q.first_name, 1, 1 ), '. ', q.last_name ), 'Unassigned' ) ), ' (', trim( q.position_id ), ')' )
+           
+          
           ) as territory_name,
           
           'other' AS territory_type
           
-from lastmile_dataportal.tbl_territories_other as t
-    left outer join lastmile_cha.view_position_qao_person as q on trim( t.territory_name ) like trim( q.position_id )
+    from lastmile_dataportal.tbl_territories_other as t
+        left outer join lastmile_cha.view_position_qao_person as q on trim( t.territory_name ) like trim( q.position_id )
 ;

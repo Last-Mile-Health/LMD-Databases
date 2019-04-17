@@ -121,7 +121,7 @@ do
 begin
 
   -- 2018-11-01 is the earliest date for valid ID data
-  call lastmile_dataportal.diagnostic_loader( '2018-11-01', now() );
+  call lastmile_dataportal.diagnostic_loader( '2018-11-01', current_date() );
 
 end $$
 

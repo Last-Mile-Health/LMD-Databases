@@ -149,7 +149,7 @@ from view_position_cha as p
         left outer join       view_history_position_person_first      as rf on pr.person_id               like rf.person_id
 -- For now, all we need is to match the person_id against the training module view.    
 --    left outer join           lastmile_program.view_train_cha_module  as m  on ( p.position_id like m.position_id ) and ( pr.person_id = m.person_id )
-      left outer join           lastmile_program.view_train_cha_module  as m  on pr.person_id = m.person_id
+        left outer join       lastmile_program.view_train_cha_module  as m  on pr.person_id = m.person_id
     
     left outer join           view_position_cha_supervisor            as ps   on p.position_id                  like ps.position_id
         -- left outer join       view_position_chss_person_geo           as po on ps.position_supervisor_id  like po.person_id 

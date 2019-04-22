@@ -11,7 +11,7 @@ select
       count( * )                as number_instance
       
 from lastmile_report.view_diagnostic_device_id_unfiltered as a
-where not ( a.id_value is null or a.id_value like '' or a.id_value like '%999%' or a.id_value like '%ZZZ%'  )
+-- where not ( a.id_value is null or a.id_value like '' or a.id_value like '%999%' or a.id_value like '%ZZZ%'  )
 group by a.id_type, a.meta_device_id, a.id_value
-having count( * ) > 1
+-- having count( * ) > 1
 ;

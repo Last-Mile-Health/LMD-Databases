@@ -18,9 +18,15 @@ select
       r.birth_date,
       r.gender,
       r.phone_number,
-      r.phone_number_alternate
+      r.phone_number_alternate,
+      
+      trim( p.job_id )            as job_id,
+      trim( j.title )             as title,
+      p.health_facility_id
       
 from position_person as pr
-    left outer join person as r on  pr.person_id = r.person_id 
+    left outer join person          as r on pr.person_id            = r.person_id
+        left outer join `position`  as p on trim( pr.position_id )  like trim( p.position_id )
+            left outer join job     as j on trim( p.job_id )        like j.job_id
 where pr.end_date is null -- only return active position_person records
 ;

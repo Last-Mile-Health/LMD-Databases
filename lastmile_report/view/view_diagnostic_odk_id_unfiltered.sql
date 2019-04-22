@@ -32,7 +32,7 @@ select
  
         a.meta_insertDatetime                   as meta_insert_date_time, 
         a.meta_formVersion                      as meta_form_version
-         
+               
 from lastmile_upload.odk_chaRestock as a
 
 union all
@@ -63,7 +63,7 @@ select
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
-        
+         
 from lastmile_upload.odk_chaRestock as a
 
 union all
@@ -94,9 +94,8 @@ select
   
         a.meta_insertDatetime, 
         a.meta_formVersion 
-          
+         
 from lastmile_upload.odk_chaRestock as a
-
 
 union all
 
@@ -127,11 +126,10 @@ select
   
         a.meta_insertDatetime, 
         a.meta_formVersion 
-        
+            
 from lastmile_upload.odk_chaRestock as a
 
 union all
-
 
 -- 7. odk_routineVisit --------------------------------------------------------------------------------------------
 
@@ -161,11 +159,10 @@ select
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
-        
+              
 from lastmile_upload.odk_routineVisit a
 
 union all
-
 
 -- 8. odk_sickChildForm --------------------------------------------------------------------------------------------
 
@@ -195,7 +192,7 @@ select
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
-             
+                
 from lastmile_upload.odk_sickChildForm a
 
 union all
@@ -228,7 +225,7 @@ select
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
-              
+                  
 from lastmile_upload.odk_supervisionVisitLog as a
 
 union all
@@ -259,7 +256,7 @@ select
   
         a.meta_insertDatetime, 
         a.meta_formVersion 
-         
+                 
 from lastmile_upload.odk_supervisionVisitLog as a
 
 union all
@@ -291,7 +288,7 @@ select
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
-            
+                
 from lastmile_upload.odk_vaccineTracker as a
 
 union all
@@ -321,7 +318,7 @@ select
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
-               
+                      
 from lastmile_upload.odk_vaccineTracker as a
 
 union all
@@ -354,7 +351,7 @@ select
  
         a.meta_insertDatetime, 
         a.meta_formVersion 
-        
+         
 from lastmile_upload.odk_QAOSupervisionChecklistForm as a
 
 union all

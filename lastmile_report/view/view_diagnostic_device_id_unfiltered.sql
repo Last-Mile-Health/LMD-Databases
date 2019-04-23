@@ -9,7 +9,7 @@ create view lastmile_report.view_diagnostic_device_id_unfiltered as
 select  
         'chss'                                  as id_type,
         trim( a.chssID )                        as id_value,
-        a.meta_deviceID                         as meta_device_id     
+        trim( a.meta_deviceID )                 as meta_device_id      
 from lastmile_upload.odk_chaRestock as a
 
 union all
@@ -17,7 +17,7 @@ union all
 select  
         'chss'                                  as id_type,
         trim( a.user_id )                       as id_value,
-        a.meta_deviceID                         as meta_device_id  
+        trim( a.meta_deviceID )                 as meta_device_id  
 from lastmile_upload.odk_chaRestock as a
 
 union all

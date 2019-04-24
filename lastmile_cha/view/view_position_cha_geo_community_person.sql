@@ -123,9 +123,13 @@ select
       ps1.position_supervisor_id                                  as qao_position_id,
       ps1.position_supervisor_begin_date                          as qao_position_begin_date,
 
-      poq.health_facility_id_list                                 as qao_health_facility_id_list,
-      poq.health_facility_list                                    as qao_health_facility_list,
-      poq.health_district_list                                    as qao_health_district_list,
+      -- Note: there is a 61 table/view join limit in MySQL.  I commented these out and dropped view_position_qao_geo_list
+      -- from view_position_qao_person_geo to come in under the limit.  Nonetheless, we are right at the limit of 61.
+      -- I may need to fully restructure this view.
+      
+      -- poq.health_facility_id_list                                 as qao_health_facility_id_list,
+      -- poq.health_facility_list                                    as qao_health_facility_list,
+      -- poq.health_district_list                                    as qao_health_district_list,
     
       poq.position_person_begin_date                              as qao_position_person_begin_date,
       poq.hire_date                                               as qao_hire_date,

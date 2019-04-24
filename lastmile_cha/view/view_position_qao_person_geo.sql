@@ -20,15 +20,16 @@ select
       pr.birth_date,
       pr.gender,
       pr.phone_number,
-      pr.phone_number_alternate,
+      pr.phone_number_alternate
 
-      qgl.health_facility_id_list,
-      qgl.health_facility_list,
-      qgl.health_district_list,
-      qgl.county_list
+      -- 61 join limit.  Breaking view_base_position_cha
+      -- qgl.health_facility_id_list,
+      -- qgl.health_facility_list,
+      -- qgl.health_district_list,
+      -- qgl.county_list
       
 from view_position_qao_person as pr
     left outer join   view_history_position_last_date           as d    on pr.position_id like d.position_id
     left outer join   view_history_position_person_first        as rf   on pr.person_id    =   rf.person_id 
-    left outer join   view_position_qao_geo_list                as qgl  on pr.position_id like qgl.position_id
+    -- left outer join   view_position_qao_geo_list                as qgl  on pr.position_id like qgl.position_id
 ;

@@ -89,12 +89,13 @@ select
       qao_birth_date,
       qao_gender,
       qao_phone_number,
-      qao_phone_number_alternate,
+      qao_phone_number_alternate
            
-      qao_health_facility_id_list,
-      qao_health_facility_list,
-      qao_health_district_list
+      -- 61 join limit.  Had to remove
       
-      
+      -- qao_health_facility_id_list,
+      -- qao_health_facility_list,
+      -- qao_health_district_list
+        
 from view_position_cha_geo_community_person
 ;

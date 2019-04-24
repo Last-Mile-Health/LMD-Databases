@@ -28,16 +28,14 @@ select
       c.community_id_list,
       c.community_list,
       
-
       if( pr.position_person_begin_date is null, 'N', 'Y' )                                         as position_filled,
       if( pr.position_person_begin_date is null, d.end_date_last, pr.position_person_begin_date )   as position_filled_last_date,
       
       -- cha person fields
       pr.position_person_begin_date,
-      rf.begin_date                       as hire_date,
+      rf.begin_date                                 as hire_date,
       pr.person_id,
-      pr.first_name,
-      pr.last_name,
+      concat( pr.first_name, ' ', pr.last_name )    as cha,
       pr.birth_date,
       pr.gender,
       pr.phone_number,
@@ -49,21 +47,18 @@ select
          
       ps.position_supervision_begin_date  as chss_position_supervision_begin_date,  
      
-      pr1.position_id                     as chss_position_id,
-      pr1.position_begin_date             as chss_position_begin_date,
-      pr1.health_facility_id              as chss_health_facility_id,
-      pr1.health_facility                 as chss_health_facility,
-      
-      pr1.position_person_begin_date      as chss_position_person_begin_date,
-      pr1.person_id                       as chss_person_id,
-      pr1.person_id_lmh                   as chss_person_id_lmh,
-      
-      pr1.first_name                      as chss_first_name,
-      pr1.last_name                       as chss_last_name,
-      pr1.birth_date                      as chss_birth_date,
-      pr1.gender                          as chss_gender,
-      pr1.phone_number                    as chss_phone_number,
-      pr1.phone_number_alternate          as chss_phone_number_alternate,
+      pr1.position_id                               as chss_position_id,
+      pr1.position_begin_date                       as chss_position_begin_date,
+      pr1.health_facility_id                        as chss_health_facility_id,
+      pr1.health_facility                           as chss_health_facility,
+      pr1.position_person_begin_date                as chss_position_person_begin_date,
+      pr1.person_id                                 as chss_person_id,
+      pr1.person_id_lmh                             as chss_person_id_lmh,
+      concat( pr1.first_name, ' ', pr1.last_name )  as chss,
+      pr1.birth_date                                as chss_birth_date,
+      pr1.gender                                    as chss_gender,
+      pr1.phone_number                              as chss_phone_number,
+      pr1.phone_number_alternate                    as chss_phone_number_alternate,
       
       -- ---------------------------------------------------------------------------------------------------
       -- Beginning of QAO info
@@ -71,16 +66,16 @@ select
          
       ps1.position_supervision_begin_date as qao_position_supervision_begin_date,  
       
-      poq.position_person_begin_date      as qao_position_person_begin_date,
-      poq.hire_date                       as qao_hire_date,
-      poq.person_id                       as qao_person_id,
-      poq.person_id_lmh                   as qao_person_id_lmh,
-      poq.first_name                      as qao_first_name,
-      poq.last_name                       as qao_last_name,
-      poq.birth_date                      as qao_birth_date,
-      poq.gender                          as qao_gender,
-      poq.phone_number                    as qao_phone_number,
-      poq.phone_number_alternate          as qao_phone_number_alternate
+      poq.position_id                               as qao_position_id,
+      poq.position_person_begin_date                as qao_position_person_begin_date,
+      poq.hire_date                                 as qao_hire_date,
+      poq.person_id                                 as qao_person_id,
+      poq.person_id_lmh                             as qao_person_id_lmh,     
+      concat( poq.first_name, ' ', poq.last_name )  as qao,      
+      poq.birth_date                                as qao_birth_date,
+      poq.gender                                    as qao_gender,
+      poq.phone_number                              as qao_phone_number,
+      poq.phone_number_alternate                    as qao_phone_number_alternate
        
 from view_position_cha as p
 

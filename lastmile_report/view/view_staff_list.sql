@@ -18,6 +18,6 @@ select
       community_list,
       community_id_list
       
-from lastmile_cha.view_base_position_cha
+from lastmile_cha.view_base_position_cha_basic_info
 order by county, health_district, health_facility, chss, cha, community_list
 ;

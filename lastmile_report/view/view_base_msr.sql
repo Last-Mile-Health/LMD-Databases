@@ -82,5 +82,5 @@ select
         LEFT JOIN `lastmile_report`.`data_mart_snapshot_position_cha` `d` ON (((`a`.`cha_id` = `d`.`position_id`)
             AND (CAST(CONCAT(`a`.`year_reported`, '-', `a`.`month_reported`, '-01')
             AS DATE) = `d`.`snapshot_date`))))
-        LEFT JOIN `lastmile_cha`.`view_base_cha` `e` ON ((`a`.`cha_id` = `e`.`position_id`)))
+        LEFT JOIN `lastmile_cha`.`view_base_cha_basic_info` `e` ON ((`a`.`cha_id` = `e`.`position_id`)))
 ;

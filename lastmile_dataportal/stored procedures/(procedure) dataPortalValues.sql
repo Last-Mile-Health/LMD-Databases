@@ -180,7 +180,7 @@ SET a.num_cha = b.num_cha;
 -- Total hack hack for Grand Bassa.  Until we get the position_community data in for GB, the num_cha will be null.
 -- Could be argued that this is a flaw in the coding of the snapshot code.
 update lastmile_report.mart_program_scale 
-set num_cha =  ( select count( * ) as num_cha from lastmile_cha.view_base_position_cha where county like '%Grand%Bassa%' and position_filled like 'Y' )
+set num_cha =  ( select count( * ) as num_cha from lastmile_cha.view_base_position_cha_basic_info where county like '%Grand%Bassa%' and position_filled like 'Y' )
 where territory_id like '1\\_4';
 
 

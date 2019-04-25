@@ -320,7 +320,7 @@ where s.territory_id like '1\\_%'
 union all
 
 select concat('2_',health_district_id), 1 as period_id, 28, count( * ) 
-from lastmile_cha.view_base_cha 
+from lastmile_cha.view_base_cha_basic_info 
 group by health_district_id
 ;
 

@@ -4,5 +4,5 @@ drop view if exists view_geo_community_primary;
  
 create view view_geo_community_primary as 
 select substring_index( community_id_list, ',', 1 ) as community_id_primary 
-from view_base_cha 
+from view_base_cha_basic_info 
 group by community_id_primary;

@@ -27,7 +27,7 @@ select
       position_filled,
       position_filled_last_date
       
-from view_base_position_cha
+from view_base_position_cha_basic_info
 
 union all
 

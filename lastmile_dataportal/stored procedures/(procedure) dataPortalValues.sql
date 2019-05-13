@@ -2587,7 +2587,7 @@ select 407, '6_16', 1, @p_month, @p_year, sum( a.number_muac ) as total_number_m
 ) as a
 ;
 
--- 6_32 LMH Assisted areas
+-- 6_32 LMH Not Managed areas
 
 replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
 select 407, '6_32', 1, @p_month, @p_year, sum( a.number_muac ) as total_number_muac from (
@@ -3271,7 +3271,6 @@ where ind_id in ( 28, 29 ) and period_id = 1 and `month` = @p_month and `year` =
 
 
 -- 426. Treatments Delivered and Malnutrition Screens for children under age 5
-
 replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
 select 426, '6_27', 1, @p_month, @p_year, sum( coalesce( value, 0 ) ) as number_treat
 from lastmile_dataportal.tbl_values 
@@ -3283,7 +3282,36 @@ where (
       ) and
      `year` = @p_year and `month` = @p_month and period_id = 1
  ;
+ 
+ 
+-- 428. TARGET: Treatments Delivered and Malnutrition Screens for children under age 5 ( ind_id = 426, territory_id = 6_27 )
+ case
+ 
+       -- fy 2018 and earlier
+      when @p_year <  2018                                then set @target_fy_426_6_27 = null;
+      when @p_year =  2018 and @p_month between 1 and 6   then set @target_fy_426_6_27 = null;
+      
+      -- fy 2019
+      when @p_year =  2018 and @p_month between 7 and 12  then set @target_fy_426_6_27 = 350241;
+      when @p_year =  2019 and @p_month between 1 and 6   then set @target_fy_426_6_27 = 350241;
+      
+      -- fy 2020
+      when @p_year =  2019 and @p_month between 7 and 12  then set @target_fy_426_6_27 = 350241;
+      when @p_year =  2020 and @p_month between 1 and 6   then set @target_fy_426_6_27 = 350241;
+      
+      else 
+           set @target_fy_426_6_27 = 350241;     
+        
+ end case;
+    
+if not ( @target_fy_426_6_27 is null ) then
 
+  replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`,value )
+  select 428, '6_27', 1 as period_id, @p_month, @p_year, @target_fy_426_6_27 as target;
+
+end if;
+
+ 
 -- 429. Total Number of Visits (routine, pregnant woman, HIV, TB)
 replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
 select 429, '6_27', 1, @p_month, @p_year, sum( coalesce( value, 0 ) ) as number_visits

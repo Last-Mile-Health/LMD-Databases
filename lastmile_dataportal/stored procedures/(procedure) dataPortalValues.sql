@@ -1976,8 +1976,9 @@ FROM lastmile_report.mart_view_base_msr_county
 WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
 -- 356.	NCHA Outputs: Number of women currently using a modern method of family planning
--- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
--- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+-- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators 
+-- (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) and uploading them into
+-- the dhis2 ncahap upload table.
 
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 select 356, '6_27', 1, @p_month, @p_year,  sum( coalesce( value, 0 ) ) 
@@ -1991,6 +1992,38 @@ from lastmile_dataportal.tbl_values
 where ind_id = 356 and `month` = @p_month and `year` = @p_year and period_id = 1 and 
       ( territory_id like '1\\_%' and not ( territory_id like '1\\_6' or territory_id like '1\\_14'  or territory_id like '1\\_4' ) ) 
 ;
+
+-- 391. TARGET: 356. Number of women currently using a modern method of family planning
+ case
+       -- fy 2017 and earlier
+      when @p_year <  2017                                then set @target_fy_356_6_27 = null;
+      when @p_year =  2017 and @p_month between 1 and 6   then set @target_fy_356_6_27 = null;
+      
+      -- fy 2018
+      -- Data doesnt' begin until 1/2018, so set first half of fy to null to make graph look better.
+      when @p_year =  2017 and @p_month between 7 and 12  then set @target_fy_356_6_27 = null;
+      when @p_year =  2018 and @p_month between 1 and 6   then set @target_fy_356_6_27 = 20530;
+      
+      -- fy 2019
+      when @p_year =  2018 and @p_month between 7 and 12  then set @target_fy_356_6_27 = 41060;
+      when @p_year =  2019 and @p_month between 1 and 6   then set @target_fy_356_6_27 = 41060;
+      
+      -- fy 2020
+      when @p_year =  2019 and @p_month between 7 and 12  then set @target_fy_356_6_27 = 41060;
+      when @p_year =  2020 and @p_month between 1 and 6   then set @target_fy_356_6_27 = 41060;
+      
+      else 
+           set @target_fy_356_6_27 = 41060;     
+        
+ end case;
+    
+if not ( @target_fy_356_6_27 is null ) then
+
+  replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`,value )
+  select 391, '6_27', 1 as period_id, @p_month, @p_year, @target_fy_356_6_27 as target;
+
+end if;
+
 
 -- 357. Number of HIV client visits
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -2420,6 +2453,37 @@ set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        399,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
+-- 425. TARGET: 399. Cumulative number of routine visits conducted in Liberia
+ case
+       -- fy 2017 and earlier
+      when @p_year <  2017                                then set @target_fy_399_6_27 = null;
+      when @p_year =  2017 and @p_month between 1 and 6   then set @target_fy_399_6_27 = null;
+      
+      -- fy 2018
+      -- Data doesnt' begin until 1/2018, so set first half of fy to null to make graph look better.
+      when @p_year =  2017 and @p_month between 7 and 12  then set @target_fy_399_6_27 = 367967;
+      when @p_year =  2018 and @p_month between 1 and 6   then set @target_fy_399_6_27 = 367967;
+      
+      -- fy 2019
+      when @p_year =  2018 and @p_month between 7 and 12  then set @target_fy_399_6_27 = 735934;
+      when @p_year =  2019 and @p_month between 1 and 6   then set @target_fy_399_6_27 = 735934;
+      
+      -- fy 2020
+      when @p_year =  2019 and @p_month between 7 and 12  then set @target_fy_399_6_27 = 735934;
+      when @p_year =  2020 and @p_month between 1 and 6   then set @target_fy_399_6_27 = 735934;
+      
+      else 
+           set @target_fy_399_6_27 = 735934;     
+        
+ end case;
+    
+if not ( @target_fy_399_6_27 is null ) then
+
+  replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`,value )
+  select 425, '6_27', 1 as period_id, @p_month, @p_year, @target_fy_399_6_27 as target;
+
+end if;
+
 
 -- 400. Cumulative number of monthly service reports (MSRs) collected in Liberia
 --      This indicator is the cumulative calculation of indicator 381, which is inputted monthly.  If indicator 381 
@@ -2517,8 +2581,7 @@ WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
 --      This indicator is the cumulative calculation of indicator 349, which is inputted monthly.  
 --      If indicator 349 is not updated before the 15th of the month then the stored procedure 
 --      needs to be rerun.
-
-                                     
+                                  
 set @old_value =                ( select coalesce( min( value ), 0 )
                                   from lastmile_dataportal.tbl_values
                                   where ( `ind_id`      = 405             ) and 
@@ -2540,12 +2603,44 @@ set @new_value = @old_value +   ( select coalesce( min( value ), 0 )
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        405,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
+
+-- 424. TARGET: 405. Cumulative number of pregnant woman visits tracked in Liberia ( territory_id = 6_27 )
+ case
+ 
+       -- fy 2017 and earlier
+      when @p_year <  2017                                then set @target_fy_405_6_27 = null;
+      when @p_year =  2017 and @p_month between 1 and 6   then set @target_fy_405_6_27 = null;
+      
+      -- fy 2018
+      when @p_year =  2017 and @p_month between 7 and 12  then set @target_fy_405_6_27 = 52979;
+      when @p_year =  2018 and @p_month between 1 and 6   then set @target_fy_405_6_27 = 52979;
+      
+      -- fy 2019
+      when @p_year =  2018 and @p_month between 7 and 12  then set @target_fy_405_6_27 = 105959;
+      when @p_year =  2019 and @p_month between 1 and 6   then set @target_fy_405_6_27 = 105959;
+      
+      -- fy 2020
+      when @p_year =  2019 and @p_month between 7 and 12  then set @target_fy_405_6_27 = 105959;
+      when @p_year =  2020 and @p_month between 1 and 6   then set @target_fy_405_6_27 = 105959;
+      
+      else 
+           set @target_fy_405_6_27 = 105959;     
+           
+ end case;
+    
+if not ( @target_fy_405_6_27 is null ) then
+
+  replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`,value )
+  select 424, '6_27', 1 as period_id, @p_month, @p_year, @target_fy_405_6_27 as target;
+
+end if;
+
+
 -- 407. Cumulative number of number of children screened for malnutrition (MUAC) tracked in Liberia
 --      This indicator is the cumulative calculation of indicator 235, which is inputted monthly.  
 --      If indicator 235 is not updated before the 15th of the month then the stored procedure 
 --      needs to be rerun.
-
-                                     
+                       
 set @old_value =                ( select coalesce( min( value ), 0 )
                                   from lastmile_dataportal.tbl_values
                                   where ( `ind_id`      = 407             ) and 
@@ -2796,6 +2891,42 @@ from lastmile_dataportal.tbl_values
 where ind_id = 45 and period_id = 1 and `month` = @p_month and `year` = @p_year and
       ( territory_id like '6\\_16' or territory_id like '6\\_27' or territory_id like '6\\_32' )
 ;
+
+
+-- 414. TARGET: 412. Number of women with access to family planning services Definition: 
+-- Total population served of reproductive age (i.e. population served * 24%)
+
+ case
+ 
+       -- fy 2017 and earlier
+      when @p_year <  2017                                then set @target_fy_412_6_27 = null;
+      when @p_year =  2017 and @p_month between 1 and 6   then set @target_fy_412_6_27 = null;
+      
+      -- fy 2018
+      -- Target doesnt' begin until 1/2018, so set first half of fy to null to make graph look better.
+      when @p_year =  2017 and @p_month between 7 and 12  then set @target_fy_412_6_27 = null;
+      when @p_year =  2018 and @p_month between 1 and 6   then set @target_fy_412_6_27 = 167970;
+      
+      -- fy 2019
+      when @p_year =  2018 and @p_month between 7 and 12  then set @target_fy_412_6_27 = 335940;
+      when @p_year =  2019 and @p_month between 1 and 6   then set @target_fy_412_6_27 = 335940;
+      
+      -- fy 2020
+      when @p_year =  2019 and @p_month between 7 and 12  then set @target_fy_412_6_27 = 335940;
+      when @p_year =  2020 and @p_month between 1 and 6   then set @target_fy_412_6_27 = 335940;
+      
+      else 
+           set @target_fy_412_6_27 = 335940;     
+        
+ end case;
+    
+if not ( @target_fy_412_6_27 is null ) then
+
+  replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`,value )
+  select 414, '6_27', 1 as period_id, @p_month, @p_year, @target_fy_412_6_27 as target;
+
+end if;
+
 
 
 /* 415. Number of referrals for HIV / TB / CM-NTD / mental health per 1,000 population.

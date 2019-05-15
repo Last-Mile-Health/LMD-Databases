@@ -5,12 +5,14 @@ drop view if exists lastmile_report.view_diagnostic_device_id;
 create view lastmile_report.view_diagnostic_device_id as
 
 select
-      a.id_type                                     as `ID type`,
+      
       a.meta_device_id                              as `Device ID`,
       a.id_value                                    as `ID`,
+      a.id_type                                     as `ID form type`,
       a.number_instance                             as `#instances`,
       if( pr.position_id is null, 'N', 'Y' )        as `ID valid`,
       date_format( a.last_instance, '%Y-%m-%d' )    as `Last instance`,
+      date_format( a.first_instance, '%Y-%m-%d' )   as `First instance`,
       
       concat( pr.first_name, ' ', pr.last_name )    as `Person`,
       pr.phone_number                               as `Phone`,

@@ -29,8 +29,9 @@ select
 
   case
   
-      when cast( community_id as unsigned ) between 3000 and 3299 THEN 'ZZZZ' -- Molons
-      when cast( community_id as unsigned ) between 3300 and 3399 THEN '88Y2' -- Senyah
+      -- when cast( community_id as unsigned ) between 3000 and 3299 THEN 'ZZZZ' -- Molons
+      -- when cast( community_id as unsigned ) between 3300 and 3399 THEN '88Y2' -- Senyah
+      when cast( community_id as unsigned ) between 3000 and 3399 THEN '88Y2' -- Senyah
       
       when cast( community_id as unsigned ) between 3500 and 3539 THEN 'QU46' -- Desoe
       when cast( community_id as unsigned ) between 3540 and 3599 THEN 'ZKV3' -- 

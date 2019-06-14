@@ -14,7 +14,10 @@ select
         `a`.`meta_de_time_start` AS `meta_de_time_start`,
         `a`.`meta_de_time_end` AS `meta_de_time_end`,
         `a`.`meta_data_source` AS `meta_data_source`,
-        `a`.`month_reported` AS `month_reported`,
+        
+        cast( cast( trim( a.month_reported ) as unsigned ) as char(2) ) as month_reported,
+        trim( a.month_reported ) AS month_reported_orig,
+        
         `a`.`year_reported` AS `year_reported`,
         `a`.`cha_name` AS `cha_name`,
         `a`.`cha_id` AS `cha_id`,

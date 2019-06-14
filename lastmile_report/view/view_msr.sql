@@ -8,8 +8,9 @@ select
       ( ( trim( u.year_reported ) * 10000 ) + ( trim( u.month_reported ) * 100 ) + 1 )    as date_key,
       trim( cha_id )                                                                      as cha_id, 
       
-      trim( u.month_reported  ) as month_reported, 
-      trim( u.year_reported   ) as year_reported, 
+      trim( u.month_reported  )                                       as month_reported_orig,
+      cast( cast( trim( u.month_reported ) as unsigned ) as char(2) ) as month_reported,
+      trim( u.year_reported   )                                       as year_reported, 
       
       u.cha_name, 
       u.cha_module, 

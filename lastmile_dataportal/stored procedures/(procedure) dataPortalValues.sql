@@ -499,7 +499,8 @@ create table lastmile_report.mart_program_scale_qao (
   qao                           varchar(50 )      null, 
   
   num_cha                       int               null, 
-  num_chss                      int               null, 
+  num_chss                      int               null,
+  num_position_chss             int               null,
   num_communities               int               null, 
   num_households                int               null,  
   num_people                    int               null, 
@@ -546,6 +547,24 @@ update lastmile_report.mart_program_scale_qao q
     ) as s on q.qao_position_id like s.qao_position_id
     
   set q.num_chss = s.number_chss
+;
+
+
+-- Calculate the number of CHSS positions each QAO is supervising.
+update lastmile_report.mart_program_scale_qao q
+    left outer join (
+                      select a.qao_position_id, count( * ) as number_position_chss
+                      from ( 
+                            select dp.qao_position_id, dp.chss_position_id
+                            from lastmile_datamart.dimension_position dp
+                            where date_key = @p_date_key and not ( dp.qao_position_id is null )
+                            group by dp.qao_position_id, dp.chss_position_id
+                       ) as a
+                      group by a.qao_position_id 
+
+    ) as s on q.qao_position_id like s.qao_position_id
+    
+  set q.num_position_chss = s.number_position_chss
 ;
 
 

@@ -1666,7 +1666,7 @@ select
       1 as period_id, 
       @p_month, 
       @p_year, 
-      round( count( * ) / min( s.num_chss ), 3 ) as rate
+      round( count( * ) / min( s.num_position_chss ), 3 ) as rate
 
 from lastmile_report.view_chss_msr_qao as q
     left outer join lastmile_datamart.view_dimension_position_chss as v on q.date_key = v.date_key and q.chss_position_id like v.chss_position_id

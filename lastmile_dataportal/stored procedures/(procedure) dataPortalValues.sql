@@ -151,10 +151,76 @@ INSERT INTO lastmile_report.mart_program_scale (territory_id) VALUES ('6_31'), (
 
 
 -- 28. Number of CHAs deployed
--- !!!!! the "cohort IS NULL" clause needs to be changed once cohorts are assigned !!!!!
+-- Pull the number of active CHA positions from snapshot data mart.  
+-- First, GG Unicef
+update lastmile_report.mart_program_scale a, lastmile_report.view_snapshot_position_cha as v
+
+    set a.num_cha = v.cha_count
+
+where a.territory_id like '6\\_26' and v.snapshot_date like @p_date and v.cohort like '%Grand%Gedeh%UNICEF%'
+;
+
+-- Grand Gedeh LMH
+update lastmile_report.mart_program_scale a, lastmile_report.view_snapshot_position_cha as v
+  
+    set a.num_cha = v.cha_count
+    
+where a.territory_id like '6\\_31' and v.snapshot_date like @p_date and v.cohort like '%Grand%Gedeh%LMH%'
+;
+
+-- Rivercess
+update lastmile_report.mart_program_scale a, lastmile_report.view_snapshot_position_cha as v
+  
+    set a.num_cha = v.cha_count
+    
+where a.territory_id like '1\\_14' and v.snapshot_date like @p_date and v.cohort like '%River%cess%'
+;
+-- Grand Bassa
+update lastmile_report.mart_program_scale a, lastmile_report.view_snapshot_position_cha as v
+  
+    set a.num_cha = v.cha_count
+    
+where a.territory_id like '1\\_4' and v.snapshot_date like @p_date and v.cohort like '%Grand%Bassa%'
+;
+
+-- Grand Gedeh (LMH + UNICEF)
+update lastmile_report.mart_program_scale a
+  
+  set a.num_cha = ( select sum( cha_count ) from lastmile_report.view_snapshot_position_cha
+                    where snapshot_date like @p_date and ( cohort like '%Grand%Gedeh%UNICEF%' or cohort like '%Grand%Gedeh%LMH%' )
+                  )
+    
+where a.territory_id like '1\\_6'
+;
+
+
+-- Managed areas total
+update lastmile_report.mart_program_scale a
+  
+  set a.num_cha = ( select sum( cha_count ) from lastmile_report.view_snapshot_position_cha
+                    where snapshot_date like @p_date and (  cohort like '%Grand%Gedeh%UNICEF%'  or 
+                                                            cohort like '%Grand%Gedeh%LMH%'     or
+                                                            cohort like '%River%cess%'          or
+                                                            cohort like '%Grand%Bassa%'
+                                                          )
+                  )
+    
+where a.territory_id like '6\\_16'
+;
+
+
+/* For now, obsolete this code.  It looks at view_base_history_person and checks if there is a 
+ * person assigned to a cha position at a point of time.
+ * We count number of CHAs as the number of active positions and not person filling those positions.
+ * Keep this code lying around in case we revert back to number of actives persons.  However in that case
+ * we should have migrated the code over to lastmile_datamart.dimension_position.  So both counts are
+ * availabe by querying the data mart.
+*/
+/*
 UPDATE lastmile_report.mart_program_scale a 
 
     LEFT JOIN (
+
                 SELECT 
                         IF(cohort IS NULL,'6_31',IF(cohort='UNICEF','6_26','error')) AS territory_id, 
                         COUNT(1) as num_cha 
@@ -174,9 +240,12 @@ UPDATE lastmile_report.mart_program_scale a
                 SELECT '6_16', COUNT(1) 
                 FROM lastmile_report.mart_view_base_history_person
                 WHERE job='CHA' AND position_person_begin_date <= @p_date AND (position_person_end_date IS NULL OR position_person_end_date > @p_date)
+
               ) b ON a.territory_id = b.territory_id 
 
 SET a.num_cha = b.num_cha;
+
+*/
 
 -- 29. Number of CHSSs deployed
 -- !!!!! the "cohort IS NULL" clause needs to be changed once cohorts are assigned !!!!!

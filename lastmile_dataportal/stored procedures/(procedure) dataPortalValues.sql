@@ -915,8 +915,17 @@ from (
       from lastmile_dataportal.tbl_values 
       where ind_id = 28 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_32' 
   ) as a;
-
-
+  
+  
+-- 28. # of frontline and community health workers supported in all Anchor Country Programs annually
+--      Here we will add 6_27 (Liberia) plus however we eventually bring in Malawi and other anchor countries.
+--      But for now just copy 28, 6_27 value for year, month, period_id to 28, 6_36 Global (LMH)
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 28, '6_35', 1 as period_id, @p_month, @p_year, value
+from lastmile_dataportal.tbl_values 
+where ind_id = 28 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_27' 
+;
+  
 -- 29. Number of CHSSs deployed
 
 -- Update the number of active CHSSs deployed in LMH Assisted areas, so exclude Grand Bassa, Grand Gedeh, Rivercess

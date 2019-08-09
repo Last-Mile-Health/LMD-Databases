@@ -19,7 +19,7 @@ if  p_day           is null or
     trim( p_year )  like ''
 then
 
-    set return_day = 0;
+    set return_day = 1;
     
 elseif  ( cast( trim( p_day  ) as unsigned ) between 1 and 31 )  and 
         ( cast( trim( p_year ) as unsigned ) >= 0 )

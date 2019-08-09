@@ -24,7 +24,9 @@ select
       sum( coalesce( act_25_or_50_mg_tablet_in_stock, 0 ) )               as number_act_25_or_50_mg_tablet_in_stock,
       sum( coalesce( amox_250_mg_dispersible_tablet_in_stock, 0 ) )       as number_amox_250_mg_dispersible_tablet_in_stock,
       sum( coalesce( ors_20_6_1l_sachet_in_stock, 0 ) )                   as number_ors_20_6_1l_sachet_in_stock,
-      sum( coalesce( zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) )     as number_zinc_sulfate_20_mg_scored_tablet_in_stock
+      sum( coalesce( zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) )     as number_zinc_sulfate_20_mg_scored_tablet_in_stock,
+      
+      sum( coalesce( service_delivery_question_correct_1_4, 0 ) )         as number_service_delivery_question_correct_1_4
    
 from lastmile_report.view_ifi_calculations
 group by county , `month`, `year`

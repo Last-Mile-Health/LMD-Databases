@@ -576,7 +576,7 @@ create table lastmile_report.mart_program_scale_qao (
 insert into lastmile_report.mart_program_scale_qao ( qao_position_id, qao )
 select dp.qao_position_id, dp.qao_full_name
 from lastmile_datamart.dimension_position as dp
-where date_key = @p_date_key and not ( dp.qao_position_id is null )
+where date_key = @p_date_key and not ( dp.qao_position_id is null ) and ( dp.cohort is null or not ( dp.cohort like '%UNICEF%' ) )
 group by dp.qao_position_id, dp.qao_full_name
 ;
 
@@ -585,7 +585,7 @@ update lastmile_report.mart_program_scale_qao q
     left outer join (
                       select dp.qao_position_id, sum( if( dp.person_id is null, 0, 1 ) ) as number_cha
                       from lastmile_datamart.dimension_position dp
-                      where date_key = @p_date_key and not ( dp.qao_position_id is null )            
+                      where date_key = @p_date_key and not ( dp.qao_position_id is null ) and ( dp.cohort is null or not ( dp.cohort like '%UNICEF%' ) )            
                       group by dp.qao_position_id
                     
     ) as s on q.qao_position_id like s.qao_position_id
@@ -601,7 +601,7 @@ update lastmile_report.mart_program_scale_qao q
                       from ( 
                             select dp.qao_position_id, dp.chss_position_id, dp.chss_person_id
                             from lastmile_datamart.dimension_position dp
-                            where date_key = @p_date_key and not ( dp.qao_position_id is null )
+                            where date_key = @p_date_key and not ( dp.qao_position_id is null ) and ( dp.cohort is null or not ( dp.cohort like '%UNICEF%' ) )
                             group by dp.qao_position_id, dp.chss_position_id
                       ) as a
                       group by a.qao_position_id 
@@ -619,7 +619,7 @@ update lastmile_report.mart_program_scale_qao q
                       from ( 
                             select dp.qao_position_id, dp.chss_position_id
                             from lastmile_datamart.dimension_position dp
-                            where date_key = @p_date_key and not ( dp.qao_position_id is null )
+                            where date_key = @p_date_key and not ( dp.qao_position_id is null ) and ( dp.cohort is null or not ( dp.cohort like '%UNICEF%' ) )
                             group by dp.qao_position_id, dp.chss_position_id
                        ) as a
                       group by a.qao_position_id 
@@ -636,7 +636,7 @@ update lastmile_report.mart_program_scale_qao q
                       select dp.qao_position_id, sum( coalesce( s.position_community_count, 0 ) ) as number_community
                       from lastmile_datamart.dimension_position dp
                           left outer join lastmile_report.data_mart_snapshot_position_cha as s on dp.date_key = s.date_key and dp.position_id like s.position_id
-                      where  dp.date_key = @p_date_key and not ( dp.qao_position_id is null )            
+                      where  dp.date_key = @p_date_key and not ( dp.qao_position_id is null ) and ( dp.cohort is null or not ( dp.cohort like '%UNICEF%' ) )        
                       group by dp.qao_position_id
 
     ) as s on q.qao_position_id like s.qao_position_id
@@ -650,7 +650,7 @@ update lastmile_report.mart_program_scale_qao q
                       select dp.qao_position_id, sum( coalesce( s.household, 0 ) ) as number_household
                       from lastmile_datamart.dimension_position dp
                           left outer join lastmile_report.data_mart_snapshot_position_cha as s on dp.date_key = s.date_key and dp.position_id like s.position_id
-                      where  dp.date_key = @p_date_key and not ( dp.qao_position_id is null )            
+                      where  dp.date_key = @p_date_key and not ( dp.qao_position_id is null ) and ( dp.cohort is null or not ( dp.cohort like '%UNICEF%' ) )           
                       group by dp.qao_position_id
 
     ) as s on q.qao_position_id like s.qao_position_id
@@ -664,7 +664,7 @@ update lastmile_report.mart_program_scale_qao q
                       select dp.qao_position_id, sum( coalesce( s.population, 0 ) ) as population
                       from lastmile_datamart.dimension_position dp
                           left outer join lastmile_report.data_mart_snapshot_position_cha as s on dp.date_key = s.date_key and dp.position_id like s.position_id
-                      where  dp.date_key = @p_date_key and not ( dp.qao_position_id is null )            
+                      where  dp.date_key = @p_date_key and not ( dp.qao_position_id is null ) and ( dp.cohort is null or not ( dp.cohort like '%UNICEF%' ) )       
                       group by dp.qao_position_id
 
     ) as s on q.qao_position_id like s.qao_position_id

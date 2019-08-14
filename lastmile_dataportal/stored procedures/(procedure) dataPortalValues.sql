@@ -1845,7 +1845,7 @@ if @p_year >= 2019 then
   select 322, '1_4',  1, @p_month, @p_year, 26418 union all
   select 322, '1_6',  1, @p_month, @p_year, 50000 union all
   select 322, '1_14', 1, @p_month, @p_year, 25246 union all
-  select 322, '6_16', 1, @p_month, @p_year, 75246 
+  select 322, '6_16', 1, @p_month, @p_year, 101664 
 ;
 end if;
 
@@ -3832,43 +3832,43 @@ from (
 
 -- Beginning of code for ifi database
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 476, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_life_saving_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
+select 476, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_life_saving_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
 from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
-select 477, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
+select 477, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
 from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
-select 478, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+select 478, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
 from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
-select 479, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+select 479, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
 from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
-select 480, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+select 480, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
 from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all 
 
-select 481, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+select 481, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
 from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
-select 482, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
+select 482, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
 from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 

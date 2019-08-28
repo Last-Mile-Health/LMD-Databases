@@ -738,7 +738,7 @@ FROM lastmile_report.mart_view_base_odk_supervision WHERE manualMonth=@p_month A
 
 
 -- 14. Estimated facility-based delivery rate
--- Updated quarterly
+-- Module 2 is updated quarterly
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select  14, territory_id, 1, @p_month, @p_year, 
@@ -777,6 +777,64 @@ where not ( county_id is null ) and
         ) 
       )
 ;
+
+/*
+ * Executive impact ind_id=14 6_27 for Liberia is reported annually.
+ * For annual indicators calculate them at end of FY, June, but store them in the first month of FY, July.
+ * So first month of fiscal year is current month June plus one, and the fiscal year is current year minus one.
+ * Note: home and facility births (459, 460) for all counties are loaded into tbl_values from the dhis2
+ * upload at beginning of this script.
+ *
+ * Only update the annual indicators on June.
+ *
+*/
+
+if @p_month = 6 then
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 14, '6_27' as territory_id, 1 as period_id, @p_month + 1 as `month`, @p_year - 1 as `year`,
+        
+        round(  ( sum( coalesce( num_births_facility,0 ) ) ) /
+                ( sum( coalesce( num_births_facility, 0 ) ) + sum( coalesce( num_births_home, 0 ) ) ), 3 ) as value
+
+from (
+      -- Only use whole county values for GG and GB
+      select 0 as ind_id, territory_id, month_reported, year_reported, num_births_facility, num_births_home
+      from lastmile_report.mart_view_base_msr_county 
+      where 
+            not ( county_id is null )                                   and
+            ( territory_id like '1\\_4' or territory_id like '1\\_14' ) and
+            ( 
+              ( month_reported in ( 7, 8, 9, 10, 11, 12 ) and ( year_reported = ( @p_year - 1 ) ) ) or
+              ( month_reported in ( 1, 2, 3, 4, 5, 6    ) and ( year_reported =   @p_year       ) ) 
+            )
+
+      union all
+
+      select ind_id, territory_id, `month`, `year`, null as num_births_facility, if( ind_id = 459, value, null ) as num_births_home
+      from lastmile_dataportal.tbl_values
+      where 
+            ind_id = 459                                                        and
+            not ( ( territory_id like '1\\_4' or territory_id like '1\\_14' ) ) and
+            ( 
+              ( `month` in ( 7, 8, 9, 10, 11, 12 ) and ( `year` = ( @p_year - 1 ) ) ) or
+              ( `month` in ( 1, 2, 3, 4, 5, 6    ) and ( `year` =   @p_year       ) ) 
+            )
+
+      union all
+
+      select ind_id, territory_id, `month`, `year`, if( ind_id = 460, value, null ) as num_births_facility, null as num_births_home
+      from lastmile_dataportal.tbl_values
+      where 
+            ind_id = 460                                                        and
+            not ( ( territory_id like '1\\_4' or territory_id like '1\\_14' ) ) and
+            ( 
+              ( `month` in ( 7, 8, 9, 10, 11, 12 ) and ( `year` = ( @p_year - 1 ) ) ) or
+              ( `month` in ( 1, 2, 3, 4, 5, 6    ) and ( `year` =   @p_year       ) ) 
+            )
+) as a;
+
+end if;
 
 -- 17. Number of attempted supervision visits
 -- Currently based off of ODK data

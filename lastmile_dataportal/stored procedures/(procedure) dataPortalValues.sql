@@ -3576,7 +3576,35 @@ where (
      `year` = @p_year and `month` = @p_month and period_id = 1
  ;
  
- 
+ -- 426, 6_35 Global (Liberia) LMH Not Managed areas
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 426, '6_35', 1, @p_month, @p_year, sum( a.number_treatment ) as value from (
+
+    --  Cummulative muac screens for previous month. 
+    select coalesce( value, 0 ) as number_treatment 
+    from lastmile_dataportal.tbl_values 
+    where 
+          ind_id = 426                and 
+          territory_id like '6\\_35'  and 
+          `year` = @p_yearMinus1      and 
+          `month` = @p_monthMinus1    and 
+          period_id = 1
+    
+    union all
+    
+    -- Cummulative muac screens or malaria, ARI, and diarrhea treatments current month.
+    select coalesce( value, 0 ) as number_treatment 
+    from lastmile_dataportal.tbl_values 
+    where 
+          ind_id in ( 235, 23, 21, 19 ) and 
+          territory_id like '1\\_%'     and 
+          `year` = @p_year              and 
+          `month` = @p_month            and 
+          period_id = 1
+    
+ ) as a;
+
+
 -- 428. TARGET: Treatments Delivered and Malnutrition Screens for children under age 5 ( ind_id = 426, territory_id = 6_27 )
  case
  

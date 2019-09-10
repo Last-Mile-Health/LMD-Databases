@@ -1087,6 +1087,13 @@ from (
 ) as a
 ;
 
+-- 45. Just copy 6_27 for now.
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 45, '6_35', 1 as period_id, @p_month, @p_year, value
+from lastmile_dataportal.tbl_values 
+where ind_id = 45 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_27' 
+;
+
 -- 47. Number of records entered
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 47, '6_16', 1, @p_month, @p_year, SUM(`# records entered`) FROM lastmile_report.view_data_entry WHERE `Month`=@p_month AND `Year`=@p_year;
@@ -3645,7 +3652,36 @@ where (
       ) and
      `year` = @p_year and `month` = @p_month and period_id = 1
  ;
+ 
+-- 429. Total Number of Visits (routine, pregnant woman, HIV, TB) globally, beginning in FY20.
+if @p_date_key >= 20190701 then
 
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+select 
+      429                         as ind_id, 
+      '6_35'                      as territory_id,
+      1                           as period_id, 
+      @p_month                    as `month`,
+      @p_year                     as `year`,
+      sum( coalesce( value, 0 ) ) as value
+from lastmile_dataportal.tbl_values 
+where  -- This months totals for all Liberia for routine, pregnant, HIV, TB visits
+        ( 
+          ind_id in ( 119, 349, 357, 358 )  and
+          territory_id like '6\\_27'        and 
+          `month`   = @p_month              and 
+          `year`    = @p_year               and
+          period_id = 1
+        ) or
+        ( -- Last months cumulative totals for all Global for routine, pregnant, HIV, TB visits
+          ind_id = 429                      and
+          territory_id like '6\\_35'        and 
+          `month`   = @p_monthMinus1        and 
+          `year`    = @p_yearMinus1         and
+          period_id = 1
+        ); 
+        
+end if;
 
 -- 430. Percent of CHAs with all life-saving commodities in stock
 -- The if-clause suppresses the results if the reporting rate is below 25% (here and below)

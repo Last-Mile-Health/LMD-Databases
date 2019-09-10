@@ -2739,7 +2739,7 @@ SELECT                                        402,      '6_27',         1,      
 -- This code is now the preferred way to code cummulative, not 402/6_27 above or the other way I (owen) was doing 
 -- it with unions and subqueries.  Also, see 429/6_35 as well.
 
-if @p_date_key >= 20190701 then
+if @p_date_key >= 20170701 then
 
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 select
@@ -2768,8 +2768,6 @@ where (
         
 end if;
  
-
-
 
 -- 403. Average number of essential commodity stock-outs per CHA
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -3846,7 +3844,6 @@ from lastmile_dataportal.tbl_values
 where ind_id = 432 and territory_id like '1\\_%' and `year` = @p_year and `month` = @p_month and period_id = 1;
  
 
-
 -- 464. Number of facilities
 replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`,`year`,value )
 select 464 as ind_id, t.territory_id, 1 as period_id, @p_month, @p_year, v.health_facility_number as value
@@ -3966,8 +3963,26 @@ from (
 ) as a
 ;
 
+-- 464. # of community clinics supported by community and frontline health workers in Anchor Country Programs
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+select
+      464                         as ind_id, 
+      '6_35'                      as territory_id,
+      1                           as period_id, 
+      @p_month                    as `month`,
+      @p_year                     as `year`,
+      sum( coalesce( value, 0 ) ) as value
 
-
+from lastmile_dataportal.tbl_values 
+where ( 
+        ind_id = 464                      and
+        territory_id like '1\\_%'         and 
+        `month`   = @p_month              and 
+        `year`    = @p_year               and
+        @isEndOfQuarter                   and
+        period_id = 1
+      )
+;
 
 
 /* 

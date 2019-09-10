@@ -2735,6 +2735,42 @@ replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_
 SELECT                                        402,      '6_27',         1,            @p_month, @p_year,  @new_value;
 
 
+-- 402. (6_35) # of potential epidemic events identified across Anchor Country Programs, beginning with FY20.
+-- This code is now the preferred way to code cummulative, not 402/6_27 above or the other way I (owen) was doing 
+-- it with unions and subqueries.  Also, see 429/6_35 as well.
+
+if @p_date_key >= 20190701 then
+
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
+select
+      402                         as ind_id, 
+      '6_35'                      as territory_id,
+      1                           as period_id, 
+      @p_month                    as `month`,
+      @p_year                     as `year`,
+      sum( coalesce( value, 0 ) ) as value
+
+from lastmile_dataportal.tbl_values 
+where ( 
+        ind_id = 347                      and
+        territory_id like '6\\_27'        and 
+        `month`   = @p_month              and 
+        `year`    = @p_year               and
+        period_id = 1
+      ) or
+      ( 
+        ind_id = 402                      and
+        territory_id like '6\\_35'        and 
+        `month`   = @p_monthMinus1        and 
+        `year`    = @p_yearMinus1         and
+        period_id = 1
+      ); 
+        
+end if;
+ 
+
+
+
 -- 403. Average number of essential commodity stock-outs per CHA
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 403, a.territory_id, 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND(COALESCE(SUM(num_stockouts_essentials),0)/COALESCE(COUNT(1),0),1),NULL)

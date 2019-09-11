@@ -2288,7 +2288,7 @@ FROM lastmile_report.mart_view_base_ifi WHERE ((`year`=@p_year AND `month`=@p_mo
 
 
 -- Before July 2019 we were excluding managed counties.
-if @date_key < 20190701 then
+if @p_date_key < 20190701 then
 
     replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
     select 368, '6_32', 1, @p_month, @p_year, round( sum( coalesce( supervisedLastMonth, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
@@ -4552,6 +4552,23 @@ group by dp.qao_position_id
 ) as jj on s.qao_position_id = jj.qao_position_id
 ;
 
+
+-- 484. % CHWs who pass a knowledge assessment by CHW provider across Anchor Country Programs
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select  484, '6_35' as territory_id, 1 as period_id, @p_month, @p_year,
+
+        round( sum( coalesce( number_service_delivery_question_correct_1_4, 0 ) ) / 
+               sum( coalesce( numReports, 0 ) ), 3 ) as value
+      
+from lastmile_report.mart_view_base_ifi 
+where 
+      @isEndOfQuarter and 
+      (
+        ( `year`=@p_year        and `month`=@p_month        ) or 
+        ( `year`=@p_yearMinus1  and `month`=@p_monthMinus1  ) or 
+        ( `year`=@p_yearMinus2  and `month`=@p_monthMinus2  )
+      )
+;
 
 
 -- ------ --

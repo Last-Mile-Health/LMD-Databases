@@ -50,9 +50,15 @@ create event event_dimension_populate
 on schedule every 1 day
 starts '2019-04-08 02:30:00'
 do begin
-
-  set @begin_date       = '2012-10-01';
-  set @end_date         = current_date();
+  
+ 
+  -- dimension position table getting too big.  Only go back 2 years for now.
+  -- set @begin_date       = '2012-10-01';
+  -- set @end_date         = current_date();
+  
+  set @begin_date       = date_format( date_sub( curdate(), INTERVAL 2 year ), '%Y-%m-%d' );
+  set @end_date         = date_format( current_date(), '%Y-%m-%d' );
+  
   set @unit             = 'DAY';
   set @position_status  = 'ALL';
 

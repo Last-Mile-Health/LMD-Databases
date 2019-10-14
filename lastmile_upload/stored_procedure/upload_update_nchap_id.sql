@@ -3,6 +3,17 @@ use lastmile_upload;
 drop procedure if exists lastmile_upload.upload_update_nchap_id;
 
 /*  
+  10/14/2019 
+  Owen Eddins:  I obsoleted this procedure and broke it up into these four:
+  
+                lastmile_upload.1_id_repair_critical()
+                lastmile_upload.2_id_repair_routine_visit()
+                lastmile_upload.3_id_repair_sick_child()
+                lastmile_upload.4_id_repair_non_critical()
+                
+  It was hanging, I believe, after running through because of a memory issue.
+                
+                
   Update every cha and chss ID in the upload tables based on the value in the _inserted field.  Compare _inserted values
   against the lastmile_cha.temp_view_base_history_moh_lmh_cha_id table and the lastmile_cha.view_base_history_moh_lmh_chss_id view,
   depending on whether it's a cha or chss.
@@ -36,7 +47,9 @@ select * from lastmile_cha.view_base_history_moh_lmh_cha_id;
 -- with the _inserted_format suffix.  This should be run nightly before the nchap id updates, which now join with the _inserted_format values
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------
 
+/*
 update lastmile_upload.odk_routineVisit                 set cha_id_inserted_format            = lastmile_upload.nchap_id_format( cha_id_inserted );
+*/
 
 update lastmile_upload.odk_chaRestock                   set supervised_cha_id_inserted_format = lastmile_upload.nchap_id_format( supervised_cha_id_inserted );
 
@@ -118,7 +131,9 @@ update lastmile_upload.odk_QAO_CHSSQualityAssuranceForm set chss_id_inserted_for
 
 update lastmile_upload.odk_communityEngagementLog       set data_collector_id_inserted_format = lastmile_upload.nchap_id_format( data_collector_id_inserted );
 
+/*
 update lastmile_upload.odk_sickChildForm                set cha_id_inserted_format            = lastmile_upload.nchap_id_format( cha_id_inserted );
+*/
 
 update lastmile_upload.odk_supervisionVisitLog          set supervised_cha_id_inserted_format = lastmile_upload.nchap_id_format( supervised_cha_id_inserted );
 
@@ -132,9 +147,11 @@ update lastmile_upload.odk_vaccineTracker               set cha_id_inserted_form
 
 update lastmile_upload.odk_vaccineTracker               set chss_id_inserted_format           = lastmile_upload.nchap_id_format( chss_id_inserted );
 
+update lastmile_archive.chwdb_odk_vaccine_tracker       set cha_id_inserted_format            = lastmile_upload.nchap_id_format( cha_id_inserted );
+
 update lastmile_archive.chwdb_odk_chw_restock           set cha_id_inserted_format            = lastmile_upload.nchap_id_format( cha_id_inserted );
 
-update lastmile_archive.chwdb_odk_vaccine_tracker       set cha_id_inserted_format            = lastmile_upload.nchap_id_format( cha_id_inserted );
+
 
 
 -- -----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -525,6 +542,7 @@ insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) v
 
 -- odk_routineVisit --------------------------------------- 14.
 
+/*
 update lastmile_upload.odk_routineVisit a, lastmile_cha.temp_view_base_history_moh_lmh_cha_id m
 
     set a.chaID = if( m.cha_id_historical is null, trim( a.cha_id_inserted_format ), m.position_id )
@@ -533,6 +551,7 @@ where ( trim( a.cha_id_inserted_format ) like m.position_id ) or ( trim( a.cha_i
 ;
 
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_routineVisit' );
+
 
 -- odk_sickChildForm --------------------------------------- 15.
 
@@ -544,6 +563,8 @@ where ( trim( a.cha_id_inserted_format ) like m.position_id ) or ( trim( a.cha_i
 ;
 
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_sickChildForm' );
+
+*/
 
 -- odk_supervisionVisitLog --------------------------------------- 16.
 
@@ -627,7 +648,11 @@ update lastmile_upload.odk_QAOSupervisionChecklistForm a, lastmile_cha.temp_view
 where ( trim( a.cha_id_inserted_format ) like m.position_id ) or ( trim( a.cha_id_inserted_format ) like m.cha_id_historical )
 ;
 
+
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_QAOSupervisionChecklistForm' );
+
 -- lastmile_archive table NCHAP ID updates go here.
+
 
 
 update lastmile_archive.chwdb_odk_chw_restock a, lastmile_cha.temp_view_base_history_moh_lmh_cha_id m

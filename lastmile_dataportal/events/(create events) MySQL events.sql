@@ -56,7 +56,7 @@ do begin
   -- set @begin_date       = '2012-10-01';
   -- set @end_date         = current_date();
   
-  set @begin_date       = date_format( date_sub( curdate(), INTERVAL 2 year ), '%Y-%m-%d' );
+  set @begin_date       = date_format( date_sub( curdate(), INTERVAL 6 month ), '%Y-%m-%d' );
   set @end_date         = date_format( current_date(), '%Y-%m-%d' );
   
   set @unit             = 'DAY';
@@ -69,7 +69,7 @@ end $$
 
 
 -- Create `evt_dataMartTables`
--- Runs `updateDataMarts` on a daily basis
+-- Runs `update data marts` on a daily basis
 -- See the procedure code for further documentation
 
 CREATE EVENT evt_dataMartTables
@@ -78,8 +78,13 @@ STARTS '2016-01-15 03:30:00'
 DO 
 BEGIN
 
-	CALL `lastmile_dataportal`.`updateDataMarts`();
+-- OBSOLETE: CALL `lastmile_dataportal`.`updateDataMarts`();
 
+  call lastmile_dataportal.data_mart_other();
+  call lastmile_dataportal.data_mart_msr_1();
+  call lastmile_dataportal.data_mart_msr_2();
+  call lastmile_dataportal.data_mart_msr_3();
+  
 END $$
 
 

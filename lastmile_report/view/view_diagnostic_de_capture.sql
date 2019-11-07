@@ -21,7 +21,7 @@ select
       month_capture          as `Month`,
     
       case
-          when table_name like 'de_case_scenario'               then 'Case Scenario'     
+          when table_name like 'de_case_scenario%'              then 'Case Scenario'     
           when table_name like 'de_chss_commodity_distribution' then 'CHSS Commodity'
           when table_name like 'de_chss_monthly_service_report' then 'CHSS MSR'
           when table_name like 'de_chaHouseholdRegistration'    then 'CHA HHR'
@@ -30,7 +30,7 @@ select
       end as Form,
       
       case
-          when table_name like 'de_case_scenario'               then 1
+          when table_name like 'de_case_scenario%'              then 1
           when table_name like 'de_chss_commodity_distribution' then 2
           when table_name like 'de_chss_monthly_service_report' then 3
           when table_name like 'de_chaHouseholdRegistration'    then 4

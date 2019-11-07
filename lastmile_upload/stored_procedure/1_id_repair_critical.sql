@@ -35,6 +35,31 @@ create table lastmile_cha.temp_view_base_history_moh_lmh_cha_id as
 select * from lastmile_cha.view_base_history_moh_lmh_cha_id;
 
 
+
+-- 1. critical: de_case_scenario_2 --------------------------------------- 
+
+update lastmile_upload.de_case_scenario_2 set cha_id_inserted_format  = lastmile_upload.nchap_id_format( cha_id_inserted );
+
+update lastmile_upload.de_case_scenario_2 set chss_id_inserted_format = lastmile_upload.nchap_id_format( chss_id_inserted );
+
+
+update lastmile_upload.de_case_scenario_2 a, lastmile_cha.temp_view_base_history_moh_lmh_cha_id m
+
+    set a.cha_id = if( m.cha_id_historical is null, trim( a.cha_id_inserted_format ), m.position_id )
+    
+where ( trim( a.cha_id_inserted_format ) like m.position_id ) or ( trim( a.cha_id_inserted_format ) like m.cha_id_historical )
+;
+
+update lastmile_upload.de_case_scenario_2 a, lastmile_cha.view_base_history_moh_lmh_chss_id m
+
+    set a.chss_id = if( m.chss_id_historical is null, trim( a.chss_id_inserted_format ), m.position_id )
+    
+where ( trim( a.chss_id_inserted_format ) like m.position_id ) or ( trim( a.chss_id_inserted_format ) like m.chss_id_historical )
+;
+
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'de_case_scenario_2' );
+
+
 -- 1. critical: de_case_scenario --------------------------------------- 
 
 update lastmile_upload.de_case_scenario set cha_id_inserted_format  = lastmile_upload.nchap_id_format( cha_id_inserted );

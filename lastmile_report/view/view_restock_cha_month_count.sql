@@ -11,7 +11,7 @@ select
       -- Total times the CHA was restocked in the current month
       sum( if( extract( year_month from r.manual_date ) =             extract( year_month from now() ),        1, 0 ) ) as month_current,
       
-      -- Total number of times the CHA was restocked in the preceding 12 months
+      -- Totol time the CHA was restocked in the preceding 12 months
       sum( if( extract( year_month from r.manual_date ) = period_add( extract( year_month from now() ), -1  ), 1, 0 ) ) as month_minus_1,
       sum( if( extract( year_month from r.manual_date ) = period_add( extract( year_month from now() ), -2  ), 1, 0 ) ) as month_minus_2,
       sum( if( extract( year_month from r.manual_date ) = period_add( extract( year_month from now() ), -3  ), 1, 0 ) ) as month_minus_3,

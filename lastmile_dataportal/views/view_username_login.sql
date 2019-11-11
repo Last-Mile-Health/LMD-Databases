@@ -9,7 +9,6 @@ select
         u.username, 
         concat( u.first_name, ' ', u.last_name )  as full_name,
         max( l.login_time )                       as last_login,
-        min( l.login_time )                       as first_login,
         count( * )                                as number_login
 from tbl_utility_users as u
     left outer join tbl_utility_logins as l on u.username = l.username

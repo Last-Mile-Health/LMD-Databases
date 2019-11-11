@@ -30,10 +30,7 @@ select
       if( soundex( v.cha ) = soundex( trim( m.cha_name ) ), 'Y', 'N' ) as soundex_cha_match,
       
       v.community_list          as db_community_list,
-      trim( m.community )       as msr_community,
-      
-      v.community_id_list       as db_community_id_list,
-      trim( m.community_id )    as msr_community_id
+      trim( m.community )       as msr_community
             
 from lastmile_upload.de_cha_monthly_service_report as m
     left outer join lastmile_cha.view_base_position_cha_basic_info as v on trim( m.cha_id ) like v.position_id

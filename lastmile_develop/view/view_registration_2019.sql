@@ -1,15 +1,15 @@
-use lastmile_program;
+use lastmile_develop;
 
-drop view if exists lastmile_program.view_registration_year;
+drop view if exists lastmile_develop.view_registration_2019;
 
-create view lastmile_program.view_registration_year as 
+create view lastmile_develop.view_registration_2019 as 
 
 select
       year( trim( g.registrationDate ) )                                        as registration_year,
       trim( g.communityID )                                                     as community_id,
       trim( g.chaID )                                                           as position_id,
       
-      max( trim( g.registrationDate ) )                                         as  registration_date,
+      max( trim( g.registrationDate ) )                                         as registration_date,
 
       sum( cast( g.1_1_A_total_number_households as unsigned ) )                as total_household,
       sum( cast( g.1_1_B_total_household_members as unsigned ) )                as total_household_member,
@@ -30,9 +30,11 @@ select
       sum( cast( g.1_1_L_total_fifty_plus_years_female as unsigned ) )          as total_fifty_plus_year_female
   
 from lastmile_upload.de_chaHouseholdRegistration as g
-
--- temporary hack to filter out 2019 household registration until we can QA
-where g.meta_insertDatetime < '2019-01-01'
-
-group by registration_year, community_id, position_id
+where g.valid = 1 and 
+      year( trim( g.registrationDate ) ) = 2019 -- hard code for now
+      
+group by 
+        registration_year, -- aliases are okay in group by
+        community_id, 
+        position_id
 ;

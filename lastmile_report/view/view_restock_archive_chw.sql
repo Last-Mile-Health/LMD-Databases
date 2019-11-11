@@ -1,5 +1,6 @@
 use lastmile_report;
 
+-- Note: Similar code is part of the 
 drop view if exists view_restock_archive_chw;
 
 create view view_restock_archive_chw as

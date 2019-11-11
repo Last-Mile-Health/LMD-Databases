@@ -5,28 +5,33 @@ drop view if exists view_community_grand_bassa_master;
 create view view_community_grand_bassa_master as
 
 select
-
-  m.archived	      as 	archived,
-  m.community_id	  as 	community_id,
-  m.town_name 	    as 	community,
-  m.alt_name 	      as 	community_alternate,
-  m.health_district as  health_district,
+  m.master_list_id,
+  m.position_id,
+  m.archived	              as 	archived,
+  m.community_id	          as 	community_id,
+  m.town_name 	            as 	community,
+  m.alt_name 	              as 	community_alternate,
+  m.health_district,
   
-  -- if( trim( m.adm_distri ) like '%2%', 25, if( trim( m.adm_distri ) like '%3%', 26, null ) ) as 	district_id,
+  -- if( trim( m.map_adm_distri ) like '%2%', 25, if( trim( m.map_adm_distri ) like '%3%', 26, null ) ) as 	district_id,
   
   case
   
-      when trim( m.adm_distri ) like '1'          THEN '24' -- district 1
-      when trim( m.adm_distri ) like '2'          THEN '25' -- district 2
-      when trim( m.adm_distri ) like '3'          THEN '26' -- district 3
-      when trim( m.adm_distri ) like '4'          THEN '27' -- district 4
-      when trim( m.adm_distri ) like '%neek%'     THEN '28' -- district Neekreen
-      when trim( m.adm_distri ) like '%owen%'     THEN '29' -- district Owensgrove
-      when trim( m.adm_distri ) like '%st%john%'  THEN '30' -- district St. John River City
+      when trim( m.map_adm_distri ) like '1'          THEN '24' -- district 1
+      when trim( m.map_adm_distri ) like '2'          THEN '25' -- district 2
+      when trim( m.map_adm_distri ) like '3'          THEN '26' -- district 3
+      when trim( m.map_adm_distri ) like '4'          THEN '27' -- district 4
+      when trim( m.map_adm_distri ) like '%neek%'     THEN '28' -- district Neekreen
+      when trim( m.map_adm_distri ) like '%owen%'     THEN '29' -- district Owensgrove
+      when trim( m.map_adm_distri ) like '%st%john%'  THEN '30' -- district St. John River City
 
       else '999'
   end as district_id,
+  
+  trim( substring_index( trim( substring_index( position_id, ',', 1 ) ), '-', 1 ) ) as health_facility_id,
+  health_facility,
 
+/*
   case
   
       -- when cast( community_id as unsigned ) between 3000 and 3299 THEN 'ZZZZ' -- Molons
@@ -46,9 +51,12 @@ select
    
       else '999'
   end as health_facility_id,
-  
-  m.remoteness 	    as 	health_facility_proximity,
-  m.dist_km 	      as 	health_facility_km,
+ 
+ */
+ 
+ 
+  m.map_remoteness 	    as 	health_facility_proximity,
+  m.map_dist_km 	      as 	health_facility_km,
   m.X 	            as 	x,
   m.Y 	            as 	y,
   m.numHH 	        as 	household_map_count,

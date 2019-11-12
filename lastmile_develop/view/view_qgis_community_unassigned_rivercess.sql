@@ -27,6 +27,7 @@ select
 
 from lastmile_cha.community
 where     ( community_id between 500 and 1999 ) and 
+          ( archived = 0 ) and
       not ( 
             community_id in ( -- build list of community IDs that are assigned to position IDs in Rivercess
                               select community_id

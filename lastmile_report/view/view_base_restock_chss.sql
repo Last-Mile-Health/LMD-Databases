@@ -25,7 +25,7 @@ select
       a.meta_fabricated,
         
       a.chss,
-      trim( a.chss_id )     as chss_id,
+      trim( a.chss_id )                         as chss_id,
       a.chss_id_inserted,
       a.restock_date,
       a.restock_driver,
@@ -38,7 +38,8 @@ select
           and
           ( coalesce( a.ors_initial_stock_on_hand, 0 ) > 0 ) 
           and
-          ( ( coalesce( a.amoxicillin_250_tablet_4_bottle_1000_initial_stock_on_hand, 0 ) > 0 ) or
+          ( ( coalesce( a.amoxicillin_250_tablet_2_bottle_1000_initial_stock_on_hand, 0 ) > 0 ) or
+            ( coalesce( a.amoxicillin_250_tablet_4_bottle_1000_initial_stock_on_hand, 0 ) > 0 ) or
             ( coalesce( a.amoxicillin_250_tablet_200_strip_10_initial_stock_on_hand,  0 ) > 0 ) or
             ( coalesce( a.amoxicillin_250_suspension_initial_stock_on_hand,           0 ) > 0 )
           ),
@@ -92,14 +93,21 @@ select
         a.artesunate_suppository_5_unit_amount_restocked,
         a.artesunate_suppository_5_unit_ending_balance,
         a.artesunate_suppository_5_unit_stock_returned,
-        
-        
-        if( ( coalesce( a.amoxicillin_250_tablet_4_bottle_1000_initial_stock_on_hand, 0 ) > 0 ) or
+               
+        if(
+            ( coalesce( a.amoxicillin_250_tablet_2_bottle_1000_initial_stock_on_hand, 0 ) > 0 ) or
+            ( coalesce( a.amoxicillin_250_tablet_4_bottle_1000_initial_stock_on_hand, 0 ) > 0 ) or
             ( coalesce( a.amoxicillin_250_tablet_200_strip_10_initial_stock_on_hand,  0 ) > 0 ) or
             ( coalesce( a.amoxicillin_250_suspension_initial_stock_on_hand,           0 ) > 0 )
-            , 1, 0
+            , 1, 0   
         ) as amoxicillin_250_initial_stock_on_hand,
-        
+                
+        a.amoxicillin_250_tablet_2_bottle_1000_initial_stock_on_hand,
+        a.amoxicillin_250_tablet_2_bottle_1000_stock_damaged_expiring,
+        a.amoxicillin_250_tablet_2_bottle_1000_amount_restocked,
+        a.amoxicillin_250_tablet_2_bottle_1000_ending_balance,
+        a.amoxicillin_250_tablet_2_bottle_1000_stock_returned,
+   
         a.amoxicillin_250_tablet_4_bottle_1000_initial_stock_on_hand,
         a.amoxicillin_250_tablet_4_bottle_1000_stock_damaged_expiring,
         a.amoxicillin_250_tablet_4_bottle_1000_amount_restocked,
@@ -181,7 +189,7 @@ select
         a.comment
     
 from lastmile_upload.de_chss_commodity_distribution a
-where trim( a.chss_id ) in (  select view_base_history_person.position_id 
+where trim( a.chss_id ) in (  select position_id 
                               from lastmile_cha.view_base_history_person
                               where view_base_history_person.job like 'CHSS' 
                             )

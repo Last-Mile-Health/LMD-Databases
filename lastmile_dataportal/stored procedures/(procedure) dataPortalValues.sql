@@ -2310,22 +2310,90 @@ end if;
 
 
 -- 369. Percent of CHAs who received their last monetary incentive on time (IFI)
-REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 369, territory_id, 1, @p_month, @p_year, ROUND(SUM(COALESCE(receivedLastIncentiveOnTime,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year GROUP BY territory_id
-UNION SELECT 369, '6_27', 1, @p_month, @p_year, ROUND(SUM(COALESCE(receivedLastIncentiveOnTime,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year
-UNION SELECT 369, territory_id, 2, @p_month, @p_year, ROUND(SUM(COALESCE(receivedLastIncentiveOnTime,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_base_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
 
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 369, '6_16', 1, @p_month, @p_year, round( sum( coalesce( receivedLastIncentiveOnTime, 0 ) )/sum( coalesce( numReports, 0 ) ), 3)
-from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month AND `year`=@p_year and ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' )
+select
+      369               as ind_id,
+      a.territory_id    as territory_id,
+      1                 as period_id,
+      @p_month,
+      @p_year,
+      coalesce( round( sum( coalesce( i.receivedLastIncentiveOnTime, 0 ) ) / sum( coalesce( i.numReports, 0 ) ), 3 ), 0 ) as value
+     
+from lastmile_dataportal.view_territories_active as a
+    left outer join lastmile_report.mart_view_base_ifi as i on  ( a.territory_id like i.territory_id  ) and
+                                                                ( i.`month` = @p_month                ) and 
+                                                                ( i.`year` = @p_year                  )
+                                                                
+where ( a.territory_type like 'county' ) and not ( a.territory_id like '1\\_11' )
+group by a.territory_id
+
+union all 
+
+select
+      369               as ind_id,
+      '6_27'            as territory_id,
+      1                 as period_id,
+      @p_month,
+      @p_year,
+      coalesce( round( sum( coalesce( i.receivedLastIncentiveOnTime, 0 ) ) / sum( coalesce( i.numReports, 0 ) ), 3 ), 0 ) as value
+     
+from lastmile_dataportal.view_territories_active as a
+    left outer join lastmile_report.mart_view_base_ifi as i on  ( a.territory_id like i.territory_id  ) and
+                                                                ( i.`month` = @p_month                ) and 
+                                                                ( i.`year` = @p_year                  )
+                                                                
+where ( a.territory_type like 'county' ) and not ( a.territory_id like '1\\_11' )
+
 union all
-select 369, '6_32', 1, @p_month, @p_year, round( sum( coalesce( receivedLastIncentiveOnTime, 0 ) )/sum( coalesce( numReports, 0 ) ), 3)
+
+select
+      369               as ind_id,
+      a.territory_id    as territory_id,
+      2                 as period_id,
+      @p_month,
+      @p_year,
+      coalesce( round( sum( coalesce( i.receivedLastIncentiveOnTime, 0 ) ) / sum( coalesce( i.numReports, 0 ) ), 3 ), 0 ) as value
+     
+from lastmile_dataportal.view_territories_active as a
+    left outer join lastmile_report.mart_view_base_ifi as i on  ( a.territory_id like i.territory_id  ) and
+                                                                ( 
+                                                                  ( ( i.`month` = @p_month        ) and ( i.`year` = @p_year       ) ) or 
+                                                                  ( ( i.`month` = @p_monthMinus1  ) and ( i.`year` = @p_yearMinus1 ) ) or 
+                                                                  ( ( i.`month` = @p_monthMinus2  ) and ( i.`year` = @p_yearMinus2 ) )                                                              
+                                                                )
+                                                                
+where ( a.territory_type like 'county' ) and not ( a.territory_id like '1\\_11' )
+group by a.territory_id
+;
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select  
+      369, 
+      '6_16', 
+      1, 
+      @p_month, 
+      @p_year, 
+      round( sum( coalesce( receivedLastIncentiveOnTime, 0 ) )/sum( coalesce( numReports, 0 ) ), 3)
+      
 from lastmile_report.mart_view_base_ifi 
-where `month`=@p_month AND `year`=@p_year and not ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' );
+where `month` = @p_month and `year`=@p_year and 
+      ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
+
+union all
+
+select 
+      369, 
+      '6_32', 
+      1, 
+      @p_month, 
+      @p_year, 
+      round( sum( coalesce( receivedLastIncentiveOnTime, 0 ) )/sum( coalesce( numReports, 0 ) ), 3)
+      
+from lastmile_report.mart_view_base_ifi 
+where `month`=@p_month AND `year`=@p_year and 
+      not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
+;
 
 
 -- 381. NCHA Outputs: Number of CHA monthly service reports (MSRs) received by MOH
@@ -4724,10 +4792,6 @@ from (
 ) as a
     left outer join lastmile_report.mart_program_scale as s on a.territory_id like s.territory_id
 ;
-
-
-
-
 
 
 -- ------ --

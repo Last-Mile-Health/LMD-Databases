@@ -2009,10 +2009,10 @@ from (
 -- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 331, a.territory_id, 1, @p_month, @p_year, ROUND(COUNT(DISTINCT chss_id)/num_chss,3)
-FROM lastmile_report.view_base_restock_chss a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
+FROM lastmile_report.mart_view_base_restock_chss a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
 WHERE restock_month=@p_month AND restock_year=@p_year AND a.territory_id IS NOT NULL GROUP BY county
 UNION SELECT 331, '6_16', 1, @p_month, @p_year, ROUND(COUNT(DISTINCT chss_id)/num_chss,3)
-FROM lastmile_report.view_base_restock_chss a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
+FROM lastmile_report.mart_view_base_restock_chss a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
 WHERE restock_month=@p_month AND restock_year=@p_year AND a.territory_id IS NOT NULL;
 
 
@@ -3352,20 +3352,18 @@ WHERE month_reported = @p_month AND
       county_id IS NOT NULL
 ;
 
-
-
 /*  418. Percent of CHAs who received a supervision visit in the past month. 
     Notes:  For Grand Gedeh, the UNICEF CHAs are not being counted in the denominator.  To add them in, remove the
             the "cohort is null" from the where clause (two places) below.
 
 */
-
 replace into lastmile_dataportal.tbl_values ( ind_id , territory_id, period_id, `month`, `year`, value )
 select
       418,
       case 
           when a.county like 'Rivercess'    then '1_14'
           when a.county like 'Grand Gedeh'  then '6_31'
+          when a.county like 'Grand Bassa'  then '1_4'
           else null
       end  as territory_id, 
       1, 
@@ -3385,7 +3383,13 @@ from (
                               group by supervisedCHAID 
                               
                             ) as s on c.position_id like s.position_id_supervision                   
-        where ( c.cohort is null ) and -- filter out UNICEF for now.
+        where 
+              (       
+                ( c.county like 'Rivercess'   ) or
+                ( c.county like 'Grand Bassa' ) or
+                ( c.county like 'Grand Gedeh' and c.cohort is null  )
+              ) 
+              or
               ( ( month( c.snapshot_date ) =  @p_month ) and ( year( c.snapshot_date ) = @p_year ) ) 
       
 ) as a
@@ -3413,11 +3417,18 @@ from (
                               group by supervisedCHAID 
                               
                             ) as s on c.position_id like s.position_id_supervision                   
-        where ( c.cohort is null ) and -- filter out UNICEF for now.
+        where
+              (       
+                ( c.county like 'Rivercess'   ) or
+                ( c.county like 'Grand Bassa' ) or
+                ( c.county like 'Grand Gedeh' and c.cohort is null  )
+              ) 
+              or
               ( ( month( c.snapshot_date ) =  @p_month ) and ( year( c.snapshot_date ) = @p_year ) ) 
       
 ) as a
 ;
+
 
 /*
  419. Estimated percent of children who received a MUAC screen

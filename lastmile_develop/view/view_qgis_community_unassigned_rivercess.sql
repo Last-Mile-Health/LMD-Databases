@@ -32,7 +32,8 @@ where     ( community_id between 500 and 1999 ) and
             community_id in ( -- build list of community IDs that are assigned to position IDs in Rivercess
                               select community_id
                               from lastmile_cha.position_community
-                              where community_id between 500 and 1999
+                              where ( community_id between 500 and 1999 ) 
+                              and ( not ( begin_date is null ) and ( end_date is null ) )
                               group by community_id
                             ) 
           );

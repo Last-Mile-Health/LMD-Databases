@@ -9,7 +9,9 @@ select
       communityID                                                                                   as community_id,
       -- gpsCoordinate,
       trim( substring_index( trim( substring_index( trim( gpsCoordinate ), ' ', 2 ) ), ' ', -1 ) )  as x,
-      trim( substring_index( trim( gpsCoordinate ), ' ', 1 ) ) as y
+      trim( substring_index( trim( gpsCoordinate ), ' ', 1 ) )                                      as y,
+      
+      manualDate                                                                                    as manualDate
       
 from lastmile_upload.odk_supervisionVisitLog
 where not ( ( gpsCoordinate is null ) or ( trim( gpsCoordinate ) like '' ) )

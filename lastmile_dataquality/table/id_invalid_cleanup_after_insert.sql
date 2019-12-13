@@ -11,7 +11,7 @@ case
 
     -- 1. de_case_scenario_2 ----------------------------------------------------
 
-    when  trim( new.table_name )  like 'de_case_scenario_2'               and 
+    when  trim( new.table_name )  like 'de_case_scenario_2'             and 
           trim( new.id_type )     like 'chss'                           and 
           trim( new.id_name )     like 'chss_id'                        and 
           not ( new.id_repair is null )                                 and
@@ -20,10 +20,10 @@ case
     then
           update lastmile_upload.de_case_scenario_2 as u
               set u.chss_id_inserted  = new.id_repair
-          where u.de_case_scenario_id = new.pk_id;
+          where u.de_case_scenario_2_id = new.pk_id;
     
          
-    when  trim( new.table_name )  like 'de_case_scenario_2'               and 
+    when  trim( new.table_name )  like 'de_case_scenario_2'             and 
           trim( new.id_type )     like 'cha'                            and 
           trim( new.id_name )     like 'cha_id'                         and 
           not ( new.id_repair is null )                                 and
@@ -32,7 +32,7 @@ case
     then
           update lastmile_upload.de_case_scenario_2 as u
               set u.cha_id_inserted   = new.id_repair
-          where u.de_case_scenario_id = new.pk_id;
+          where u.de_case_scenario_2_id = new.pk_id;
      
     -- 2. de_case_scenario ----------------------------------------------------
 

@@ -125,8 +125,18 @@ select
                   coalesce( trim( a.6_2_service_delivery_question_4 ), '' ) like 'C' 
             then 1
             else 0
-        end as service_delivery_question_correct_1_4
-       
+        end as service_delivery_question_correct_1_4,
+        
+        if(
+                upper( 5_3_me_module_3_row_marked_form_1 )      like 'Y' and
+                upper( 5_3_me_module_3_row_marked_form_2 )      like 'Y' and
+                upper( 5_3_me_module_3_row_marked_form_3 )      like 'Y' and
+                upper( 5_4_me_module_3_row_bolded_box_form_1 )  like 'Y' and
+                upper( 5_4_me_module_3_row_bolded_box_form_2 )  like 'Y' and
+                upper( 5_4_me_module_3_row_bolded_box_form_3 )  like 'Y',
+                1, 0  
+            ) as correct_treatment
+         
     from lastmile_report.mart_de_integrated_supervision_tool_community as a
         left outer join lastmile_cha.county as b on  convert( a.county using UTF8 ) = b.county
 ;

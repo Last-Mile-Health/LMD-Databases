@@ -986,6 +986,20 @@ select 28, '6_35', 1 as period_id, @p_month, @p_year, value
 from lastmile_dataportal.tbl_values 
 where ind_id = 28 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_27' 
 ;
+
+
+-- 28. Co-impact KPIs are reported on for March and August.  Use period_id = 38 (month 3 and month 8) to specific them.
+if ( @p_month = 3 ) or ( @p_month = 8 ) then 
+
+-- 28.  # of CHAs in Liberia (6_27), same as period_id for months 3, 8.
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 28, '6_27', 38 as period_id, @p_month, @p_year, value
+from lastmile_dataportal.tbl_values 
+where ind_id = 28 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_27' 
+;
+
+end if;
+
   
 -- 29. Number of CHSSs deployed
 
@@ -1021,6 +1035,20 @@ from (
       from lastmile_dataportal.tbl_values 
       where ind_id = 29 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_32' 
  ) as a;
+
+
+-- 29. Co-impact KPIs are reported on for March and August.  Use period_id = 38 (month 3 and month 8) to specific them.
+if ( @p_month = 3 ) or ( @p_month = 8 ) then 
+
+-- 29.  # of CSSs in Liberia (6_27), same as period_id for months 3, 8.
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 29, '6_27', 38 as period_id, @p_month, @p_year, value
+from lastmile_dataportal.tbl_values 
+where ind_id = 29 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_27' 
+;
+
+end if;
+
 
 -- 30. Number of deaths (child)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -2290,6 +2318,19 @@ UNION SELECT 368, territory_id, 2, @p_month, @p_year, ROUND(SUM(COALESCE(supervi
 FROM lastmile_report.mart_view_base_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
 
 
+-- 368. Co-impact KPIs are reported on for March and August.  Use period_id = 38 (month 3 and month 8) to specific them.
+if ( @p_month = 3 ) or ( @p_month = 8 ) then 
+
+-- 368.  Percent of CHAs who received a supervision visit in the past month (IFI)
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 368, '6_27', 38 as period_id, @p_month, @p_year, value
+from lastmile_dataportal.tbl_values 
+where ind_id = 368 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_27' 
+;
+
+end if;
+
+
 -- Before July 2019 we were excluding managed counties.
 if @p_date_key < 20190701 then
 
@@ -2394,6 +2435,19 @@ from lastmile_report.mart_view_base_ifi
 where `month`=@p_month AND `year`=@p_year and 
       not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
 ;
+
+
+-- 369. Co-impact KPIs are reported on for March and August.  Use period_id = 38 (month 3 and month 8) to specific them.
+if ( @p_month = 3 ) or ( @p_month = 8 ) then 
+
+-- 369. Percent of CHAs who received their last monetary incentive on time (IFI)
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 369, '6_27', 38 as period_id, @p_month, @p_year, value
+from lastmile_dataportal.tbl_values 
+where ind_id = 369 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_27' 
+;
+
+end if;
 
 
 -- 381. NCHA Outputs: Number of CHA monthly service reports (MSRs) received by MOH
@@ -4223,9 +4277,17 @@ group by territory_id
 -- end of code from ifi database
 
 
+-- 477. Co-impact KPIs are reported on for March and August.  Use period_id = 38 (month 3 and month 8) to specific them.
+if ( @p_month = 3 ) or ( @p_month = 8 ) then 
 
+-- 477. Percent of CHAs who received their last monetary incentive on time (IFI)
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select 477, '6_27', 38 as period_id, @p_month, @p_year, value
+from lastmile_dataportal.tbl_values 
+where ind_id = 477 and period_id = 1 and `month` = @p_month and `year` = @p_year and territory_id like '6\\_27' 
+;
 
-
+end if;
 
 
 /* 
@@ -4803,6 +4865,27 @@ from (
 ) as a
     left outer join lastmile_report.mart_program_scale as s on a.territory_id like s.territory_id
 ;
+
+
+
+-- 805. Co-impact KPIs are reported for March and August.  Use period_id = 38 (month 3 and month 8) to specific them.
+if ( @p_month = 3 ) or ( @p_month = 8 ) then 
+
+-- 805. % correct treatment rate/CHA clinical practice
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select  805, '6_27' as territory_id, 38 as period_id, @p_month, @p_year,
+
+        round( sum( coalesce( number_correct_treatment, 0 ) ) / 
+               sum( coalesce( numReports, 0 ) ), 3 ) as value
+      
+from lastmile_report.mart_view_base_ifi 
+where `year`=@p_year and `month`=@p_month
+;
+
+end if;
+
+
+
 
 
 -- ------ --

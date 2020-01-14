@@ -26,7 +26,8 @@ select
       sum( coalesce( ors_20_6_1l_sachet_in_stock, 0 ) )                   as number_ors_20_6_1l_sachet_in_stock,
       sum( coalesce( zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) )     as number_zinc_sulfate_20_mg_scored_tablet_in_stock,
       
-      sum( coalesce( service_delivery_question_correct_1_4, 0 ) )         as number_service_delivery_question_correct_1_4
+      sum( coalesce( service_delivery_question_correct_1_4, 0 ) )         as number_service_delivery_question_correct_1_4,
+      sum( coalesce( correct_treatment ) )                                as number_correct_treatment
    
 from lastmile_report.view_ifi_calculations
 group by county , `month`, `year`

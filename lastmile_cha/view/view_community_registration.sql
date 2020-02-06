@@ -8,8 +8,8 @@ create view view_community_registration as
 
 select
       pc.community_id,
-      group_concat( pc.position_id        order by cast( pc.position_id as unsigned ) separator ', ' )  as position_id_list,
-      group_concat( g.registration_year   order by cast( pc.position_id as unsigned ) separator ', ' )  as registration_year_list, 
+      group_concat( pc.position_id        order by pc.position_id separator ', ' )  as position_id_list,
+      group_concat( g.registration_year   order by pc.position_id separator ', ' )  as registration_year_list, 
       
       sum( g.total_household )                      as total_household, 
       sum( g.total_household_member )               as total_household_member,

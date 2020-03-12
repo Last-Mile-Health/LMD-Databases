@@ -11,7 +11,9 @@ select
       pr.person_id,
       pr.person_id_lmh,
       
-      if( pr.position_id like pr.person_id_lmh, pr.position_id, pr.person_id_lmh ) as cha_id_historical,
+      
+      -- Stop associating position_id with person_id_lmh from the old LMH ID system
+      -- if( pr.position_id like pr.person_id_lmh, pr.position_id, pr.person_id_lmh ) as cha_id_historical,
       
       pr.position_begin_date,
       pr.position_end_date,

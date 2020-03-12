@@ -26,7 +26,7 @@ select
         
       */
       
-      pr.person_id as chss_id_historical,
+      -- pr.person_id as chss_id_historical,
       -- if( pr.position_id like pr.person_id_lmh, pr.position_id, pr.person_id_lmh ) as chss_id_historical,
       
       pr.position_begin_date,

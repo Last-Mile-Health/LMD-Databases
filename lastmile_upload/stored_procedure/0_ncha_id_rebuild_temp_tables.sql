@@ -8,7 +8,8 @@ drop procedure if exists lastmile_upload.0_ncha_id_rebuild_temp_tables;
  * 
  * Rebuild the tables temp_view_person_position_cha_id_update and temp_view_person_position_chss_id_update.
  *
- * For temp_view_person_position_cha_id_update, index the position_id_last, position_id, cha_id_historical 
+ * For temp_view_person_position_cha_id_update, index the position_id_last, position_id
+ * Note: cha_id_historical is when a person_id or position_id mateches old LMH IDs as integers
  * for performance during global ID cleanup. 
  *
  * For temp_view_person_position_chss_id_update, index the X, Y, Z 
@@ -41,7 +42,9 @@ select * from lastmile_ncha.view_person_position_cha_id_update;
 -- index on the three fields in the update where clause
 alter table lastmile_ncha.temp_view_person_position_cha_id_update add index ( position_id_last  );
 alter table lastmile_ncha.temp_view_person_position_cha_id_update add index ( position_id       );
-alter table lastmile_ncha.temp_view_person_position_cha_id_update add index ( cha_id_historical );
+
+-- code to map old LMH integer ID system to position ID
+-- alter table lastmile_ncha.temp_view_person_position_cha_id_update add index ( cha_id_historical );
 
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'temp_view_person_position_cha_id_update' );
 
@@ -57,7 +60,9 @@ select * from lastmile_ncha.view_person_position_chss_id_update;
 -- index on the three fields in the update where clause
 -- alter table lastmile_ncha.temp_view_person_position_chss_id_update add index ( position_id_last  );
 alter table lastmile_ncha.temp_view_person_position_chss_id_update add index ( position_id       );
-alter table lastmile_ncha.temp_view_person_position_chss_id_update add index ( chss_id_historical );
+
+-- code to map old LMH integer ID system to position ID
+-- alter table lastmile_ncha.temp_view_person_position_chss_id_update add index ( chss_id_historical );
 
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'temp_view_person_position_chss_id_update' );
 

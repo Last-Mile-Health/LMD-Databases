@@ -29,11 +29,10 @@ update  lastmile_upload.odk_routineVisit set cha_id_inserted_format = lastmile_u
 
 update  lastmile_upload.odk_routineVisit a, lastmile_ncha.temp_view_person_position_cha_id_update m
     
-    set a.chaID = if( m.cha_id_historical is null, trim( a.cha_id_inserted_format ), m.position_id_last )  
+    set a.chaID = m.position_id_last 
 
 where ( trim( a.cha_id_inserted_format ) like m.position_id_last  ) or 
-      ( trim( a.cha_id_inserted_format ) like m.position_id       ) or 
-      ( trim( a.cha_id_inserted_format ) like m.cha_id_historical )
+      ( trim( a.cha_id_inserted_format ) like m.position_id       )
 ;
 
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_routineVisit' );

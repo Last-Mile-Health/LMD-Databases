@@ -32,11 +32,10 @@ update lastmile_upload.odk_sickChildForm set cha_id_inserted_format = lastmile_u
 
 update lastmile_upload.odk_sickChildForm a, lastmile_ncha.temp_view_person_position_cha_id_update m
 
-    set a.chwID = if( m.cha_id_historical is null, trim( a.cha_id_inserted_format ), m.position_id_last )
+    set a.chwID = m.position_id_last
     
 where ( trim( a.cha_id_inserted_format ) like m.position_id_last  ) or 
-      ( trim( a.cha_id_inserted_format ) like m.position_id       ) or 
-      ( trim( a.cha_id_inserted_format ) like m.cha_id_historical )
+      ( trim( a.cha_id_inserted_format ) like m.position_id       )
 ;
 
 

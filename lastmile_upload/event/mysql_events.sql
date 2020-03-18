@@ -18,13 +18,26 @@ delimiter $$
 create event lastmile_upload.nightly_upload_update_nchap_id
 on schedule every 1 day starts '2017-12-09 01:00:00' on completion preserve enable 
 do  begin
+
+      -- original upate script
       -- call lastmile_upload.upload_update_nchap_id(); 
       
-      call lastmile_upload.1_id_repair_critical();
-      call lastmile_upload.2_id_repair_routine_visit();
-      call lastmile_upload.3_id_repair_sick_child();
-      call lastmile_upload.4_id_repair_non_critical();
-         
+      -- broke original script up into 4 because it was taking too long to run
+      -- call lastmile_upload.1_id_repair_critical();
+      -- call lastmile_upload.2_id_repair_routine_visit();
+      -- call lastmile_upload.3_id_repair_sick_child();
+      -- call lastmile_upload.4_id_repair_non_critical();
+      
+      -- March 18, 2020
+      -- Ported update scripts from lastmile_cha to lastmile_ncha schema
+      -- 0 script builds the two temp table for CHSS and CHA historical IDs that the other four
+      -- update scripts used to repair and update the IDs
+      call lastmile_upload.0_ncha_id_rebuild_temp_tables();
+      call lastmile_upload.1_ncha_id_repair_critical();
+      call lastmile_upload.2_ncha_id_repair_routine_visit();
+      call lastmile_upload.3_ncha_id_repair_sick_child();
+      call lastmile_upload.4_ncha_id_repair_non_critical();
+      
     end 
 $$
 

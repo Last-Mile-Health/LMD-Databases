@@ -34,6 +34,7 @@ select
       c.household_map_count                                 as map_household_count,
       c.health_facility_km                                  as map_distance_kem_facility,
       c.health_facility_proximity                           as map_proximity_facility,
+      c.motorbike_access                                    as map_motorbike_acces,
       c.X                                                   as map_X,
       c.Y                                                   as map_Y
       

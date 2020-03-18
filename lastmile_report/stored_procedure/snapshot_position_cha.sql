@@ -80,7 +80,7 @@ select
       */    
       if( pc.position_count > 0, pc.position_community_count/pc.position_count , 0 ) as  position_community_count_proportional 
         
-from lastmile_cha.view_history_position_geo as p
+from lastmile_ncha.view_history_position_geo as p
     left outer join ( select
                             pr.position_id,
                             pr.person_id,
@@ -96,11 +96,19 @@ from lastmile_cha.view_history_position_geo as p
                             pr.reason_left,
                             pr.reason_left_description
                        
-                      from lastmile_cha.view_history_position_person_cha as pr
+                      from lastmile_ncha.view_history_position_person_cha as pr
                       where 
-                            ( pr.position_person_begin_date <= snapshot_date ) 
-                            and 
-                            ( ( pr.position_person_end_date is null ) or ( pr.position_person_end_date > snapshot_date ) ) 
+                            (
+                              ( pr.position_id_begin_date <= snapshot_date ) 
+                              and
+                              ( ( pr.position_id_end_date is null ) or ( pr.position_id_end_date > snapshot_date ) ) 
+                            )
+                            and
+                            (
+                              ( pr.position_person_begin_date <= snapshot_date ) 
+                              and 
+                              ( ( pr.position_person_end_date is null ) or ( pr.position_person_end_date > snapshot_date ) ) 
+                            )
      
                     ) as r on p.position_id like r.position_id
  
@@ -120,7 +128,7 @@ from lastmile_cha.view_history_position_geo as p
                               
                               cc.position_count
                               
-                      from lastmile_cha.view_history_position_community as hpc
+                      from lastmile_ncha.view_history_position_community as hpc
                             left outer join (                            
                                               -- This code block is pulled directly from the view lastmile_program.view_registration.  The only difference is the
                                               -- "where m.registration_date <= snapshot_date " clause at the bottom, which discards registration data 
@@ -172,7 +180,7 @@ from lastmile_cha.view_history_position_geo as p
                                                     hpcc.community_id, 
                                                     count( * ) as position_count
                                               
-                                              from lastmile_cha.view_history_position_community as hpcc
+                                              from lastmile_ncha.view_history_position_community as hpcc
                                               where ( hpcc.position_community_begin_date  <= snapshot_date ) and ( ( hpcc.position_community_end_date  is  null ) or ( hpcc.position_community_end_date  > snapshot_date ) )
                                               group by hpcc.community_id
     
@@ -184,8 +192,21 @@ from lastmile_cha.view_history_position_geo as p
                     ) as pc on p.position_id like pc.position_id
                     
 -- Conditional clause for positions active during snapshot date.                    
-where ( p.job like 'CHA' ) and ( ( p.position_begin_date <= snapshot_date ) and ( ( p.position_end_date is null ) or ( p.position_end_date > snapshot_date ) ) )
-
+where 
+      ( p.job like 'CHA' ) 
+      and 
+      ( 
+        ( p.position_begin_date <= snapshot_date ) 
+        and 
+        ( ( p.position_end_date is null ) or ( p.position_end_date > snapshot_date ) ) 
+      )
+      and    
+      ( 
+        ( p.position_id_begin_date <= snapshot_date ) 
+        and 
+        ( ( p.position_id_end_date is null ) or ( p.position_id_end_date > snapshot_date ) ) 
+      )
+      
 and case
         when  position_status like 'ALL'  then position_status        
         when  not r.person_id is    null  then 'FILLED'

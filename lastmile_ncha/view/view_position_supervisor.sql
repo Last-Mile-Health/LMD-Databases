@@ -7,7 +7,7 @@ select
       ps.position_id_pk, 
       pl.position_id_last           as position_id,
       ps.position_supervisor_id_pk, 
-      psl.position_id_last          as chss_position_id,
+      psl.position_id_last          as position_supervisor_id,
       ps.begin_date, 
       ps.end_date,
       ps.meta_insert_date_time

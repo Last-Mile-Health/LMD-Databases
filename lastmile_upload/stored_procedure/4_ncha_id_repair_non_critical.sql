@@ -3,7 +3,7 @@ use lastmile_upload;
 drop procedure if exists lastmile_upload.4_ncha_id_repair_non_critical;
 /*  
   Update every cha and chss ID in the upload tables based on the value in the _inserted field.  Compare _inserted values
-  against the lastmile_ncha.temp_view_person_position_cha_id_update table and the lastmile_ncha.view_person_position_cha_id_update 
+  against the lastmile_ncha.temp_view_history_position_position_id_cha_update table and the lastmile_ncha.temp_view_history_position_position_id_chss_update 
   view, depending on whether it's a cha or chss.  This procedure should be called nightly to upload the days inserted records.
 
 */
@@ -19,20 +19,50 @@ values ( now(), 'error occurred' );
 
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'BEGIN: 4_ncha_id_repair_non_critical' );
 
+-- 1. critical: odk_vaccineTracker ---------------------------------------
 
--- 1. non-critical: lastmile_archive table NCHAP ID updates go here.
+update lastmile_upload.odk_vaccineTracker 
+    set cha_id_inserted_format  = lastmile_upload.nchap_id_format( cha_id_inserted ), 
+        position_id_pk = null -- always set to null
+;
+update lastmile_upload.odk_vaccineTracker 
+    set chss_id_inserted_format = lastmile_upload.nchap_id_format( chss_id_inserted ), 
+        chss_position_id_pk = null -- always set to null
+;
 
--- added cha_id_original
 
-update lastmile_archive.chwdb_odk_chw_restock set cha_id_inserted_format = lastmile_upload.nchap_id_format( cha_id_inserted );
+update lastmile_upload.odk_vaccineTracker a, lastmile_ncha.temp_view_history_position_position_id_cha_update m
+
+    set a.SupervisedchaID = m.position_id_nchap, a.position_id_pk = m.position_id_pk
+        
+where ( trim( a.cha_id_inserted_format ) like m.position_id       ) or
+      ( trim( a.cha_id_inserted_format ) like m.position_id_nchap )   
+;
 
 
-update lastmile_archive.chwdb_odk_chw_restock a, lastmile_ncha.temp_view_person_position_cha_id_update m
+update lastmile_upload.odk_vaccineTracker a, lastmile_ncha.temp_view_history_position_position_id_chss_update m
 
-    set a.supervisedChwID = m.position_id_last 
+    set a.chssID = m.position_id_nchap, a.chss_position_id_pk = m.position_id_pk
     
-where ( trim( a.cha_id_inserted_format ) like m.position_id_last  ) or 
-      ( trim( a.cha_id_inserted_format ) like m.position_id       )
+where trim( a.chss_id_inserted_format ) like m.position_id_nchap        
+;
+
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_vaccineTracker' );
+
+
+
+-- 2. lastmile_archive.chwdb_odk_chw_restock
+
+update lastmile_archive.chwdb_odk_chw_restock 
+    set cha_id_inserted_format = lastmile_upload.nchap_id_format( cha_id_inserted ), position_id_pk = null;
+        
+
+update lastmile_archive.chwdb_odk_chw_restock a, lastmile_ncha.temp_view_history_position_position_id_cha_update m
+
+    set a.supervisedChwID = m.position_id_nchap, a.position_id_pk = m.position_id_pk 
+    
+where ( trim( a.cha_id_inserted_format ) like m.position_id       ) or
+      ( trim( a.cha_id_inserted_format ) like m.position_id_nchap )
 ;
 
 
@@ -40,36 +70,38 @@ insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) v
 
 
 
--- 2. non-critical: lastmile_archive.chwdb_odk_vaccine_tracker --------------------------------------- 
+-- 3. non-critical: lastmile_archive.chwdb_odk_vaccine_tracker --------------------------------------- 
 
 -- added cha_id_original
 
-update lastmile_archive.chwdb_odk_vaccine_tracker set cha_id_inserted_format = lastmile_upload.nchap_id_format( cha_id_inserted );
+update lastmile_archive.chwdb_odk_vaccine_tracker 
+    set cha_id_inserted_format = lastmile_upload.nchap_id_format( cha_id_inserted ), position_id_pk = null;
 
 
-update lastmile_archive.chwdb_odk_vaccine_tracker a, lastmile_ncha.temp_view_person_position_cha_id_update m
+update lastmile_archive.chwdb_odk_vaccine_tracker a, lastmile_ncha.temp_view_history_position_position_id_cha_update m
 
-    set a.chwID = m.position_id_last
+    set a.chwID = m.position_id_nchap, a.position_id_pk = m.position_id_pk
     
-where ( trim( a.cha_id_inserted_format ) like m.position_id_last  ) or 
-      ( trim( a.cha_id_inserted_format ) like m.position_id       ) 
+where ( trim( a.cha_id_inserted_format ) like m.position_id       ) or
+      ( trim( a.cha_id_inserted_format ) like m.position_id_nchap )
 ;
 
 
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'chwdb_odk_vaccine_tracker' );
 
 
--- 3. non-critical: lastmile_archive.staging_chwMonthlyServiceReportStep1 --------------------------------------- 
+-- 4. non-critical: lastmile_archive.staging_chwMonthlyServiceReportStep1 --------------------------------------- 
 
-update lastmile_archive.staging_chwMonthlyServiceReportStep1 set cha_id_inserted_format = lastmile_upload.nchap_id_format( chwID_inserted );
+update lastmile_archive.staging_chwMonthlyServiceReportStep1 
+    set cha_id_inserted_format = lastmile_upload.nchap_id_format( chwID_inserted ), position_id_pk = null;
 
 
-update lastmile_archive.staging_chwMonthlyServiceReportStep1 a, lastmile_ncha.temp_view_person_position_cha_id_update m
+update lastmile_archive.staging_chwMonthlyServiceReportStep1 a, lastmile_ncha.temp_view_history_position_position_id_cha_update m
 
-    set a.chwID = m.position_id_last
+    set a.chwID = m.position_id_nchap, a.position_id_pk = m.position_id_pk
     
-where ( trim( a.cha_id_inserted_format ) like m.position_id_last  ) or 
-      ( trim( a.cha_id_inserted_format ) like m.position_id       ) 
+where ( trim( a.cha_id_inserted_format ) like m.position_id       ) or
+      ( trim( a.cha_id_inserted_format ) like m.position_id_nchap )
 ;
 
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'staging_chwMonthlyServiceReportStep1' );

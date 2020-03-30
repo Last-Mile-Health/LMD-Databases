@@ -34,37 +34,34 @@ insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) v
 
 -- Rebuild the table temp_view_person_position_cha_id_update everytime this procedure is called.
 
-drop table if exists lastmile_ncha.temp_view_person_position_cha_id_update;
+drop table if exists lastmile_ncha.temp_view_history_position_position_id_cha_update;
 
-create table lastmile_ncha.temp_view_person_position_cha_id_update as 
-select * from lastmile_ncha.view_person_position_cha_id_update;
+create table lastmile_ncha.temp_view_history_position_position_id_cha_update as 
+select * from lastmile_ncha.view_history_position_position_id_cha_update;
 
 -- index on the three fields in the update where clause
-alter table lastmile_ncha.temp_view_person_position_cha_id_update add index ( position_id_last  );
-alter table lastmile_ncha.temp_view_person_position_cha_id_update add index ( position_id       );
+alter table lastmile_ncha.temp_view_history_position_position_id_cha_update add index ( position_id_nchap( 50 ) );
+alter table lastmile_ncha.temp_view_history_position_position_id_cha_update add index ( position_id( 50 )       );
+alter table lastmile_ncha.temp_view_history_position_position_id_cha_update add index ( position_id_pk       );
 
--- code to map old LMH integer ID system to position ID
--- alter table lastmile_ncha.temp_view_person_position_cha_id_update add index ( cha_id_historical );
-
-insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'temp_view_person_position_cha_id_update' );
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'temp_view_history_position_position_id_cha_update' );
 
 
 
 -- Rebuild the table temp_view_person_position_chss_id_update everytime this procedure is called.
 
-drop table if exists lastmile_ncha.temp_view_person_position_chss_id_update;
+drop table if exists lastmile_ncha.temp_view_history_position_position_id_chss_update;
 
-create table lastmile_ncha.temp_view_person_position_chss_id_update as 
-select * from lastmile_ncha.view_person_position_chss_id_update;
+create table lastmile_ncha.temp_view_history_position_position_id_chss_update as 
+select * from lastmile_ncha.view_history_position_position_id_chss_update;
 
 -- index on the three fields in the update where clause
--- alter table lastmile_ncha.temp_view_person_position_chss_id_update add index ( position_id_last  );
-alter table lastmile_ncha.temp_view_person_position_chss_id_update add index ( position_id       );
+alter table lastmile_ncha.temp_view_history_position_position_id_chss_update add index ( position_id_nchap( 50 ) );
+alter table lastmile_ncha.temp_view_history_position_position_id_chss_update add index ( position_id( 50 )       );
+alter table lastmile_ncha.temp_view_history_position_position_id_chss_update add index ( position_id_pk       );
 
--- code to map old LMH integer ID system to position ID
--- alter table lastmile_ncha.temp_view_person_position_chss_id_update add index ( chss_id_historical );
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'temp_view_history_position_position_id_chss_update' );
 
-insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'temp_view_person_position_chss_id_update' );
 
 -- End of procedure
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'END: 0_ncha_id_rebuild_temp_tables' );

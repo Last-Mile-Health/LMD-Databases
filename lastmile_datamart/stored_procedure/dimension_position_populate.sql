@@ -14,6 +14,8 @@ begin
  * Step 1. populate the dimension_date table
  *
 */
+
+-- TEMP comment out
 call lastmile_datamart.dimension_date_populate('2012-10-01', current_date() );
 
 
@@ -28,25 +30,27 @@ call lastmile_datamart.dimension_date_populate('2012-10-01', current_date() );
  *
 */
 
+-- view_history_position_person_cha
 drop table if exists lastmile_datamart.materialize_view_history_position_person_cha;
 create table lastmile_datamart.materialize_view_history_position_person_cha as 
 select 
       a.*
       -- s.position_supervisor_id
       
-from lastmile_cha.view_history_position_person_cha as a
+from lastmile_ncha.view_history_position_person_cha as a
 ;
 
 create index index_begin_end_date on 
 lastmile_datamart.materialize_view_history_position_person_cha( position_person_begin_date, position_person_end_date );
+
  
 drop table if exists lastmile_datamart.materialize_view_history_position_geo;
 create table lastmile_datamart.materialize_view_history_position_geo as
 select
       p.*,
       s.position_supervisor_id
-from lastmile_cha.view_history_position_geo as p
-    left outer join lastmile_cha.position_supervisor as s on p.position_id like trim( s.position_id ) and  p.job like 'CHA'
+from lastmile_ncha.view_history_position_geo as p
+    left outer join lastmile_ncha.view_position_supervisor as s on p.position_id like trim( s.position_id ) and  p.job like 'CHA'
 ;
 
 create index index_job_begin_end_date on 
@@ -58,7 +62,7 @@ lastmile_datamart.materialize_view_history_position_geo( job, position_begin_dat
  * dimension_position_populate() stored procedure.  You need to go into the source code and 
  * comment out the select * from faux_cursor_* statement.  Maybe put in a parameter debug switch.
 */
--- call lastmile_datamart.dimension_position_snapshot( '2019-03-31', 'ALL' );
+-- call lastmile_datamart.dimension_position_snapshot( '2020-03-18', 'ALL' );
 
 
 /* 
@@ -67,9 +71,7 @@ lastmile_datamart.materialize_view_history_position_geo( job, position_begin_dat
  * Populate dimenension_position with CHA position data
  *
 */
-
 call lastmile_datamart.dimension_position_populate_cha( begin_date, end_date, unit, position_status );
-
 
 
 /*
@@ -92,10 +94,12 @@ select
         day(    s.position_person_end_date  ) as position_person_end_date_key,
       s.*
       
-from lastmile_cha.view_history_position_person_chss as s;
+from lastmile_ncha.view_history_position_person_chss as s;
 
+-- Prefix indexes for the position IDs.  For some reason, some of the ID are giving the error: "specified key was too long max key length is 1000bytes."
 create index index_chss_begin_end_date on 
-lastmile_datamart.materialize_view_history_position_person_chss( position_id, position_person_begin_date_key, position_person_end_date_key );
+lastmile_datamart.materialize_view_history_position_person_chss( position_id( 25 ), position_person_begin_date_key, position_person_end_date_key );
+
 
 update lastmile_datamart.dimension_position d, lastmile_datamart.materialize_view_history_position_person_chss s
   
@@ -126,27 +130,31 @@ where ( d.chss_position_id like s.position_id )           and
  *
 */
 
--- Create temp table of supervisor position with begin/end dates as date keys (integers)
-drop table if exists lastmile_datamart.temp_position_supervisor;
 
-create table lastmile_datamart.temp_position_supervisor as
+-- Create temp table of supervisor position with begin/end dates as date keys (integers)
+drop table if exists lastmile_datamart.materialize_view_position_supervisor;
+
+create table lastmile_datamart.materialize_view_position_supervisor as
 select
-      begin_date,
-      end_date,
-      
-      ( year( begin_date  ) * 10000 ) + ( month( begin_date ) * 100 ) + day( begin_date ) as begin_date_key,
-      ( year( end_date    ) * 10000 ) + ( month( end_date   ) * 100 ) + day( end_date   ) as end_date_key,
-        
-      trim( position_id )               as position_id,
-      trim( position_supervisor_id )    as position_supervisor_id
        
-from lastmile_cha.position_supervisor
+      position_supervisor_id_pk_begin_date  as begin_date,
+      position_supervisor_id_pk_end_date    as end_date,
+      
+      ( year( position_supervisor_id_pk_begin_date  ) * 10000 ) + ( month( position_supervisor_id_pk_begin_date ) * 100 ) + day( position_supervisor_id_pk_begin_date ) as begin_date_key,
+      ( year( position_supervisor_id_pk_end_date    ) * 10000 ) + ( month( position_supervisor_id_pk_end_date   ) * 100 ) + day( position_supervisor_id_pk_end_date   ) as end_date_key,
+      
+      position_id,
+      position_supervisor_id
+       
+from lastmile_ncha.view_position_supervisor
 ;
 
+-- Prefix indexes for the position IDs.  For some reason, some of the ID are giving the error: "specified key was too long max key length is 1000bytes."
 create index index_position_supervisor_begin_end_date on 
-lastmile_datamart.temp_position_supervisor( position_id, position_supervisor_id, begin_date_key, end_date_key );
+lastmile_datamart.materialize_view_position_supervisor( position_id( 25 ), position_supervisor_id( 25 ), begin_date_key, end_date_key );
 
-update lastmile_datamart.dimension_position d, lastmile_datamart.temp_position_supervisor s
+
+update lastmile_datamart.dimension_position d, lastmile_datamart.materialize_view_position_supervisor s
   
   set d.qao_position_id                     = s.position_supervisor_id,
       d.qao_position_supervisor_begin_date  = s.begin_date,
@@ -157,6 +165,7 @@ where ( d.chss_position_id like s.position_id ) and
       ( ( s.end_date_key is null ) or ( s.end_date_key >= d.date_key ) )   
 ;
 
+
 drop table if exists lastmile_datamart.materialize_view_history_position_person_qao;
 
 create table lastmile_datamart.materialize_view_history_position_person_qao as 
@@ -165,10 +174,11 @@ select
         ( year( q.position_person_end_date    ) * 10000 ) + ( month( q.position_person_end_date   ) * 100 ) + day( q.position_person_end_date   ) as position_person_end_date_key,
         q.*
         
-from lastmile_cha.view_history_position_person_qao as q;
+from lastmile_ncha.view_history_position_person_qao as q;
 
 create index index_qao_begin_end_date on 
-lastmile_datamart.materialize_view_history_position_person_qao( position_id, position_person_begin_date_key, position_person_end_date_key );
+lastmile_datamart.materialize_view_history_position_person_qao( position_id( 25 ), position_person_begin_date_key, position_person_end_date_key );
+
 
 update lastmile_datamart.dimension_position d, lastmile_datamart.materialize_view_history_position_person_qao s
   

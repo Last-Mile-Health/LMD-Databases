@@ -40,9 +40,16 @@ select
 
       ( year( snapshot_date ) * 10000 ) + ( month( snapshot_date ) * 100 ) + day( snapshot_date ) as date_key,
       p.position_id,
-       
+      
+      -- dates from position table
       p.position_begin_date,
       p.position_end_date,
+      
+      -- dates from the position_id table.  These line up with position_begin/end_date columns from lastmile_cha data model
+      p.position_id_begin_date,
+      p.position_id_end_date,
+      
+      
       
       -- geography     
       p.county,
@@ -83,15 +90,50 @@ from lastmile_datamart.materialize_view_history_position_geo as p
                         
                       from lastmile_datamart.materialize_view_history_position_person_cha as pr
                       where 
-                            ( pr.position_person_begin_date <= snapshot_date ) 
-                            and 
-                            ( ( pr.position_person_end_date is null ) or ( pr.position_person_end_date >= snapshot_date ) ) 
-     
+                      /*                     
+                      ( pr.position_person_begin_date <= snapshot_date ) and ( ( pr.position_person_end_date is null ) or ( pr.position_person_end_date >= snapshot_date ) ) 
+                      */
+                      
+                      /* UNDER TESTING */
+                      (
+                        ( pr.position_id_begin_date <= snapshot_date ) 
+                        and
+                        ( ( pr.position_id_end_date is null ) or ( pr.position_id_end_date >= snapshot_date ) ) 
+                      )
+                      and
+                      (
+                        ( pr.position_person_begin_date <= snapshot_date ) 
+                        and 
+                        ( ( pr.position_person_end_date is null ) or ( pr.position_person_end_date >= snapshot_date ) ) 
+                      )
+                      /* END OF UNDER TESTING */
+
+       
                     ) as r on p.position_id like r.position_id
        
 -- Conditional clause for positions active during snapshot date.                    
-where ( p.job like 'CHA' ) and ( ( p.position_begin_date <= snapshot_date ) and ( ( p.position_end_date is null ) or ( p.position_end_date >= snapshot_date ) ) )
-
+where 
+      /* 
+      ( p.job like 'CHA' ) and ( ( p.position_begin_date <= snapshot_date ) and ( ( p.position_end_date is null ) or ( p.position_end_date >= snapshot_date ) ) )
+      */
+      
+      /* UNDER TESTING */
+      ( p.job like 'CHA' ) 
+      and 
+      ( 
+        ( p.position_begin_date <= snapshot_date )
+        and 
+        ( ( p.position_end_date is null ) or ( p.position_end_date >= snapshot_date ) ) 
+      )
+      and    
+      ( 
+        ( p.position_id_begin_date <= snapshot_date ) 
+        and 
+        ( ( p.position_id_end_date is null ) or ( p.position_id_end_date >= snapshot_date ) ) 
+      )
+ 
+      /* END OF UNDER TESTING */
+           
 and case
         when  position_status like 'ALL'  then position_status        
         when  not r.person_id is    null  then 'FILLED'

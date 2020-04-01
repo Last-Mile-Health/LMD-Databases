@@ -56,7 +56,7 @@ do begin
   -- set @begin_date       = '2012-10-01';
   -- set @end_date         = current_date();
   
-  set @begin_date       = date_format( date_sub( curdate(), INTERVAL 6 month ), '%Y-%m-%d' );
+  set @begin_date       = date_format( date_sub( curdate(), INTERVAL 12 month ), '%Y-%m-%d' );
   set @end_date         = date_format( current_date(), '%Y-%m-%d' );
   
   set @unit             = 'DAY';

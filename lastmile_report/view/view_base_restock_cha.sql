@@ -122,3 +122,4 @@ select
       if( a.stockOnHand_safetyBox             = 0, 1, 0 ) as stockout_safetyBox
             
 from lastmile_report.view_restock_cha_month a
+;

@@ -1,11 +1,11 @@
 use lastmile_report;
 
-drop view if exists view_restock_cha_month;
+drop view if exists lastmile_report.view_restock_cha_month;
 
-create view view_restock_cha_month as
+create view lastmile_report.view_restock_cha_month as
 select
         a.chaRestockID,
-        a.supervisedChaID                                                     as cha_id,
+        trim( a.supervisedChaID )                             as cha_id,
         b.county,
         b.county_id,
         
@@ -35,12 +35,18 @@ select
         min( a.stockOnHand_ZincSulfate_Infidelity )           as stockOnHand_ZincSulfate_Infidelity
         
 from lastmile_report.view_restock_union as a
-        left outer join mart_view_base_history_person_position as b on  (  
-                                                                          ( a.supervisedChaID like b.position_id )          and 
-                                                                          ( a.manualDate >= b.position_person_begin_date )  and 
-                                                                          ( ( a.manualDate <= b.position_person_end_date )  or 
-                                                                            isnull( b.position_person_end_date ) )                                                                        
-                                                                        )  
+        left outer join lastmile_report.mart_view_history_position_geo as b on trim( a.supervisedChaID ) like b.position_id 
+
+/* Owen:  We shouldn't be checking that the ID being used falls within the dates for IDs stored in lastmile_ncha schema.  We are
+          often months behind what the reality is in the field.
+                                                                                      and 
+                                                                                      (
+                                                                                      ( a.manualDate >= b.position_person_begin_date )  and 
+                                                                                      ( ( a.manualDate <= b.position_person_end_date )  or 
+                                                                                                    isnull( b.position_person_end_date ) 
+                                                                                                )  
+                                                                                      )
+ */                                                                                             
 where not ( a.supervisedChaID is null )
-group by a.supervisedChaID, month( a.manualDate ), year( a.manualDate )
+group by trim( a.supervisedChaID), month( a.manualDate ), year( a.manualDate )
 ;

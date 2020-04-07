@@ -6,7 +6,7 @@ use lastmile_report;
 --        Years is an integer between 2017 and 2030
 --
 --        If a day in the month falls outside the parameters of a valid date (Feb 29 in a non leap year, for example) then
---        the function valid_day_month_year sets the day to the last valid day in a month.  One minor issue we have been 
+--        the function lastmile_report.valid_day_month_year sets the day to the last valid day in a month.  One minor issue we have been 
 --        having is when data entry folks enter the current month instead of the month the ifi form was filled out.
 
 drop view if exists view_ifi_calculations;
@@ -17,21 +17,21 @@ select
         b.county_id,
         
         month( str_to_date( concat( trim( a.month_complete ), '/', 
-                                    valid_day_month_year( trim( a.day_complete ), trim( a.month_complete ), trim( a.year_complete ) ), '/', 
+                                    lastmile_report.valid_day_month_year( trim( a.day_complete ), trim( a.month_complete ), trim( a.year_complete ) ), '/', 
                                     trim( a.year_complete ) ), '%M/%e/%Y' ) )                                               as `month`,
                     
         trim( a.year_complete )                                                                                             as `year`,
         1                                                                                                           as numReports,
             
         str_to_date( concat(  trim( a.month_complete ), '/', 
-                              valid_day_month_year( trim( a.day_complete ), trim( a.month_complete ), trim( a.year_complete ) ), '/', 
+                              lastmile_report.valid_day_month_year( trim( a.day_complete ), trim( a.month_complete ), trim( a.year_complete ) ), '/', 
                               trim( a.year_complete )), '%M/%e/%Y' )                                                        as visitDate,
               
         str_to_date( concat(  trim( a.2_2_supply_restock_month_last ),  '/', 
         
                               -- a.2_2_supply_restock_day_last,    '/', 
                               
-                              valid_day_month_year( trim( a.2_2_supply_restock_day_last ), trim( a.2_2_supply_restock_month_last ), trim( a.2_2_supply_restock_year_last ) ),    '/',                             
+                              lastmile_report.valid_day_month_year( trim( a.2_2_supply_restock_day_last ), trim( a.2_2_supply_restock_month_last ), trim( a.2_2_supply_restock_year_last ) ),    '/',                             
                               
                               trim( a.2_2_supply_restock_year_last ) ), '%M/%e/%Y')                                         as lastRestockDate,
                               
@@ -40,7 +40,7 @@ select
         if( ( ( to_days( str_to_date( concat( trim( a.month_complete ),   '/',
         
                                               -- trim( a.day_complete ),     '/',
-                                              valid_day_month_year( trim( a.day_complete ), trim( a.month_complete ), trim( a.year_complete ) ), '/', 
+                                              lastmile_report.valid_day_month_year( trim( a.day_complete ), trim( a.month_complete ), trim( a.year_complete ) ), '/', 
                                           
                                               trim( a.year_complete ) ),  '%M/%e/%Y'
                                      )
@@ -49,7 +49,7 @@ select
               - to_days( str_to_date( concat( a.2_2_supply_restock_month_last,  '/',
               
                                               -- a.2_2_supply_restock_day_last,    '/',
-                                              valid_day_month_year( trim( a.2_2_supply_restock_day_last ), trim( a.2_2_supply_restock_month_last ), trim( a.2_2_supply_restock_year_last ) ),    '/',                             
+                                              lastmile_report.valid_day_month_year( trim( a.2_2_supply_restock_day_last ), trim( a.2_2_supply_restock_month_last ), trim( a.2_2_supply_restock_year_last ) ),    '/',                             
                               
                                               a.2_2_supply_restock_year_last ), '%M/%e/%Y'
                                             )
@@ -63,7 +63,7 @@ select
         if( ( ( to_days( str_to_date( concat( trim( a.month_complete ), '/',
         
                                               -- trim( a.day_complete ),   '/',
-                                              valid_day_month_year( trim( a.day_complete ), trim( a.month_complete ), trim( a.year_complete ) ), '/', 
+                                              lastmile_report.valid_day_month_year( trim( a.day_complete ), trim( a.month_complete ), trim( a.year_complete ) ), '/', 
 
                                               trim( a.year_complete ) ), '%M/%e/%Y'
                                             )
@@ -71,7 +71,7 @@ select
               - to_days( str_to_date( concat( a.2_2_supply_restock_month_last,  '/',
               
                                               -- a.2_2_supply_restock_day_last,    '/',
-                                              valid_day_month_year( trim( a.2_2_supply_restock_day_last ), trim( a.2_2_supply_restock_month_last ), trim( a.2_2_supply_restock_year_last ) ),    '/',                             
+                                              lastmile_report.valid_day_month_year( trim( a.2_2_supply_restock_day_last ), trim( a.2_2_supply_restock_month_last ), trim( a.2_2_supply_restock_year_last ) ),    '/',                             
                               
                                               a.2_2_supply_restock_year_last),  '%M/%e/%Y'
                                             )
@@ -138,5 +138,5 @@ select
             ) as correct_treatment
          
     from lastmile_report.mart_de_integrated_supervision_tool_community as a
-        left outer join lastmile_cha.county as b on  convert( a.county using UTF8 ) = b.county
+        left outer join lastmile_ncha.county as b on  convert( a.county using UTF8 ) = b.county
 ;

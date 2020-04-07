@@ -55,14 +55,18 @@ select
         a.fieldEmergencyDescription
         
 from lastmile_upload.odk_supervisionVisitLog a
+    left outer join lastmile_ncha.view_base_history_position as b on trim( a.supervisedCHAID ) like  b.position_id
+where a.meta_fabricated <> 1
+;
+/* Owen: Again, I don't think we need to be checking date ranges for IDs.  There's going to be spillover from
+         month-to-month
     left outer join lastmile_report.mart_view_base_history_person_position b ON 
         
         ( trim( a.supervisedCHAID ) like  b.position_id ) and
         ( a.manualDate >= b.position_person_begin_date  ) and
         ( isnull( b.position_person_end_date ) or ( a.manualDate <= b.position_person_end_date ) )          
+*/
 
-where a.meta_fabricated <> 1
-; -- end of view
 
             
             

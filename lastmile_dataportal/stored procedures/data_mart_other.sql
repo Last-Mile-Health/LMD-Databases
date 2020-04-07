@@ -22,7 +22,6 @@ INSERT INTO lastmile_dataportal.tbl_stored_procedure_log (`proc_name`, `paramete
 VALUES ('BEGIN: data_mart_other', 'none', NOW());
 
 
-
 -- Creates temporary tables from views, all prefixed with mart_* and stored in lastmile_report
 -- Called daily by evt_dataMartTables. Daily updates done because some reports look directly at these tables
 -- The dataPortalValues procedure works mainly off of the data marts created here
@@ -45,11 +44,19 @@ select * from lastmile_liberiamohdata.federated_de_integrated_supervision_tool_f
 
 drop table if exists lastmile_report.mart_view_base_history_person;
 create table lastmile_report.mart_view_base_history_person as 
-select * from lastmile_cha.view_base_history_person;
+select * from lastmile_ncha.view_base_history_person;
 
 drop table if exists lastmile_report.mart_view_base_history_person_position;
 create table lastmile_report.mart_view_base_history_person_position as 
-select * from lastmile_cha.view_base_history_person_position;
+select * from lastmile_ncha.view_base_history_person_position;
+
+drop table if exists lastmile_report.mart_view_history_position_geo;
+create table lastmile_report.mart_view_history_position_geo as 
+select * from lastmile_ncha.view_history_position_geo;
+
+drop table if exists lastmile_report.mart_view_base_history_position;
+create table lastmile_report.mart_view_base_history_position as 
+select * from lastmile_ncha.view_base_history_position;
 
 drop table if exists lastmile_report.mart_view_base_restock_cha;
 create table lastmile_report.mart_view_base_restock_cha as 
@@ -60,8 +67,8 @@ create table lastmile_report.mart_view_base_restock_chss as
 select * from lastmile_report.view_base_restock_chss;
 
 drop table if exists lastmile_report.mart_view_base_odk_supervision;
-create table lastmile_report.mart_view_base_odk_supervision 
-as select * from lastmile_report.view_base_odk_supervision;
+create table lastmile_report.mart_view_base_odk_supervision as 
+select * from lastmile_report.view_base_odk_supervision;
 
 drop table if exists lastmile_report.mart_view_base_ifi;
 create table lastmile_report.mart_view_base_ifi as 

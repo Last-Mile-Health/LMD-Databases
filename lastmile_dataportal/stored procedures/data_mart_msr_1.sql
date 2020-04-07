@@ -28,13 +28,14 @@ drop table if exists lastmile_report.mart_view_msr;
 create table lastmile_report.mart_view_msr as 
 select * from lastmile_report.view_msr;
 
-DROP TABLE IF EXISTS lastmile_report.mart_view_base_msr_county;
-CREATE TABLE lastmile_report.mart_view_base_msr_county as 
-SELECT * FROM lastmile_report.view_base_msr_county;
 
-DROP TABLE IF EXISTS lastmile_report.mart_view_base_msr_community;
-CREATE TABLE lastmile_report.mart_view_base_msr_community as 
-SELECT * FROM lastmile_report.view_base_msr_community;
+drop table if exists lastmile_report.mart_view_base_msr_county;
+create table lastmile_report.mart_view_base_msr_county as 
+select * from lastmile_report.view_base_msr_county;
+
+drop table if exists lastmile_report.mart_view_base_msr_community;
+create table lastmile_report.mart_view_base_msr_community as 
+select * from lastmile_report.view_base_msr_community;
 
 
 INSERT INTO lastmile_dataportal.tbl_stored_procedure_log (`proc_name`, `parameters`, `timestamp`) 

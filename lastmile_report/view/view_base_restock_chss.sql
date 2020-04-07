@@ -3,7 +3,6 @@ use lastmile_report;
 drop view if exists lastmile_report.view_base_restock_chss;
 
 create view lastmile_report.view_base_restock_chss as 
-
 select 
       lastmile_report.territory_id(a.county, 1) as territory_id,
         
@@ -189,8 +188,17 @@ select
         a.comment
     
 from lastmile_upload.de_chss_commodity_distribution a
-where trim( a.chss_id ) in (  select position_id 
-                              from lastmile_cha.view_base_history_person
-                              where view_base_history_person.job like 'CHSS' 
+
+where trim( a.chss_id ) in (  select  position_id
+                              from lastmile_ncha.view_base_history_position
+                              where job like 'CHSS'
                             )
 ;
+/* *** view_base_history_person is too slow.  Besides, we just need a list of valid CHSS position IDs that have existed over time.
+where trim( a.chss_id ) in (  select position_id 
+                              from lastmile_ncha.view_base_history_person  
+                              where job like 'CHSS'
+                     
+                            )
+                            
+*/                           

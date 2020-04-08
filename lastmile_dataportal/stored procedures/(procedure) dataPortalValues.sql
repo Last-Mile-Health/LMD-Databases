@@ -1142,72 +1142,72 @@ SELECT 59, '6_16', 1, @p_month, @p_year, ROUND(SUM(COALESCE(`# records receiving
 
 -- 104. Turnover rate (CHAs; overall)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 104, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Grand Gedeh', 'rate');
+SELECT 104, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 104, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Rivercess', 'rate');
+SELECT 104, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Rivercess', 'rate');
 
 
 -- 105. Turnover rate (CHAs; termination)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 105, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Grand Gedeh', 'rate');
+SELECT 105, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 105, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Rivercess', 'rate');
+SELECT 105, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Rivercess', 'rate');
 
 
 -- 106. Turnover rate (CHAs; resignation)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 106, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Grand Gedeh', 'rate');
+SELECT 106, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 106, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Rivercess', 'rate');
+SELECT 106, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Rivercess', 'rate');
 
 
 -- 107. Turnover rate (CHAs; promotion)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 107, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Grand Gedeh', 'rate');
+SELECT 107, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 107, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Rivercess', 'rate');
+SELECT 107, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Rivercess', 'rate');
 
 
 -- 108. Turnover rate (CHAs; other/unknown)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 108, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Grand Gedeh', 'rate');
+SELECT 108, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 108, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Rivercess', 'rate');
+SELECT 108, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Rivercess', 'rate');
 
 
 -- 109. Turnover rate (Supervisors; overall)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 109, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Grand Gedeh', 'rate');
+SELECT 109, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 109, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Rivercess', 'rate');
+SELECT 109, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Rivercess', 'rate');
 
 
 -- 110. Turnover rate (Supervisors; termination)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 110, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Grand Gedeh', 'rate');
+SELECT 110, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 110, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Rivercess', 'rate');
+SELECT 110, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Rivercess', 'rate');
 
 
 -- 111. Turnover rate (Supervisors; resignation)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 111, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Grand Gedeh', 'rate');
+SELECT 111, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 111, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Rivercess', 'rate');
+SELECT 111, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Rivercess', 'rate');
 
 
 -- 112. Turnover rate (Supervisors; promotion)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 112, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Grand Gedeh', 'rate');
+SELECT 112, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 112, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Rivercess', 'rate');
+SELECT 112, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Rivercess', 'rate');
 
 
 -- 113. Turnover rate (Supervisors; other/unknown)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 113, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Grand Gedeh', 'rate');
+SELECT 113, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 113, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Rivercess', 'rate');
+SELECT 113, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Rivercess', 'rate');
 
 
 -- 117. Number of deaths (maternal)
@@ -1745,72 +1745,72 @@ where not ( county_id is null ) and
 
 -- 247. Numerator (indID 104)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 247, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Grand Gedeh', 'numerator');
+SELECT 247, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 247, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Rivercess', 'numerator');
+SELECT 247, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Rivercess', 'numerator');
 
 
 -- 249. Numerator (indID 105)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 249, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Grand Gedeh', 'numerator');
+SELECT 249, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 249, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Rivercess', 'numerator');
+SELECT 249, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Rivercess', 'numerator');
 
 
 -- 250. Numerator (indID 106)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 250, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Grand Gedeh', 'numerator');
+SELECT 250, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 250, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Rivercess', 'numerator');
+SELECT 250, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Rivercess', 'numerator');
 
 
 -- 251. Numerator (indID 107)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 251, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Grand Gedeh', 'numerator');
+SELECT 251, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 251, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Rivercess', 'numerator');
+SELECT 251, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Rivercess', 'numerator');
 
 
 -- 252. Numerator (indID 108)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 252, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Grand Gedeh', 'numerator');
+SELECT 252, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 252, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Rivercess', 'numerator');
+SELECT 252, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Rivercess', 'numerator');
 
 
 -- 253. Numerator (indID 109)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 253, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Grand Gedeh', 'numerator');
+SELECT 253, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 253, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Rivercess', 'numerator');
+SELECT 253, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Rivercess', 'numerator');
 
 
 -- 255. Numerator (indID 110)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 255, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Grand Gedeh', 'numerator');
+SELECT 255, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 255, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Rivercess', 'numerator');
+SELECT 255, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Rivercess', 'numerator');
 
 
 -- 256. Numerator (indID 111)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 256, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Grand Gedeh', 'numerator');
+SELECT 256, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 256, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Rivercess', 'numerator');
+SELECT 256, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Rivercess', 'numerator');
 
 
 -- 257. Numerator (indID 112)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 257, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Grand Gedeh', 'numerator');
+SELECT 257, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 257, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Rivercess', 'numerator');
+SELECT 257, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Rivercess', 'numerator');
 
 
 -- 258. Numerator (indID 113)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 258, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Grand Gedeh', 'numerator');
+SELECT 258, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 258, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Rivercess', 'numerator');
+SELECT 258, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Rivercess', 'numerator');
 
 
 -- 302. CHSS reporting rate

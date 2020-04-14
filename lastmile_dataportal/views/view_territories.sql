@@ -6,39 +6,39 @@ create view lastmile_dataportal.view_territories as
 
     SELECT 
         CONCAT('1_',
-                `lastmile_cha`.`county`.`county_id`) AS `territory_id`,
-        `lastmile_cha`.`county`.`county` AS `territory_name`,
+                `lastmile_ncha`.`county`.`county_id`) AS `territory_id`,
+        `lastmile_ncha`.`county`.`county` AS `territory_name`,
         'county' AS `territory_type`
     FROM
-        `lastmile_cha`.`county` 
+        `lastmile_ncha`.`county` 
     UNION SELECT 
         CONCAT('2_',
-                `lastmile_cha`.`health_district`.`health_district_id`) AS `CONCAT('2_',health_district_id)`,
-        `lastmile_cha`.`health_district`.`health_district` AS `health_district`,
+                `lastmile_ncha`.`health_district`.`health_district_id`) AS `CONCAT('2_',health_district_id)`,
+        `lastmile_ncha`.`health_district`.`health_district` AS `health_district`,
         'health district' AS `territory_type`
     FROM
-        `lastmile_cha`.`health_district` 
+        `lastmile_ncha`.`health_district` 
     UNION SELECT 
         CONCAT('3_',
-                `lastmile_cha`.`district`.`district_id`) AS `CONCAT('3_',district_id)`,
-        `lastmile_cha`.`district`.`district` AS `district`,
+                `lastmile_ncha`.`district`.`district_id`) AS `CONCAT('3_',district_id)`,
+        `lastmile_ncha`.`district`.`district` AS `district`,
         'district' AS `territory_type`
     FROM
-        `lastmile_cha`.`district` 
+        `lastmile_ncha`.`district` 
     UNION SELECT 
         CONCAT('4_',
-                `lastmile_cha`.`health_facility`.`health_facility_id`) AS `CONCAT('4_',health_facility_id)`,
-        `lastmile_cha`.`health_facility`.`health_facility` AS `health_facility`,
+                `lastmile_ncha`.`health_facility`.`health_facility_id`) AS `CONCAT('4_',health_facility_id)`,
+        `lastmile_ncha`.`health_facility`.`health_facility` AS `health_facility`,
         'health facility' AS `territory_type`
     FROM
-        `lastmile_cha`.`health_facility` 
+        `lastmile_ncha`.`health_facility` 
     UNION SELECT 
         CONCAT('5_',
-                `lastmile_cha`.`community`.`community_id`) AS `CONCAT('5_',community_id)`,
-        `lastmile_cha`.`community`.`community` AS `community`,
+                `lastmile_ncha`.`community`.`community_id`) AS `CONCAT('5_',community_id)`,
+        `lastmile_ncha`.`community`.`community` AS `community`,
         'community' AS `territory_type`
     FROM
-        `lastmile_cha`.`community` 
+        `lastmile_ncha`.`community` 
     
     union
     
@@ -60,5 +60,5 @@ create view lastmile_dataportal.view_territories as
           'other' AS territory_type
           
     from lastmile_dataportal.tbl_territories_other as t
-        left outer join lastmile_cha.view_position_qao_person as q on trim( t.territory_name ) like trim( q.position_id )
+        left outer join lastmile_ncha.view_position_qao_person as q on trim( t.territory_name ) like trim( q.position_id )
 ;

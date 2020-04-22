@@ -33,7 +33,7 @@ select
       trim( m.community )       as msr_community
             
 from lastmile_upload.de_cha_monthly_service_report as m
-    left outer join lastmile_cha.view_base_position_cha_basic_info as v on trim( m.cha_id ) like v.position_id
+    left outer join lastmile_ncha.view_base_position_cha as v on trim( m.cha_id ) like v.position_id
 where not ( v.position_id is null )
 order by cast( trim( m.year_reported  ) as unsigned ) desc, 
          cast( trim( m.month_reported ) as unsigned ) desc,

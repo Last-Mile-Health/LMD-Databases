@@ -24,7 +24,7 @@ select
       v.community_list
       
 from lastmile_report.view_twelve_month as d
-    cross join lastmile_cha.view_base_position_cha_basic_info as v
+    cross join lastmile_ncha.view_base_position_cha as v
         left outer join lastmile_upload.de_cha_monthly_service_report as m on ( trim( v.position_id ) like trim( m.cha_id )                                   ) and
                                                                               ( cast( d.year_reported   as unsigned ) = cast( m.year_reported   as unsigned ) ) and
                                                                               ( cast( d.month_reported  as unsigned ) = cast( m.month_reported  as unsigned ) )

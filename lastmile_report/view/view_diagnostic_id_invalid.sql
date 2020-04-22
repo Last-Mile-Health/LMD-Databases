@@ -30,6 +30,6 @@ select
       d.meta_form_version
 
 from lastmile_report.view_diagnostic_id as d
-    left outer join lastmile_cha.`position` as p on trim( d.id_inserted_value ) like p.position_id and d.id_type like if( p.job_id = 1, 'cha',  if( p.job_id = 3, 'chss', null ) )
+    left outer join lastmile_ncha.view_position_id_distinct as p on trim( d.id_inserted_value ) like p.position_id and d.id_type like if( p.job_id = 1, 'cha',  if( p.job_id = 3, 'chss', null ) )
 where p.position_id is null
 ;

@@ -17,6 +17,6 @@ select
       group_concat( distinct chss                order by position_id separator ', ' ) as chss_list,
       group_concat( distinct cha                 order by position_id separator ', ' ) as cha_list
 
-from lastmile_cha.view_community_geo_position_cha
+from lastmile_ncha.view_community_geo_position_cha
 group by community_id, community
 ;

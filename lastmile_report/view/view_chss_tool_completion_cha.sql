@@ -8,7 +8,7 @@ select
         a.chss_position_id    as chss_id,
         count( a.cha )        as num_cha
         
-from lastmile_cha.view_base_cha_basic_info as a
+from lastmile_ncha.view_base_position_cha as a
 where not( a.position_id is null ) and ( ( a.cohort is null ) or not ( a.cohort like '%UNICEF%' ) )
 group by a.chss_position_id
 ;

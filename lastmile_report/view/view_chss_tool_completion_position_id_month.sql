@@ -2,7 +2,7 @@ use lastmile_report;
 
 drop view if exists lastmile_report.view_chss_tool_completion_position_id_month;
 
-create table lastmile_report.view_chss_tool_completion_position_id_month as
+create view lastmile_report.view_chss_tool_completion_position_id_month as
 select
       a.`year`,
       a.`month`,

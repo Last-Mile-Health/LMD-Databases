@@ -1140,6 +1140,8 @@ REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`
 SELECT 59, '6_16', 1, @p_month, @p_year, ROUND(SUM(COALESCE(`# records receiving QA`,0))/SUM(COALESCE(`# records entered`,0)),3) FROM lastmile_report.view_data_entry WHERE `Month`=@p_month AND `Year`=@p_year;
 
 
+
+
 -- 104. Turnover rate (CHAs; overall)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 104, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Grand Gedeh', 'rate');
@@ -1232,6 +1234,8 @@ SELECT 119, territory_id, 1, @p_month, @p_year, COALESCE(num_routine_visits,0)
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL
 UNION SELECT 119, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_routine_visits,0))
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
+
+
 
 
 -- 119.	NCHA Outputs: Number of routine visits conducted
@@ -1743,6 +1747,8 @@ where not ( county_id is null ) and
 ;
 
 
+
+
 -- 247. Numerator (indID 104)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 247, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Grand Gedeh', 'numerator');
@@ -1813,6 +1819,9 @@ REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`
 SELECT 258, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Rivercess', 'numerator');
 
 
+
+
+
 -- 302. CHSS reporting rate
 -- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted
 -- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
@@ -1823,6 +1832,7 @@ WHERE month_reported=@p_month AND year_reported=@p_year AND a.territory_id IS NO
 UNION SELECT 302, '6_16', 1, @p_month, @p_year, ROUND(COUNT(1)/num_chss,3)
 FROM lastmile_report.view_chss_msr a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
 WHERE month_reported=@p_month AND year_reported=@p_year AND a.territory_id IS NOT NULL;
+
 
 
 -- 302. CHSS reporting rate by QAO

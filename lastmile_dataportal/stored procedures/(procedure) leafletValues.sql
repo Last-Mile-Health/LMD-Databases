@@ -320,7 +320,7 @@ where s.territory_id like '1\\_%'
 union all
 
 select concat('2_',health_district_id), 1 as period_id, 28, count( * ) 
-from lastmile_cha.view_base_cha_basic_info 
+from lastmile_ncha.view_base_position_cha 
 group by health_district_id
 ;
 
@@ -351,11 +351,9 @@ where s.territory_id like '1\\_%'
 union all
 
 select concat('2_',health_district_id), 1 as period_id, 29, count( * ) 
-from lastmile_cha.view_base_chss 
+from lastmile_ncha.view_base_position_chss 
 group by health_district_id
 ;
-
-
 
 -- 31. Number of deaths (neonatal)
 

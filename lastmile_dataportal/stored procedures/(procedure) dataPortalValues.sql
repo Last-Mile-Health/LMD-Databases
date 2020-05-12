@@ -353,6 +353,14 @@ update lastmile_report.mart_program_scale s
 where territory_id like '1\\_14'
 ;
 
+-- Note: 5/6/2020 This is a temp hack to make the Rivercess numbers look better.
+-- Rivercess 1_14
+update lastmile_report.mart_program_scale s
+    set s.num_people = 51186
+where territory_id like '1\\_14'
+;
+
+
 -- Grand Bassa 1_4
 
 update lastmile_report.mart_program_scale s
@@ -424,6 +432,14 @@ update lastmile_report.mart_program_scale s
 
                               ) as a
                        )
+where territory_id like '6\\_16'
+;
+
+
+-- Note: 5/6/2020 This is a temp hack to make the Rivercess numbers look better.
+-- all managed ares 6_16
+update lastmile_report.mart_program_scale s
+    set s.num_people = 146605
 where territory_id like '6\\_16'
 ;
 
@@ -2026,7 +2042,7 @@ replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id
 select 325, '6_27', 1, @p_month,  @p_year,  round( count( * ) / coalesce( d.number_county_report, 0 ), 3 ) as ifi_report_rate
 from (  
         select county 
-        from lastmile_report.mart_view_base_ifi 
+        from lastmile_report.mart_view_kobo_ifi 
         where `month` = @p_month and `year` = @p_year 
         group by county
 ) as n
@@ -2034,7 +2050,7 @@ from (
                 select count( * ) as number_county_report
                 from (  
                         select county 
-                        from lastmile_report.mart_view_base_ifi  
+                        from lastmile_report.mart_view_kobo_ifi  
                         where date( concat( `year`, '-', `month`,'-', '-01' ) ) <= date( concat( @p_year, '-', @p_month,'-', '-01' ) )
                         group by county
                 ) as t
@@ -2301,31 +2317,30 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 -- 366. Number of IFI visits conducted (CHAs)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 366, territory_id, 1, @p_month, @p_year, COALESCE(numReports,0)
-FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year
+FROM lastmile_report.mart_view_kobo_ifi WHERE `month`=@p_month AND `year`=@p_year
 UNION SELECT 366, '6_27', 1, @p_month, @p_year, SUM(COALESCE(numReports,0))
-FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year
+FROM lastmile_report.mart_view_kobo_ifi WHERE `month`=@p_month AND `year`=@p_year
 UNION SELECT 366, territory_id, 2, @p_month, @p_year, SUM(COALESCE(numReports,0))
-FROM lastmile_report.mart_view_base_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
-
+FROM lastmile_report.mart_view_kobo_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
 
 -- 367. Percent of CHAs who received a restock visit in the past month (IFI)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 367, territory_id, 1, @p_month, @p_year, ROUND(SUM(COALESCE(restockedInLastMonth,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year GROUP BY territory_id
+FROM lastmile_report.mart_view_kobo_ifi WHERE `month`=@p_month AND `year`=@p_year GROUP BY territory_id
 UNION SELECT 367, '6_27', 1, @p_month, @p_year, ROUND(SUM(COALESCE(restockedInLastMonth,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year
+FROM lastmile_report.mart_view_kobo_ifi WHERE `month`=@p_month AND `year`=@p_year
 UNION SELECT 367, territory_id, 2, @p_month, @p_year, ROUND(SUM(COALESCE(restockedInLastMonth,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_base_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
+FROM lastmile_report.mart_view_kobo_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
 
 
 -- 368. Percent of CHAs who received a supervision visit in the past month (IFI)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 368, territory_id, 1, @p_month, @p_year, ROUND(SUM(COALESCE(supervisedLastMonth,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year GROUP BY territory_id
+FROM lastmile_report.mart_view_kobo_ifi WHERE `month`=@p_month AND `year`=@p_year GROUP BY territory_id
 UNION SELECT 368, '6_27', 1, @p_month, @p_year, ROUND(SUM(COALESCE(supervisedLastMonth,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year
+FROM lastmile_report.mart_view_kobo_ifi WHERE `month`=@p_month AND `year`=@p_year
 UNION SELECT 368, territory_id, 2, @p_month, @p_year, ROUND(SUM(COALESCE(supervisedLastMonth,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_base_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
+FROM lastmile_report.mart_view_kobo_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
 
 
 -- 368. Co-impact KPIs are reported on for March and August.  Use period_id = 38 (month 3 and month 8) to specific them.
@@ -2346,7 +2361,7 @@ if @p_date_key < 20190701 then
 
     replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
     select 368, '6_32', 1, @p_month, @p_year, round( sum( coalesce( supervisedLastMonth, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-    from lastmile_report.mart_view_base_ifi 
+    from lastmile_report.mart_view_kobo_ifi 
     where `month`=@p_month and `year`=@p_year and 
     not ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' );
 
@@ -2354,7 +2369,7 @@ else
 
     replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
     select 368, '6_32', 1, @p_month, @p_year, round( sum( coalesce( supervisedLastMonth, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-    from lastmile_report.mart_view_base_ifi 
+    from lastmile_report.mart_view_kobo_ifi 
     where `month`=@p_month and `year`=@p_year;
 
 end if;
@@ -2372,7 +2387,7 @@ select
       coalesce( round( sum( coalesce( i.receivedLastIncentiveOnTime, 0 ) ) / sum( coalesce( i.numReports, 0 ) ), 3 ), 0 ) as value
      
 from lastmile_dataportal.view_territories_active as a
-    left outer join lastmile_report.mart_view_base_ifi as i on  ( a.territory_id like i.territory_id  ) and
+    left outer join lastmile_report.mart_view_kobo_ifi as i on  ( a.territory_id like i.territory_id  ) and
                                                                 ( i.`month` = @p_month                ) and 
                                                                 ( i.`year` = @p_year                  )
                                                                 
@@ -2390,7 +2405,7 @@ select
       coalesce( round( sum( coalesce( i.receivedLastIncentiveOnTime, 0 ) ) / sum( coalesce( i.numReports, 0 ) ), 3 ), 0 ) as value
      
 from lastmile_dataportal.view_territories_active as a
-    left outer join lastmile_report.mart_view_base_ifi as i on  ( a.territory_id like i.territory_id  ) and
+    left outer join lastmile_report.mart_view_kobo_ifi as i on  ( a.territory_id like i.territory_id  ) and
                                                                 ( i.`month` = @p_month                ) and 
                                                                 ( i.`year` = @p_year                  )
                                                                 
@@ -2407,7 +2422,7 @@ select
       coalesce( round( sum( coalesce( i.receivedLastIncentiveOnTime, 0 ) ) / sum( coalesce( i.numReports, 0 ) ), 3 ), 0 ) as value
      
 from lastmile_dataportal.view_territories_active as a
-    left outer join lastmile_report.mart_view_base_ifi as i on  ( a.territory_id like i.territory_id  ) and
+    left outer join lastmile_report.mart_view_kobo_ifi as i on  ( a.territory_id like i.territory_id  ) and
                                                                 ( 
                                                                   ( ( i.`month` = @p_month        ) and ( i.`year` = @p_year       ) ) or 
                                                                   ( ( i.`month` = @p_monthMinus1  ) and ( i.`year` = @p_yearMinus1 ) ) or 
@@ -2427,7 +2442,7 @@ select
       @p_year, 
       round( sum( coalesce( receivedLastIncentiveOnTime, 0 ) )/sum( coalesce( numReports, 0 ) ), 3)
       
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month` = @p_month and `year`=@p_year and 
       ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
 
@@ -2441,7 +2456,7 @@ select
       @p_year, 
       round( sum( coalesce( receivedLastIncentiveOnTime, 0 ) )/sum( coalesce( numReports, 0 ) ), 3)
       
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month AND `year`=@p_year and 
       not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
 ;
@@ -2458,6 +2473,7 @@ where ind_id = 369 and period_id = 1 and `month` = @p_month and `year` = @p_year
 ;
 
 end if;
+
 
 
 -- 381. NCHA Outputs: Number of CHA monthly service reports (MSRs) received by MOH
@@ -3919,7 +3935,7 @@ from (
  * the denominator is the number of CHAs sampled during the month.  We could suppress is number of CHAs is too low.
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 430, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_life_saving_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year and NOT ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' );
 */
 
@@ -3978,7 +3994,7 @@ from (
 /* Note: moved to code 465-469
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 431, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year and NOT ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' );
 */
 
@@ -4148,47 +4164,46 @@ where (
  * the denominator is the number of CHAs sampled during the month.  We could suppress if number of CHAs is too low.
 */
 
-
 -- Beginning of code for ifi database
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 476, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_life_saving_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 477, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 478, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 479, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 480, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all 
 
 select 481, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 482, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
@@ -4196,13 +4211,13 @@ union all
 -- For graph, generate period 2 quarterly totals for everything below
 
 select 477, territory_id, 1, @p_month, @p_year, round( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 477, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where ( ( `year` = @p_year and `month` = @p_month             ) or 
         ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
         ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
@@ -4211,13 +4226,13 @@ group by territory_id
 union all
 
 select 478, territory_id, 1, @p_month, @p_year, round( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 478, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where ( ( `year` = @p_year and `month` = @p_month             ) or 
         ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
         ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
@@ -4226,13 +4241,13 @@ group by territory_id
 union all
 
 select 479, territory_id, 1, @p_month, @p_year, round( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 479, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where ( ( `year` = @p_year and `month` = @p_month             ) or 
         ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
         ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
@@ -4241,13 +4256,13 @@ group by territory_id
 union all
 
 select 480, territory_id, 1, @p_month, @p_year, round( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 480, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where ( ( `year` = @p_year and `month` = @p_month             ) or 
         ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
         ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
@@ -4256,13 +4271,13 @@ group by territory_id
 union all 
 
 select 481, territory_id, 1, @p_month, @p_year, round( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value 
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 481, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where ( ( `year` = @p_year and `month` = @p_month             ) or 
         ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
         ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
@@ -4271,13 +4286,13 @@ group by territory_id
 union all
 
 select 482, territory_id, 1, @p_month, @p_year, round( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 482, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where ( ( `year` = @p_year and `month` = @p_month             ) or 
         ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
         ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
@@ -4298,6 +4313,7 @@ where ind_id = 477 and period_id = 1 and `month` = @p_month and `year` = @p_year
 ;
 
 end if;
+
 
 
 /* 
@@ -4714,7 +4730,7 @@ select  484, '6_35' as territory_id, 1 as period_id, @p_month, @p_year,
         round( sum( coalesce( number_service_delivery_question_correct_1_4, 0 ) ) / 
                sum( coalesce( numReports, 0 ) ), 3 ) as value
       
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where 
       @isEndOfQuarter and 
       (
@@ -4723,6 +4739,7 @@ where
         ( `year`=@p_yearMinus2  and `month`=@p_monthMinus2  )
       )
 ;
+
 
 
 /*
@@ -4877,7 +4894,6 @@ from (
 ;
 
 
-
 -- 805. Co-impact KPIs are reported for March and August.  Use period_id = 38 (month 3 and month 8) to specific them.
 if ( @p_month = 3 ) or ( @p_month = 8 ) then 
 
@@ -4888,11 +4904,13 @@ select  805, '6_27' as territory_id, 38 as period_id, @p_month, @p_year,
         round( sum( coalesce( number_correct_treatment, 0 ) ) / 
                sum( coalesce( numReports, 0 ) ), 3 ) as value
       
-from lastmile_report.mart_view_base_ifi 
+from lastmile_report.mart_view_kobo_ifi 
 where `year`=@p_year and `month`=@p_month
 ;
 
 end if;
+
+
 
 
 

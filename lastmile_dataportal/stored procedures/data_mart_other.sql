@@ -74,6 +74,10 @@ drop table if exists lastmile_report.mart_view_base_ifi;
 create table lastmile_report.mart_view_base_ifi as 
 select * from lastmile_report.view_base_ifi;
 
+drop table if exists lastmile_report.mart_view_kobo_ifi;
+create table lastmile_report.mart_view_kobo_ifi as 
+select * from lastmile_report.view_kobo_ifi;
+
 drop table if exists lastmile_report.mart_view_odk_sickchild;
 create table lastmile_report.mart_view_odk_sickchild as 
 select * from lastmile_report.view_odk_sickchild;

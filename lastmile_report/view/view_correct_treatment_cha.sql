@@ -13,6 +13,7 @@ select
       trim( c.cha_id ) as position_id
       
 from lastmile_upload.de_case_scenario_2 as c
+where c.cha_assessed_checkbox = 1
 
 union all
 

@@ -1281,6 +1281,99 @@ FROM lastmile_report.mart_view_base_msr_county a LEFT JOIN `lastmile_report`.`ma
 WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
 
+-- 124.  Number of malaria treatments per CHA.  CHA is number of active CHAs in territory_id
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 
+      124 as ind_id, 
+      m.territory_id, 
+      1 as period_id, 
+      @p_month, 
+      @p_year, 
+      round( ( coalesce( m.num_tx_malaria, 0 ) / coalesce( s.num_cha, 0 ) ), 1 ) as malaria_treat_per_cha
+         
+from lastmile_report.mart_view_base_msr_county as m
+    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
+    
+where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
+
+union all
+
+select 
+      124 as ind_id,
+      '6_16',
+      1 as period_id, 
+      @p_month, 
+      @p_year, 
+      round( ( sum( coalesce( m.num_tx_malaria, 0 ) ) / sum( coalesce( s.num_cha, 0 ) ) ), 1 ) as malaria_treat_per_cha
+
+from lastmile_report.mart_view_base_msr_county as m
+    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
+
+where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
+;
+
+-- 125.  Number of diarrhea treatments per CHA.  CHA is number of active CHAs in territory_id
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 
+      125 as ind_id, 
+      m.territory_id, 
+      1 as period_id, 
+      @p_month, 
+      @p_year, 
+      round( ( coalesce( m.num_tx_diarrhea, 0 ) / coalesce( s.num_cha, 0 ) ), 1 ) as diarrhea_treat_per_cha
+          
+from lastmile_report.mart_view_base_msr_county as m
+    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
+    
+where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
+
+union all
+
+select 
+      125 as ind_id,
+      '6_16',
+      1 as period_id, 
+      @p_month, 
+      @p_year, 
+      round( ( sum( coalesce( m.num_tx_diarrhea, 0 ) ) / sum( coalesce( s.num_cha, 0 ) ) ), 1 ) as diarrhea_treat_per_cha
+
+from lastmile_report.mart_view_base_msr_county as m
+    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
+
+where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
+;
+
+-- 126.  Number of ari treatments per CHA.  CHA is number of active CHAs in territory_id
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 
+      126 as ind_id, 
+      m.territory_id, 
+      1 as period_id, 
+      @p_month, 
+      @p_year, 
+      round( ( coalesce( m.num_tx_ari, 0 ) / coalesce( s.num_cha, 0 ) ), 1 ) as ari_treat_per_cha
+          
+from lastmile_report.mart_view_base_msr_county as m
+    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
+    
+where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
+
+union all
+
+select 
+      126 as ind_id,
+      '6_16',
+      1 as period_id, 
+      @p_month, 
+      @p_year, 
+      round( ( sum( coalesce( m.num_tx_ari, 0 ) ) / sum( coalesce( s.num_cha, 0 ) ) ), 1 ) as ari_treat_per_cha
+
+from lastmile_report.mart_view_base_msr_county as m
+    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
+
+where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
+;
+
 -- 127. Number of actual supervision visits
 -- Currently based off of ODK data
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -2473,6 +2566,42 @@ where ind_id = 369 and period_id = 1 and `month` = @p_month and `year` = @p_year
 ;
 
 end if;
+
+
+-- 372.  Number of MUAC test (red + yellow + green) per CHA.  CHA is number of active CHAs in territory_id
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 
+      372 as ind_id, 
+      m.territory_id, 
+      1 as period_id, 
+      @p_month, 
+      @p_year, 
+      round( ( 
+              ( coalesce( m.num_muac_green, 0 ) + coalesce( m.num_muac_yellow, 0 ) + coalesce( m.num_muac_red, 0 ) ) 
+              / coalesce( s.num_cha, 0 ) ), 1 ) as muac_per_cha
+          
+from lastmile_report.mart_view_base_msr_county as m
+    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
+    
+where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
+
+union all
+
+select 
+      372 as ind_id,
+      '6_16',
+      1 as period_id, 
+      @p_month, 
+      @p_year, 
+      round( ( 
+              sum( ( coalesce( m.num_muac_green, 0 ) + coalesce( m.num_muac_yellow, 0 ) + coalesce( m.num_muac_red, 0 ) ) ) 
+              / sum( coalesce( s.num_cha, 0 ) ) ), 1 ) as muac_per_cha
+
+from lastmile_report.mart_view_base_msr_county as m
+    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
+
+where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
+;
 
 
 

@@ -58,6 +58,10 @@ drop table if exists lastmile_report.mart_view_base_history_position;
 create table lastmile_report.mart_view_base_history_position as 
 select * from lastmile_ncha.view_base_history_position;
 
+drop table if exists lastmile_report.mart_view_base_position_cha;
+create table lastmile_report.mart_view_base_position_cha as
+select * from lastmile_ncha.view_base_position_cha;
+
 drop table if exists lastmile_report.mart_view_base_restock_cha;
 create table lastmile_report.mart_view_base_restock_cha as 
 select * from lastmile_report.view_base_restock_cha;

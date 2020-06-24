@@ -3598,7 +3598,7 @@ from (
                 ( c.county like 'Grand Bassa' ) or
                 ( c.county like 'Grand Gedeh' and c.cohort is null  )
               ) 
-              or
+              and
               ( ( month( c.snapshot_date ) =  @p_month ) and ( year( c.snapshot_date ) = @p_year ) ) 
       
 ) as a
@@ -3632,7 +3632,7 @@ from (
                 ( c.county like 'Grand Bassa' ) or
                 ( c.county like 'Grand Gedeh' and c.cohort is null  )
               ) 
-              or
+              and
               ( ( month( c.snapshot_date ) =  @p_month ) and ( year( c.snapshot_date ) = @p_year ) ) 
       
 ) as a

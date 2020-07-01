@@ -485,7 +485,7 @@ update lastmile_upload.odk_chaRestock
 ;
 update lastmile_upload.odk_chaRestock a, lastmile_ncha.temp_view_history_position_position_id_cha_update m
 
-    set a. = m.position_id_nchap, a.supervised_cha_position_id_pk = m.position_id_pk
+    set a.supervisedChaID = m.position_id_nchap, a.supervised_cha_position_id_pk = m.position_id_pk
     
 where ( trim( a.supervised_cha_id_inserted_format ) like m.position_id        ) or
       ( trim( a.supervised_cha_id_inserted_format ) like m.position_id_nchap  )
@@ -589,6 +589,25 @@ where trim( a.chss_id_inserted_format ) like m.position_id_nchap
 
 
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_QAOSupervisionChecklistForm' );
+
+
+-- 12. critical: QCA GPS
+
+update lastmile_upload.odk_QCA_GPSForm  
+    set cha_id_inserted_format  = lastmile_upload.nchap_id_format( cha_id_inserted ), 
+        position_id_pk = null -- always set to null
+;
+
+update lastmile_upload.odk_QCA_GPSForm a, lastmile_ncha.temp_view_history_position_position_id_cha_update m
+
+    set a.Cha_id = m.position_id_nchap, a.position_id_pk = m.position_id_pk
+        
+where ( trim( a.cha_id_inserted_format ) like m.position_id       ) or
+      ( trim( a.cha_id_inserted_format ) like m.position_id_nchap )  
+;
+
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'odk_QCA_GPSForm' );
+
 
 
 -- End of procedure

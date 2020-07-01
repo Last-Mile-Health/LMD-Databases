@@ -370,6 +370,19 @@ where ( a.chss_position_id_pk is null ) and ( trim( a.CHSSID ) like m.position_i
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'LEGACY: odk_QAOSupervisionChecklistForm' );
 
 
+-- 12. critical: QCA GPS
+
+update lastmile_upload.odk_QCA_GPSForm a, lastmile_ncha.temp_view_history_position_position_id_cha_update m
+
+    set a.position_id_pk = m.position_id_pk
+    
+where ( a.position_id_pk is null ) and ( trim( a.Cha_id ) like m.position_id )
+;
+
+insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'LEGACY: odk_QCA_GPSForm' );
+
+
+
 -- End of procedure
 insert into lastmile_upload.log_update_nchap_id ( meta_date_time, table_name ) values ( now(), 'END: 1_legacy_position_id_pk_critical' );
 

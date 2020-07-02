@@ -465,7 +465,21 @@ case
               set u.cha_id_inserted   = new.id_repair
           where u.odk_QAOSupervisionChecklistForm_id = new.pk_id;
       
-   
+              
+    -- 13. odk_QCA_GPSForm ------------------------------------------
+                 
+    when  trim( new.table_name )  like 'odk_QCA_GPSForm'  and 
+          trim( new.id_type )     like 'cha'                              and 
+          trim( new.id_name )     like 'Cha_id'                           and 
+          not ( new.id_repair is null )                                   and
+          not ( new.pk_id     is null )
+         
+    then
+          update lastmile_upload.odk_QCA_GPSForm as u
+              set u.cha_id_inserted   = new.id_repair
+          where u.odk_QCA_GPSForm_id = new.pk_id;
+  
+  
     -- else fall through
 end case
 ;

@@ -383,4 +383,35 @@ select
         a.meta_formVersion 
         
 from lastmile_upload.odk_QAOSupervisionChecklistForm as a
+
+union all
+
+select  
+        'odk_QCA_GPSForm'                       as table_name,
+        a.odk_QCA_GPSForm_id                    as pk_id,
+
+        'cha'                                   as id_type,
+        'Cha_id'                                as id_name,
+
+        a.cha_id_original                       as id_original_value, 
+        a.cha_id_inserted                       as id_inserted_value, 
+        a.cha_id_inserted_format                as id_inserted_format_value, 
+        a.Cha_id                                as id_value,
+
+        null 		                                as meta_cha,
+        null		                                as meta_cha_id,
+        null		                                as meta_chss,
+        null 	                                  as meta_chss_id,
+        null		                                as meta_facility,
+        null                                    as meta_facility_id,
+        null		                                as meta_health_district,
+        null                                    as meta_county,
+        a.community_name		                    as meta_community,
+        a.community_id		                      as meta_community_id,
+        a.todayDate                             as meta_form_date,
+ 
+        a.meta_insert_date_time, 
+        a.meta_formVersion 
+                
+from lastmile_upload.odk_QCA_GPSForm a
 ;

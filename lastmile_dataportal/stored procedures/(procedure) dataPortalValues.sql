@@ -1813,14 +1813,27 @@ FROM lastmile_report.mart_view_base_restock_cha WHERE `month`=@p_month AND `year
 
 
 -- 238. Percent of CHAs who received a restock visit
--- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
-REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 238, a.territory_id, 1, @p_month, @p_year, ROUND(COALESCE(COUNT(1),0)/num_cha,3)
-FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
-WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL GROUP BY county_id
-UNION SELECT 238, '6_16', 1, @p_month, @p_year, ROUND(COALESCE(COUNT(1),0)/num_cha,3)
-FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
-WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
+select 238, a.territory_id, 1, @p_month, @p_year, round( coalesce( a.number_restock, 0 ) / m.num_cha, 3 ) as restock_rate
+from (
+      select territory_id, count( * ) as number_restock
+      from lastmile_report.mart_view_base_restock_cha
+      where `month`=@p_month and `year`=@p_year and not( territory_id is null )
+      group by territory_id     
+) as a
+    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
+
+union all
+
+select 238, '6_16', 1, @p_month, @p_year, round( sum( coalesce( a.number_restock, 0 ) ) / sum( m.num_cha ), 3 ) as restock_rate
+from (
+      select territory_id, count( * ) as number_restock
+      from lastmile_report.mart_view_base_restock_cha
+      where `month`=@p_month and `year`=@p_year and not( territory_id is null )
+      group by territory_id     
+) as a
+    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
+;
 
 
 -- 245. Estimated facility-based delivery rate n-value, which is the sum of the number of births in home and the number of births in facility.
@@ -2151,16 +2164,37 @@ from (
   ) as d;
 
 
+
 -- 331. CHSS restock rate
--- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted
--- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
-REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 331, a.territory_id, 1, @p_month, @p_year, ROUND(COUNT(DISTINCT chss_id)/num_chss,3)
-FROM lastmile_report.mart_view_base_restock_chss a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
-WHERE restock_month=@p_month AND restock_year=@p_year AND a.territory_id IS NOT NULL GROUP BY county
-UNION SELECT 331, '6_16', 1, @p_month, @p_year, ROUND(COUNT(DISTINCT chss_id)/num_chss,3)
-FROM lastmile_report.mart_view_base_restock_chss a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
-WHERE restock_month=@p_month AND restock_year=@p_year AND a.territory_id IS NOT NULL;
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
+select 331, a.territory_id, 1, @p_month, @p_year, round( coalesce( a.number_restock, 0 ) / m.num_chss, 3 ) as restock_rate
+from (
+      select r.territory_id, count( * ) as number_restock
+      from (
+            select territory_id, chss_id
+            from lastmile_report.mart_view_base_restock_chss
+            where restock_month = @p_month and restock_year = @p_year and not ( territory_id is null ) 
+            group by territory_id, chss_id
+      ) as r
+      group by r.territory_id
+) as a
+    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
+
+union all
+
+select 331, '6_16', 1, @p_month, @p_year, round( sum( coalesce( a.number_restock, 0 ) ) / sum( m.num_chss ), 3 ) as restock_rate
+from (
+      select r.territory_id, count( * ) as number_restock
+      from (
+            select territory_id, chss_id
+            from lastmile_report.mart_view_base_restock_chss
+            where restock_month = @p_month and restock_year = @p_year and not ( territory_id is null ) 
+            group by territory_id, chss_id
+      ) as r
+      group by r.territory_id
+) as a
+    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
+;
 
 
 -- 347. Number of community triggers reported
@@ -5040,9 +5074,39 @@ where `year`=@p_year and `month`=@p_month
 end if;
 
 
+-- 819. Number of in-home births
 
+replace into lastmile_dataportal.tbl_values ( ind_id , territory_id , period_id,`month`,`year`,`value`)
+select 819, territory_id, 1, @p_month, @p_year, coalesce( num_births_home, 0 ) as num_births_home
 
+from lastmile_report.mart_view_base_msr_county
+where year_reported = @p_year and month_reported = @p_month and 
+      ( territory_id like '1_4' or territory_id like '1_14' or territory_id like '6_31' )
 
+union all 
+
+select 819, '6_16', 1, @p_month, @p_year, sum( coalesce( num_births_home, 0 ) ) as num_births_home
+from lastmile_report.mart_view_base_msr_county
+where year_reported = @p_year and month_reported = @p_month and 
+      ( territory_id like '1_4' or territory_id like '1_14' or territory_id like '6_31' )
+;
+
+-- 820. Number of in-facility births
+
+replace into lastmile_dataportal.tbl_values ( ind_id , territory_id , period_id,`month`,`year`,`value`)
+select 820, territory_id, 1, @p_month, @p_year, coalesce( num_births_facility, 0 ) as num_births_facility
+
+from lastmile_report.mart_view_base_msr_county
+where year_reported = @p_year and month_reported = @p_month and 
+      ( territory_id like '1_4' or territory_id like '1_14' or territory_id like '6_31' )
+
+union all 
+
+select 820, '6_16', 1, @p_month, @p_year, sum( coalesce( num_births_facility, 0 ) ) as num_births_facility
+from lastmile_report.mart_view_base_msr_county
+where year_reported = @p_year and month_reported = @p_month and 
+      ( territory_id like '1_4' or territory_id like '1_14' or territory_id like '6_31' )
+;
 
 
 -- ------ --

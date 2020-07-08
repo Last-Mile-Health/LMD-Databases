@@ -699,16 +699,28 @@ update lastmile_report.mart_program_scale_qao q
 -- ------------ --
 
 -- 7. Monthly supervision rate
--- Currently based off of ODK data
--- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
-REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 7, a.territory_id, 1, @p_month, @p_year, ROUND( SUM( supervisionAttendance ) / num_cha, 1 )
-FROM lastmile_report.mart_view_base_odk_supervision a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
-WHERE manualMonth=@p_month  AND manualYear=@p_year AND county_id IS NOT NULL GROUP BY county_id
-union SELECT 7, '6_16', 1, @p_month, @p_year, ROUND( SUM( supervisionAttendance ) / num_cha, 1 )
-FROM lastmile_report.mart_view_base_odk_supervision a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id 
-WHERE manualMonth=@p_month AND manualYear=@p_year AND county_id IS NOT NULL;
+-- Calculated from the ODK Supervision Visit Log form
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
+select 7, a.territory_id, 1, @p_month, @p_year, round( coalesce( a.number_supervision, 0 ) / m.num_cha, 1 ) as monthly_rate
+from (
+      select territory_id, sum( coalesce( supervisionAttendance, 0 ) ) as number_supervision
+      from lastmile_report.mart_view_base_odk_supervision
+      where manualMonth = @p_month and manualYear = @p_year and not( territory_id is null )
+      group by territory_id   
+) as a
+    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
 
+union all
+
+select 7, '6_16', 1, @p_month, @p_year, round( sum( coalesce( a.number_supervision, 0 ) ) / sum( m.num_cha ), 1 ) as monthly_rate
+from (
+      select territory_id, sum( coalesce( supervisionAttendance, 0 ) ) as number_supervision
+      from lastmile_report.mart_view_base_odk_supervision
+      where manualMonth = @p_month and manualYear = @p_year and not( territory_id is null )
+      group by territory_id     
+) as a
+    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
+;
 
 -- 7. Monthly CHA supervision rate by QAO
 replace into lastmile_dataportal.tbl_values (ind_id,territory_id,period_id, `month`, `year`, value )
@@ -1271,14 +1283,19 @@ SELECT                                        119,      '6_27',         1,      
 
 
 -- 121. CHA reporting rate
--- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
-REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 121, a.territory_id, 1, @p_month, @p_year, ROUND(COALESCE(num_reports,0)/num_cha,3)
-FROM lastmile_report.mart_view_base_msr_county a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
-WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL
-UNION SELECT 121, '6_16', 1, @p_month, @p_year, ROUND(SUM(COALESCE(num_reports,0))/num_cha,3)
-FROM lastmile_report.mart_view_base_msr_county a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
-WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
+select 121, a.territory_id, 1, @p_month, @p_year, round( coalesce( a.num_reports, 0 ) / b.num_cha, 3 ) as report_rate
+from lastmile_report.mart_view_base_msr_county as a 
+    left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
+where a.month_reported=@p_month and a.year_reported=@p_year and not ( a.territory_id is null )
+
+union all
+
+select 121, '6_16', 1, @p_month, @p_year, round( sum( coalesce( a.num_reports, 0 ) ) / sum( coalesce( b.num_cha, 0 ) ), 3 ) as report_rate
+from lastmile_report.mart_view_base_msr_county as a 
+    left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id
+where month_reported=@p_month and year_reported=@p_year and not ( a.territory_id is null )
+;
 
 
 -- 124.  Number of malaria treatments per CHA.  CHA is number of active CHAs in territory_id

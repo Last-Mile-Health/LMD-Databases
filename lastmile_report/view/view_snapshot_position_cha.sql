@@ -1,6 +1,6 @@
 use lastmile_report;
 
-drop view if exists view_snapshot_position_cha;
+drop view if exists lastmile_report.view_snapshot_position_cha;
 /*
  * Former Unicef Grand Gedef CHAs and CHSSs are tagged with the string "UNICEF" in the cohort field in the position table.
  *
@@ -11,13 +11,12 @@ drop view if exists view_snapshot_position_cha;
  *
 */
 
-create view view_snapshot_position_cha as
-
+create view lastmile_report.view_snapshot_position_cha as
 select
 
       c.position_status, 
       c.snapshot_date, 
-
+            
       case
         when ( ( c.cohort is null ) or ( trim( c.cohort ) like '' ) ) and ( c.county like '%Grand%Gedeh%' ) 
             then trim( concat( c.county, ' ', 'LMH' ) )
@@ -27,14 +26,16 @@ select
             
         else c.county
       end as cohort,
-
-      count( * )                                                      as cha_count,
+      
+      sum( if( c.person_id is null, 0, 1 ) )                          as cha_count,
+      count( * )                                                      as position_count,
+       
       round( sum( c.position_community_count_proportional ), 0 )      as community_count,
       sum( c.population )                                             as population,
       count( * ) * 235                                                as population_estimate,
       sum( c.household) as household 
      
-from data_mart_snapshot_position_cha as c
+from lastmile_report.data_mart_snapshot_position_cha as c
 group by  c.position_status, 
           c.snapshot_date,
           case

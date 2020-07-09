@@ -1958,20 +1958,55 @@ REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`
 SELECT 258, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Rivercess', 'numerator');
 
 
+-- 302. CHSS reporting rate by territory_id
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
 
+-- Step 3. calculate the CHSS reporting rate based on number of repots / number of chss for territory_id
+select 302, a.territory_id, 1, @p_month, @p_year, round( coalesce( a.number_report, 0 ) / m.num_chss, 3 ) as report_rate
+from (
+      -- Step 2.  Aggregate the records based on county_id, generate territory_id from county_id, 
+      -- and calculate the report counts for month.  Note: 1 in territory_id() signifies GG (LMH) (6_31), not 1_6
+      select lastmile_report.territory_id( p.county_id, 1 ) as territory_id, count( * ) as number_report
+      from (
+            -- Step 1. Filter the reports based on year and month and toss out duplicate chss_id(s)
+            select s.chss_id
+            from lastmile_report.view_chss_msr as s
+            where s.month_reported = @p_month and s.year_reported = @p_year
+            group by s.chss_id
+      
+      ) as r
+          left outer join lastmile_ncha.view_history_position_geo as p on ( r.chss_id like p.position_id ) and ( p.job like 'CHSS' )
+      where not ( p.position_id is null )
+      group by p.county_id
+ 
+) as a
+    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
+where not ( a.territory_id is null )
 
+union all
 
--- 302. CHSS reporting rate
--- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted
--- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
-REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 302, a.territory_id, 1, @p_month, @p_year, ROUND(COUNT(1)/num_chss,3)
-FROM lastmile_report.view_chss_msr a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
-WHERE month_reported=@p_month AND year_reported=@p_year AND a.territory_id IS NOT NULL GROUP BY a.territory_id
-UNION SELECT 302, '6_16', 1, @p_month, @p_year, ROUND(COUNT(1)/num_chss,3)
-FROM lastmile_report.view_chss_msr a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
-WHERE month_reported=@p_month AND year_reported=@p_year AND a.territory_id IS NOT NULL;
+select 302, '6_16', 1, @p_month, @p_year, round( sum( coalesce( a.number_report, 0 ) ) / sum( coalesce( m.num_chss, 0 ) ), 3 ) as report_rate
 
+from (
+      -- Step 2.  Aggregate the records based on county_id, generate territory_id from county_id, 
+      -- and calculate the report counts for month.  Note: 1 in territory_id() signifies GG (LMH) (6_31), not 1_6
+      select lastmile_report.territory_id( p.county_id, 1 ) as territory_id, count( * ) as number_report
+      from (
+            -- Step 1. Filter the reports based on year and month and toss out duplicate chss_id(s)
+            select s.chss_id
+            from lastmile_report.view_chss_msr as s
+            where s.month_reported = @p_month and s.year_reported = @p_year
+            group by s.chss_id
+      
+      ) as r
+          left outer join lastmile_ncha.view_history_position_geo as p on ( r.chss_id like p.position_id ) and ( p.job like 'CHSS' )
+      where not ( p.position_id is null )
+      group by p.county_id
+ 
+) as a
+    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
+where not ( a.territory_id is null )
+;
 
 
 -- 302. CHSS reporting rate by QAO

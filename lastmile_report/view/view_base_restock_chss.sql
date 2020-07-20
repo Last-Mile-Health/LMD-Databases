@@ -6,9 +6,6 @@ create view lastmile_report.view_base_restock_chss as
 select 
       lastmile_report.territory_id(a.county, 1) as territory_id,
         
-      month(  a.restock_date )                  as restock_month,
-      year(   a.restock_date )                  as restock_year,
-        
       a.chss_commodity_distribution_id,
         
       a.meta_uuid,
@@ -27,6 +24,8 @@ select
       trim( a.chss_id )                         as chss_id,
       a.chss_id_inserted,
       a.restock_date,
+      a.month_reported                          as restock_month,
+      a.year_reported                           as restock_year,
       a.restock_driver,
       a.health_facility,
       a.county,
@@ -188,12 +187,12 @@ select
         a.comment
     
 from lastmile_upload.de_chss_commodity_distribution a
-
 where trim( a.chss_id ) in (  select  position_id
                               from lastmile_ncha.view_base_history_position
                               where job like 'CHSS'
                             )
 ;
+
 /* *** view_base_history_person is too slow.  Besides, we just need a list of valid CHSS position IDs that have existed over time.
 where trim( a.chss_id ) in (  select position_id 
                               from lastmile_ncha.view_base_history_person  

@@ -24,7 +24,8 @@ select
       pr.phone_number,
       pr.phone_number_alternate,
 
-      gf.cohort,
+      -- gf.cohort,
+      pr.cohort,
       gf.health_district,
       gf.health_district_id,
       gf.county_id,

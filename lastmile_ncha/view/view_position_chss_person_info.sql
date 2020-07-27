@@ -9,6 +9,7 @@ select
       pr.position_begin_date,
       pr.health_facility_id,
       pr.health_facility,
+      pr.cohort,
       
       if( pr.position_person_begin_date is null, 'N', 'Y' )                                         as position_filled,
       if( pr.position_person_begin_date is null, d.end_date_last, pr.position_person_begin_date )   as position_filled_last_date,

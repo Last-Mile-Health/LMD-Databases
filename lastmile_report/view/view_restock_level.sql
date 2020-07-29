@@ -95,6 +95,7 @@ select
       r.safety_box_stock_on_hand,	
       r.safety_box_quantity_restock,
       
+      'NA' as gasoline_top_off,
       'NA' as gasoline_initial_stock_on_hand,	
       'NA' as gasoline_amount_restocked,
 
@@ -128,87 +129,88 @@ select
      
       -- commodities
       
-      'NA'                                                          as microlut_restock_type,
+      '30 packs of 3 strips'                                        as microlut_restock_type,
       r.microlut_initial_stock_on_hand,	
       r.microlut_amount_restocked,	
       
-      'NA'                                                          as microgynon_restock_type,
+      '60 packs of 3 strips'                                        as microgynon_restock_type,
       r.microgynon_initial_stock_on_hand,	
       r.microgynon_amount_restocked,	
       
       'NA'                                                          as condom_unit_type,
-      'NA'                                                          as male_condom_restock_type,
+      '30 boxes of 100'                                             as male_condom_restock_type,
       r.male_condom_initial_stock_on_hand,	
       r.male_condom_amount_restocked,	
       
-      'NA'                                                          as female_condom_restock_type,
+      '60 pieces'                                                   as female_condom_restock_type,
       r.female_condom_initial_stock_on_hand,	
       r.female_condom_amount_restocked,	
       
-      'NA'                                                          as disposable_glove_restock_type,
+      '6 boxes of 100'                                              as disposable_glove_restock_type,
       r.disposable_glove_initial_stock_on_hand,	
       r.disposable_glove_amount_restocked,	
       
-      'NA'                                                          as act_25_restock_type,
+      '50 strips of 3 tablets'                                      as act_25_restock_type,
       r.act_25_initial_stock_on_hand,	
       r.act_25_amount_restocked,	
       
-      'NA'                                                          as act_50_restock_type,
+      '100 strips of 3 tablets'                                     as act_50_restock_type,
       r.act_50_initial_stock_on_hand,	
       r.act_50_amount_restocked,	
       
-      'NA'                                                          as artesunate_suppository_5_unit_restock_type,
+      '5 units'                                                     as artesunate_suppository_5_unit_restock_type,
       r.artesunate_suppository_5_unit_initial_stock_on_hand,	
       r.artesunate_suppository_5_unit_amount_restocked,	
       
-      'NA'                                                          as amoxicillin_250_tablet_bottle_1000_restock_type,
+      '2 bottles of 1000'                                           as amoxicillin_250_tablet_bottle_1000_restock_type,
       r.amoxicillin_250_tablet_bottle_1000_initial_stock_on_hand,	
       r.amoxicillin_250_tablet_bottle_1000_amount_restocked,	
         
-      'NA'                                                          as amoxicillin_250_tablet_200_strip_10_restock_type,
+      '200 strips of 10'                                            as amoxicillin_250_tablet_200_strip_10_restock_type,
       r.amoxicillin_250_tablet_200_strip_10_initial_stock_on_hand,	
       r.amoxicillin_250_tablet_200_strip_10_amount_restocked,	
       
-      'NA'                                                          as amoxicillin_250_suspension_restock_type,
+      '120 bottles'                                                 as amoxicillin_250_suspension_restock_type,
       r.amoxicillin_250_suspension_initial_stock_on_hand,	
       r.amoxicillin_250_suspension_amount_restocked,	
       
-      'NA'                                                          as ors_restock_type,
+      '120 sachets'                                                 as ors_restock_type,
       r.ors_initial_stock_on_hand,	
       r.ors_amount_restocked,	
       
-      'NA'                                                          as zinc_sulfate_bottle_restock_type,
+      '5 bottles of 100'                                            as zinc_sulfate_bottle_restock_type,
       r.zinc_sulfate_bottle_initial_stock_on_hand,	
       r.zinc_sulfate_bottle_amount_restocked,	
       
-      'NA'                                                          as zinc_sulfate_strip_restock_type,
+      '120 strips of 10'                                            as zinc_sulfate_strip_restock_type,
       r.zinc_sulfate_strip_initial_stock_on_hand,	
       r.zinc_sulfate_strip_amount_restocked,	
       
-      'NA'                                                          as paracetamol_tablet_restock_type,
+      '4 bottles of 1000'                                           as paracetamol_tablet_restock_type,
       r.paracetamol_tablet_initial_stock_on_hand,	
       r.paracetamol_tablet_amount_restocked,	
       
-      'NA'                                                          as paracetamol_suspension_restock_type,
+      '120 bottles'                                                 as paracetamol_suspension_restock_type,
       r.paracetamol_suspension_initial_stock_on_hand,	
       r.paracetamol_suspension_amount_restocked,	
       
-      'NA'                                                          as rdt_restock_type,
+      '10 boxes of 25'                                              as rdt_restock_type,
       r.RDT_initial_stock_on_hand,	
       r.RDT_amount_restocked,	
       
-      'NA'                                                          as muac_restock_type,
+      '2 units'                                                     as muac_restock_type,
       r.MUAC_initial_stock_on_hand,	
       r.MUAC_amount_restocked,	
       
-      'NA'                                                          as dispensing_bag_restock_type,
+      '5 boxes of 100'                                              as dispensing_bag_restock_type,
       r.dispensing_bag_initial_stock_on_hand,	
       r.dispensing_bag_amount_restocked,	
       
-      'NA'                                                          as safety_box_restock_type,
+      '4 boxes'                                                     as safety_box_restock_type,
       r.safety_box_initial_stock_on_hand,	
       r.safety_box_amount_restocked,	
       
+      '12 Gallons'                                                  as gasoline_top_off,
       r.gasoline_initial_stock_on_hand,	
       r.gasoline_amount_restocked,																				
 

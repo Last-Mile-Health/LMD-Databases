@@ -14,10 +14,16 @@ select
       d.id_inserted_format_value      as id_formatted, 
       d.id_value, 
       
+      'NA' as db_cha_id, 
+      'NA' as db_cha, 
       d.meta_cha,
       d.meta_cha_id,
+      
+      'NA' as db_chss_id,
+      'NA' as db_chss,
       d.meta_chss,
       d.meta_chss_id,
+      
       d.meta_facility,
       d.meta_facility_id,
       d.meta_health_district,

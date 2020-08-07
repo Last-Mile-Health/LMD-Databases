@@ -39,6 +39,8 @@ create temporary table lastmile_datamart.faux_cursor_dimension_position as
 select 
 
       ( year( snapshot_date ) * 10000 ) + ( month( snapshot_date ) * 100 ) + day( snapshot_date ) as date_key,
+      
+      p.position_id_pk,
       p.position_id,
       
       -- dates from position table
@@ -70,7 +72,9 @@ select
       r.reason_left,
       r.reason_left_description,
       
-      p.position_supervisor_id
+      -- alias to name of dimension_position table
+      p.position_supervisor_id_pk as chss_position_id_pk,
+      p.position_supervisor_id    as chss_position_id
      
 from lastmile_datamart.materialize_view_history_position_geo as p
     left outer join ( select

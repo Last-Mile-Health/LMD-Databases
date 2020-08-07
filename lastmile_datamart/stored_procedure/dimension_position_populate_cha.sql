@@ -5,8 +5,8 @@ drop procedure if exists lastmile_datamart.dimension_position_populate_cha;
 create procedure lastmile_datamart.dimension_position_populate_cha( in  begin_date        date, 
                                                                     in  end_date          date,
                                                                     in  unit              varchar(10),
-                                                                    in  position_status   varchar(10) )
-                                                                                           
+                                                                    in  position_status   varchar(10) )                                                                                           
+
 begin
 
     declare loop_date date default begin_date;
@@ -43,38 +43,46 @@ begin
                   t.*,
                   
                   -- CHSS position data
+                 
+                  null, -- chss_position_begin_date
+                  null, -- chss_position_end_date
+                  null, -- chss_person_id
                   
-                  null, 
-                  null, 
-                  null, 
-                  null, 
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,                  
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
-                  null,
+                  null, -- chss_full_name
+                  null, -- chss_birth_date
+                  null, -- chss_gender
                   
-                  null,
-                  null,
-                  null,         
-                  null,                  
-                  null,                  
-                  null,
-                                                                 
-                  -- meta_insert_date_time stub
-                  null
+                  null, -- chss_phone_number
+                  null, -- chss_phone_number_alternate
+                  null, -- chss_position_person_begin_date
+                  
+                  null, -- chss_position_person_end_date
+                  null, -- chss_reason_left
+                  null, -- chss_reason_left_description
+                   
+                 
+                  null, -- qao_position_id_pk,
+                  null, -- qao_position_id
+                  null, -- qao_position_supervisor_begin_date
+                  null, -- qao_position_supervisor_end_date
+                  
+                  null, -- qao_person_id
+                  null, -- qao_full_name
+                  null, -- qao_birth_date
+                  
+                  null, -- qao_gender
+                  null, -- qao_phone_number
+                  null, -- qao_phone_number_alternate 
+                  
+                  null, -- qao_reason_left       
+                  null, -- qao_reason_left_description
+                  null, -- qao_position_begin_date 
+                  
+                  null, -- qao_position_end_date          
+                  null, -- qao_position_person_begin_date      
+                  null, -- qao_position_person_end_date
+                  
+                  null  -- meta_insert_date_time
   
             from lastmile_datamart.faux_cursor_dimension_position as t;
    

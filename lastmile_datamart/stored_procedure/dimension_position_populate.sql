@@ -9,26 +9,20 @@ create procedure lastmile_datamart.dimension_position_populate( in  begin_date  
                                                                                            
 begin
 
-/*
- *
- * Step 1. populate the dimension_date table
- *
-*/
+-- Step 1. populate the dimension_date table
 
 -- TEMP comment out
 call lastmile_datamart.dimension_date_populate('2012-10-01', current_date() );
 
 
-/*
- * Step 2.
- * These two views are queried repeatedly in the dimension_position_snapshot() stored procedure.  Since MySQL does
- * not support materialized view, we need to take snapshots of the views to speed up the performance of joining these
- * two views with dimension_position
+-- Step 2.
+-- These two views are queried repeatedly in the dimension_position_snapshot() stored procedure.  Since MySQL does
+-- not support materialized view, we need to take snapshots of the views to speed up the performance of joining these
+-- two views with dimension_position
 
- * Add the position_supervisor_id for CHA here because the CHSS-CHA position assignments are fixed.  There is no
- * date field to be checked.
- *
-*/
+-- Add the position_supervisor_id for CHA here because the CHSS-CHA position assignments are fixed.  There is no
+-- date field to be checked.
+
 
 -- view_history_position_person_cha
 drop table if exists lastmile_datamart.materialize_view_history_position_person_cha;
@@ -48,6 +42,7 @@ drop table if exists lastmile_datamart.materialize_view_history_position_geo;
 create table lastmile_datamart.materialize_view_history_position_geo as
 select
       p.*,
+      s.position_supervisor_id_pk,
       s.position_supervisor_id
 from lastmile_ncha.view_history_position_geo as p
     left outer join lastmile_ncha.view_position_supervisor as s on p.position_id like trim( s.position_id ) and  p.job like 'CHA'
@@ -65,21 +60,13 @@ lastmile_datamart.materialize_view_history_position_geo( job, position_begin_dat
 -- call lastmile_datamart.dimension_position_snapshot( '2020-03-18', 'ALL' );
 
 
-/* 
- * Step 3.
- *
- * Populate dimenension_position with CHA position data
- *
-*/
+-- Step 3. Populate dimenension_position with CHA position data
+
 call lastmile_datamart.dimension_position_populate_cha( begin_date, end_date, unit, position_status );
 
 
-/*
- * Step 4.
- *
- * Populate dimension_position with CHSS position data. 
- *
-*/
+
+-- Step 4. Populate dimension_position with CHSS position data. 
 
 drop table if exists lastmile_datamart.materialize_view_history_position_person_chss;
 
@@ -123,13 +110,8 @@ where ( d.chss_position_id like s.position_id )           and
 ;
 
 
-/*
- * Step 5.
- *
- * Populate dimension_position with QAO position data. 
- *
-*/
 
+-- Step 5. Populate dimension_position with QAO position data. 
 
 -- Create temp table of supervisor position with begin/end dates as date keys (integers)
 drop table if exists lastmile_datamart.materialize_view_position_supervisor;
@@ -144,7 +126,10 @@ select
       ( year( position_supervisor_id_pk_end_date    ) * 10000 ) + ( month( position_supervisor_id_pk_end_date   ) * 100 ) + day( position_supervisor_id_pk_end_date   ) as end_date_key,
       
       position_id,
-      position_supervisor_id
+      position_id_pk,
+      
+      position_supervisor_id,
+      position_supervisor_id_pk
        
 from lastmile_ncha.view_position_supervisor
 ;
@@ -156,7 +141,8 @@ lastmile_datamart.materialize_view_position_supervisor( position_id( 25 ), posit
 
 update lastmile_datamart.dimension_position d, lastmile_datamart.materialize_view_position_supervisor s
   
-  set d.qao_position_id                     = s.position_supervisor_id,
+  set d.qao_position_id_pk                  = s.position_supervisor_id_pk,
+      d.qao_position_id                     = s.position_supervisor_id,
       d.qao_position_supervisor_begin_date  = s.begin_date,
       d.qao_position_supervisor_end_date    = s.end_date
 
@@ -201,5 +187,6 @@ where ( d.qao_position_id like s.position_id )            and
       ( ( s.position_person_end_date_key is null ) or ( s.position_person_end_date_key >= d.date_key ) )
 ;
 
+
 end;
-/* End of stored procedure */
+

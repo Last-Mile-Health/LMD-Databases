@@ -38,6 +38,38 @@ from lastmile_upload.de_case_scenario_2 as a
   
 union all
 
+select 
+        'de_case_scenario_2'                    as table_name,
+        a.de_case_scenario_2_id                 as pk_id,
+        'cha'                                   as id_type,
+        'cha_id'                                as id_name,
+
+        a.cha_id_original                       as id_original_value, 
+        a.cha_id_inserted                       as id_inserted_value, 
+        a.cha_id_inserted_format                as id_inserted_format_value, 
+        a.cha_id                                as id_value,
+
+        a.cha                                   as meta_cha,
+        null		                                as meta_cha_id,
+        a.chss		                              as meta_chss,
+        a.chss_id_original 	                    as meta_chss_id,
+        a.health_facility		                    as meta_facility,
+        null                                    as meta_facility_id,
+        null		                                as meta_health_district,
+        a.county                                as meta_county,
+        a.community		                          as meta_community,
+        null		                                as meta_community_id,
+        
+        date_format( concat( a.year_report, '-', a.month_report, '-01' ), '%Y-%m-%d' )  as meta_form_date,
+        
+       
+        a.meta_insert_date_time, 
+        a.meta_form_version
+                
+from lastmile_upload.de_case_scenario_2 as a
+
+union all
+
 -- 1. de_case_scenario ----------------------------------------------------------------------------------------
 
 select  

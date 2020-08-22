@@ -111,7 +111,7 @@ select
 from lastmile_report.mart_view_base_position_cha as c
     cross join  lastmile_report.view_restock_level_year_month as d
     left outer join lastmile_report.view_restock_level_cha as r on  c.position_id like r.position_id  and 
-                                                                    d.year_report = r.restock_year  and 
+                                                                    d.year_report = r.restock_year    and 
                                                                     d.month_report= r.restock_month
 where ( c.cohort is null ) or not ( c.cohort like 'UNICEF' )
 
@@ -226,8 +226,8 @@ select
         
 from lastmile_report.mart_view_base_position_chss as c
     cross join lastmile_report.view_restock_level_year_month as d
-        left outer join lastmile_report.view_restock_level_chss as r on c.position_id   like r.chss_id    and 
-                                                                        d.year_report   = r.restock_year  and 
+        left outer join lastmile_report.view_restock_level_chss as r on c.position_id like r.chss_id            and 
+                                                                        d.year_report   = r.restock_year   and 
                                                                         d.month_report  = r.restock_month 
 where ( c.cohort is null ) or not ( c.cohort like 'UNICEF' )
 

@@ -23,9 +23,18 @@ select
       a.chss,
       trim( a.chss_id )                         as chss_id,
       a.chss_id_inserted,
+      
       a.restock_date,
+      
+      -- These are the month and year the restock actually happened in.
+      year( a.restock_date )                    as restock_date_year,
+      month( a.restock_date )                   as restock_date_month,
+      
+      -- Sometimes restock for a particular month "spills over" into early in the next month
+      -- For reporting purposes, we can tag them as being in the previous month.
       a.month_reported                          as restock_month,
       a.year_reported                           as restock_year,
+      
       a.restock_driver,
       a.health_facility,
       a.county,

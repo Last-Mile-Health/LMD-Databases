@@ -62,6 +62,18 @@ drop table if exists lastmile_report.mart_view_base_position_cha;
 create table lastmile_report.mart_view_base_position_cha as
 select * from lastmile_ncha.view_base_position_cha;
 
+drop table if exists lastmile_report.mart_view_history_position_person;
+create table lastmile_report.mart_view_history_position_person as
+select * from lastmile_ncha.view_history_position_person;
+
+drop table if exists lastmile_report.mart_view_history_position_person_aggregate;
+create table lastmile_report.mart_view_history_position_person_aggregate as
+select  position_id, 
+        group_concat( distinct full_name  order by position_person_begin_date desc separator ', ' ) as full_name, 
+        group_concat( distinct job        order by position_person_begin_date desc separator ', ' ) as job 
+from lastmile_ncha.view_history_position_person group by position_id;
+
+
 drop table if exists lastmile_report.mart_view_base_position_chss;
 create table lastmile_report.mart_view_base_position_chss as
 select * from lastmile_ncha.view_base_position_chss;

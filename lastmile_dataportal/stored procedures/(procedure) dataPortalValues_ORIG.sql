@@ -353,14 +353,6 @@ update lastmile_report.mart_program_scale s
 where territory_id like '1\\_14'
 ;
 
--- Note: 5/6/2020 This is a temp hack to make the Rivercess numbers look better.
--- Rivercess 1_14
-update lastmile_report.mart_program_scale s
-    set s.num_people = 51186
-where territory_id like '1\\_14'
-;
-
-
 -- Grand Bassa 1_4
 
 update lastmile_report.mart_program_scale s
@@ -432,14 +424,6 @@ update lastmile_report.mart_program_scale s
 
                               ) as a
                        )
-where territory_id like '6\\_16'
-;
-
-
--- Note: 5/6/2020 This is a temp hack to make the Rivercess numbers look better.
--- all managed ares 6_16
-update lastmile_report.mart_program_scale s
-    set s.num_people = 146605
 where territory_id like '6\\_16'
 ;
 
@@ -699,28 +683,16 @@ update lastmile_report.mart_program_scale_qao q
 -- ------------ --
 
 -- 7. Monthly supervision rate
--- Calculated from the ODK Supervision Visit Log form
-replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
-select 7, a.territory_id, 1, @p_month, @p_year, round( coalesce( a.number_supervision, 0 ) / m.num_cha, 1 ) as monthly_rate
-from (
-      select territory_id, sum( coalesce( supervisionAttendance, 0 ) ) as number_supervision
-      from lastmile_report.mart_view_base_odk_supervision
-      where manualMonth = @p_month and manualYear = @p_year and not( territory_id is null )
-      group by territory_id   
-) as a
-    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
+-- Currently based off of ODK data
+-- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+SELECT 7, a.territory_id, 1, @p_month, @p_year, ROUND( SUM( supervisionAttendance ) / num_cha, 1 )
+FROM lastmile_report.mart_view_base_odk_supervision a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
+WHERE manualMonth=@p_month  AND manualYear=@p_year AND county_id IS NOT NULL GROUP BY county_id
+union SELECT 7, '6_16', 1, @p_month, @p_year, ROUND( SUM( supervisionAttendance ) / num_cha, 1 )
+FROM lastmile_report.mart_view_base_odk_supervision a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id 
+WHERE manualMonth=@p_month AND manualYear=@p_year AND county_id IS NOT NULL;
 
-union all
-
-select 7, '6_16', 1, @p_month, @p_year, round( sum( coalesce( a.number_supervision, 0 ) ) / sum( m.num_cha ), 1 ) as monthly_rate
-from (
-      select territory_id, sum( coalesce( supervisionAttendance, 0 ) ) as number_supervision
-      from lastmile_report.mart_view_base_odk_supervision
-      where manualMonth = @p_month and manualYear = @p_year and not( territory_id is null )
-      group by territory_id     
-) as a
-    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
-;
 
 -- 7. Monthly CHA supervision rate by QAO
 replace into lastmile_dataportal.tbl_values (ind_id,territory_id,period_id, `month`, `year`, value )
@@ -1168,76 +1140,74 @@ REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`
 SELECT 59, '6_16', 1, @p_month, @p_year, ROUND(SUM(COALESCE(`# records receiving QA`,0))/SUM(COALESCE(`# records entered`,0)),3) FROM lastmile_report.view_data_entry WHERE `Month`=@p_month AND `Year`=@p_year;
 
 
-
-
 -- 104. Turnover rate (CHAs; overall)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 104, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Grand Gedeh', 'rate');
+SELECT 104, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 104, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Rivercess', 'rate');
+SELECT 104, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Rivercess', 'rate');
 
 
 -- 105. Turnover rate (CHAs; termination)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 105, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Grand Gedeh', 'rate');
+SELECT 105, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 105, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Rivercess', 'rate');
+SELECT 105, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Rivercess', 'rate');
 
 
 -- 106. Turnover rate (CHAs; resignation)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 106, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Grand Gedeh', 'rate');
+SELECT 106, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 106, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Rivercess', 'rate');
+SELECT 106, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Rivercess', 'rate');
 
 
 -- 107. Turnover rate (CHAs; promotion)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 107, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Grand Gedeh', 'rate');
+SELECT 107, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 107, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Rivercess', 'rate');
+SELECT 107, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Rivercess', 'rate');
 
 
 -- 108. Turnover rate (CHAs; other/unknown)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 108, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Grand Gedeh', 'rate');
+SELECT 108, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 108, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Rivercess', 'rate');
+SELECT 108, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Rivercess', 'rate');
 
 
 -- 109. Turnover rate (Supervisors; overall)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 109, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Grand Gedeh', 'rate');
+SELECT 109, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 109, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Rivercess', 'rate');
+SELECT 109, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Rivercess', 'rate');
 
 
 -- 110. Turnover rate (Supervisors; termination)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 110, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Grand Gedeh', 'rate');
+SELECT 110, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 110, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Rivercess', 'rate');
+SELECT 110, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Rivercess', 'rate');
 
 
 -- 111. Turnover rate (Supervisors; resignation)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 111, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Grand Gedeh', 'rate');
+SELECT 111, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 111, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Rivercess', 'rate');
+SELECT 111, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Rivercess', 'rate');
 
 
 -- 112. Turnover rate (Supervisors; promotion)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 112, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Grand Gedeh', 'rate');
+SELECT 112, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 112, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Rivercess', 'rate');
+SELECT 112, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Rivercess', 'rate');
 
 
 -- 113. Turnover rate (Supervisors; other/unknown)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 113, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Grand Gedeh', 'rate');
+SELECT 113, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Grand Gedeh', 'rate');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 113, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Rivercess', 'rate');
+SELECT 113, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Rivercess', 'rate');
 
 
 -- 117. Number of deaths (maternal)
@@ -1264,8 +1234,6 @@ UNION SELECT 119, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_routine_visits,
 FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
 
-
-
 -- 119.	NCHA Outputs: Number of routine visits conducted
 -- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
 -- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
@@ -1283,113 +1251,15 @@ SELECT                                        119,      '6_27',         1,      
 
 
 -- 121. CHA reporting rate
-replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
-select 121, a.territory_id, 1, @p_month, @p_year, round( coalesce( a.num_reports, 0 ) / b.num_cha, 3 ) as report_rate
-from lastmile_report.mart_view_base_msr_county as a 
-    left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id 
-where a.month_reported=@p_month and a.year_reported=@p_year and not ( a.territory_id is null )
-
-union all
-
-select 121, '6_16', 1, @p_month, @p_year, round( sum( coalesce( a.num_reports, 0 ) ) / sum( coalesce( b.num_cha, 0 ) ), 3 ) as report_rate
-from lastmile_report.mart_view_base_msr_county as a 
-    left outer join lastmile_report.mart_program_scale as b on a.territory_id like b.territory_id
-where month_reported=@p_month and year_reported=@p_year and not ( a.territory_id is null )
-;
-
-
--- 124.  Number of malaria treatments per CHA.  CHA is number of active CHAs in territory_id
+-- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 
-      124 as ind_id, 
-      m.territory_id, 
-      1 as period_id, 
-      @p_month, 
-      @p_year, 
-      round( ( coalesce( m.num_tx_malaria, 0 ) / coalesce( s.num_cha, 0 ) ), 1 ) as malaria_treat_per_cha
-         
-from lastmile_report.mart_view_base_msr_county as m
-    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
-    
-where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
+SELECT 121, a.territory_id, 1, @p_month, @p_year, ROUND(COALESCE(num_reports,0)/num_cha,3)
+FROM lastmile_report.mart_view_base_msr_county a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
+WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL
+UNION SELECT 121, '6_16', 1, @p_month, @p_year, ROUND(SUM(COALESCE(num_reports,0))/num_cha,3)
+FROM lastmile_report.mart_view_base_msr_county a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
+WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
 
-union all
-
-select 
-      124 as ind_id,
-      '6_16',
-      1 as period_id, 
-      @p_month, 
-      @p_year, 
-      round( ( sum( coalesce( m.num_tx_malaria, 0 ) ) / sum( coalesce( s.num_cha, 0 ) ) ), 1 ) as malaria_treat_per_cha
-
-from lastmile_report.mart_view_base_msr_county as m
-    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
-
-where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
-;
-
--- 125.  Number of diarrhea treatments per CHA.  CHA is number of active CHAs in territory_id
-REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 
-      125 as ind_id, 
-      m.territory_id, 
-      1 as period_id, 
-      @p_month, 
-      @p_year, 
-      round( ( coalesce( m.num_tx_diarrhea, 0 ) / coalesce( s.num_cha, 0 ) ), 1 ) as diarrhea_treat_per_cha
-          
-from lastmile_report.mart_view_base_msr_county as m
-    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
-    
-where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
-
-union all
-
-select 
-      125 as ind_id,
-      '6_16',
-      1 as period_id, 
-      @p_month, 
-      @p_year, 
-      round( ( sum( coalesce( m.num_tx_diarrhea, 0 ) ) / sum( coalesce( s.num_cha, 0 ) ) ), 1 ) as diarrhea_treat_per_cha
-
-from lastmile_report.mart_view_base_msr_county as m
-    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
-
-where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
-;
-
--- 126.  Number of ari treatments per CHA.  CHA is number of active CHAs in territory_id
-REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 
-      126 as ind_id, 
-      m.territory_id, 
-      1 as period_id, 
-      @p_month, 
-      @p_year, 
-      round( ( coalesce( m.num_tx_ari, 0 ) / coalesce( s.num_cha, 0 ) ), 1 ) as ari_treat_per_cha
-          
-from lastmile_report.mart_view_base_msr_county as m
-    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
-    
-where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
-
-union all
-
-select 
-      126 as ind_id,
-      '6_16',
-      1 as period_id, 
-      @p_month, 
-      @p_year, 
-      round( ( sum( coalesce( m.num_tx_ari, 0 ) ) / sum( coalesce( s.num_cha, 0 ) ) ), 1 ) as ari_treat_per_cha
-
-from lastmile_report.mart_view_base_msr_county as m
-    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
-
-where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
-;
 
 -- 127. Number of actual supervision visits
 -- Currently based off of ODK data
@@ -1830,27 +1700,14 @@ FROM lastmile_report.mart_view_base_restock_cha WHERE `month`=@p_month AND `year
 
 
 -- 238. Percent of CHAs who received a restock visit
-replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
-select 238, a.territory_id, 1, @p_month, @p_year, round( coalesce( a.number_restock, 0 ) / m.num_cha, 3 ) as restock_rate
-from (
-      select territory_id, count( * ) as number_restock
-      from lastmile_report.mart_view_base_restock_cha
-      where `month`=@p_month and `year`=@p_year and not( territory_id is null )
-      group by territory_id     
-) as a
-    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
-
-union all
-
-select 238, '6_16', 1, @p_month, @p_year, round( sum( coalesce( a.number_restock, 0 ) ) / sum( m.num_cha ), 3 ) as restock_rate
-from (
-      select territory_id, count( * ) as number_restock
-      from lastmile_report.mart_view_base_restock_cha
-      where `month`=@p_month and `year`=@p_year and not( territory_id is null )
-      group by territory_id     
-) as a
-    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
-;
+-- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+SELECT 238, a.territory_id, 1, @p_month, @p_year, ROUND(COALESCE(COUNT(1),0)/num_cha,3)
+FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
+WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL GROUP BY county_id
+UNION SELECT 238, '6_16', 1, @p_month, @p_year, ROUND(COALESCE(COUNT(1),0)/num_cha,3)
+FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
+WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
 
 
 -- 245. Estimated facility-based delivery rate n-value, which is the sum of the number of births in home and the number of births in facility.
@@ -1886,127 +1743,86 @@ where not ( county_id is null ) and
 ;
 
 
-
-
 -- 247. Numerator (indID 104)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 247, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Grand Gedeh', 'numerator');
+SELECT 247, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 247, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Rivercess', 'numerator');
+SELECT 247, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'any', 'Rivercess', 'numerator');
 
 
 -- 249. Numerator (indID 105)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 249, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Grand Gedeh', 'numerator');
+SELECT 249, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 249, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Rivercess', 'numerator');
+SELECT 249, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'terminated', 'Rivercess', 'numerator');
 
 
 -- 250. Numerator (indID 106)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 250, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Grand Gedeh', 'numerator');
+SELECT 250, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 250, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Rivercess', 'numerator');
+SELECT 250, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'resigned', 'Rivercess', 'numerator');
 
 
 -- 251. Numerator (indID 107)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 251, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Grand Gedeh', 'numerator');
+SELECT 251, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 251, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Rivercess', 'numerator');
+SELECT 251, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'promoted', 'Rivercess', 'numerator');
 
 
 -- 252. Numerator (indID 108)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 252, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Grand Gedeh', 'numerator');
+SELECT 252, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 252, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Rivercess', 'numerator');
+SELECT 252, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHA', 'other/unknown', 'Rivercess', 'numerator');
 
 
 -- 253. Numerator (indID 109)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 253, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Grand Gedeh', 'numerator');
+SELECT 253, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 253, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Rivercess', 'numerator');
+SELECT 253, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'any', 'Rivercess', 'numerator');
 
 
 -- 255. Numerator (indID 110)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 255, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Grand Gedeh', 'numerator');
+SELECT 255, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 255, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Rivercess', 'numerator');
+SELECT 255, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'terminated', 'Rivercess', 'numerator');
 
 
 -- 256. Numerator (indID 111)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 256, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Grand Gedeh', 'numerator');
+SELECT 256, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 256, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Rivercess', 'numerator');
+SELECT 256, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'resigned', 'Rivercess', 'numerator');
 
 
 -- 257. Numerator (indID 112)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 257, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Grand Gedeh', 'numerator');
+SELECT 257, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 257, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Rivercess', 'numerator');
+SELECT 257, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'promoted', 'Rivercess', 'numerator');
 
 
 -- 258. Numerator (indID 113)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 258, '6_31', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Grand Gedeh', 'numerator');
+SELECT 258, '6_31', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Grand Gedeh', 'numerator');
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 258, '1_14', 1, @p_month, @p_year, lastmile_ncha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Rivercess', 'numerator');
+SELECT 258, '1_14', 1, @p_month, @p_year, lastmile_cha.turnover(@p_date, @p_datePlus1, 'CHSS', 'other/unknown', 'Rivercess', 'numerator');
 
 
--- 302. CHSS reporting rate by territory_id
-replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
-
--- Step 3. calculate the CHSS reporting rate based on number of repots / number of chss for territory_id
-select 302, a.territory_id, 1, @p_month, @p_year, round( coalesce( a.number_report, 0 ) / m.num_chss, 3 ) as report_rate
-from (
-      -- Step 2.  Aggregate the records based on county_id, generate territory_id from county_id, 
-      -- and calculate the report counts for month.  Note: 1 in territory_id() signifies GG (LMH) (6_31), not 1_6
-      select lastmile_report.territory_id( p.county_id, 1 ) as territory_id, count( * ) as number_report
-      from (
-            -- Step 1. Filter the reports based on year and month and toss out duplicate chss_id(s)
-            select s.chss_id
-            from lastmile_report.view_chss_msr as s
-            where s.month_reported = @p_month and s.year_reported = @p_year
-            group by s.chss_id
-      
-      ) as r
-          left outer join lastmile_ncha.view_history_position_geo as p on ( r.chss_id like p.position_id ) and ( p.job like 'CHSS' )
-      where not ( p.position_id is null )
-      group by p.county_id
- 
-) as a
-    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
-where not ( a.territory_id is null )
-
-union all
-
-select 302, '6_16', 1, @p_month, @p_year, round( sum( coalesce( a.number_report, 0 ) ) / sum( coalesce( m.num_chss, 0 ) ), 3 ) as report_rate
-
-from (
-      -- Step 2.  Aggregate the records based on county_id, generate territory_id from county_id, 
-      -- and calculate the report counts for month.  Note: 1 in territory_id() signifies GG (LMH) (6_31), not 1_6
-      select lastmile_report.territory_id( p.county_id, 1 ) as territory_id, count( * ) as number_report
-      from (
-            -- Step 1. Filter the reports based on year and month and toss out duplicate chss_id(s)
-            select s.chss_id
-            from lastmile_report.view_chss_msr as s
-            where s.month_reported = @p_month and s.year_reported = @p_year
-            group by s.chss_id
-      
-      ) as r
-          left outer join lastmile_ncha.view_history_position_geo as p on ( r.chss_id like p.position_id ) and ( p.job like 'CHSS' )
-      where not ( p.position_id is null )
-      group by p.county_id
- 
-) as a
-    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
-where not ( a.territory_id is null )
-;
+-- 302. CHSS reporting rate
+-- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted
+-- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+SELECT 302, a.territory_id, 1, @p_month, @p_year, ROUND(COUNT(1)/num_chss,3)
+FROM lastmile_report.view_chss_msr a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
+WHERE month_reported=@p_month AND year_reported=@p_year AND a.territory_id IS NOT NULL GROUP BY a.territory_id
+UNION SELECT 302, '6_16', 1, @p_month, @p_year, ROUND(COUNT(1)/num_chss,3)
+FROM lastmile_report.view_chss_msr a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
+WHERE month_reported=@p_month AND year_reported=@p_year AND a.territory_id IS NOT NULL;
 
 
 -- 302. CHSS reporting rate by QAO
@@ -2029,33 +1845,16 @@ group by v.qao_position_id
 
 
 -- 305. Percent of expected CHSS mHealth supervision visit logs received
-replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
-select 305, a.territory_id, 1, @p_month, @p_year, round( coalesce( a.number_visit, 0 ) / ( m.num_cha * 2 ), 3 ) as report_rate
-from (
-      -- Filter the reports based on year and month and territory_id being not null
-      select s.territory_id, count( * ) number_visit
-      from lastmile_report.mart_view_base_odk_supervision as s
-      where s.manualMonth = @p_month and s.manualYear = @p_year and not ( s.territory_id is null )
-      group by s.territory_id
-            
-) as a
-    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
-where not ( a.territory_id is null )
+-- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted
+-- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+SELECT 305, a.territory_id, 1, @p_month, @p_year, ROUND(COUNT(1)/(2*num_cha),3)
+FROM lastmile_report.mart_view_base_odk_supervision a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
+WHERE manualMonth=@p_month AND manualYear=@p_year AND a.territory_id IS NOT NULL GROUP BY territory_id
+UNION SELECT 305, '6_16', 1, @p_month, @p_year, ROUND(COUNT(1)/(2*num_cha),3)
+FROM lastmile_report.mart_view_base_odk_supervision a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
+WHERE manualMonth=@p_month AND manualYear=@p_year AND a.territory_id IS NOT NULL;
 
-union all
-
-select 305, '6_16', 1, @p_month, @p_year, round( sum( coalesce( a.number_visit, 0 ) ) / ( sum( coalesce( m.num_cha, 0 ) ) * 2 ), 3 ) as report_rate
-from (
-      -- Step 1. Filter the reports based on year and month and territory_id being not null
-      select s.territory_id, count( * ) number_visit
-      from lastmile_report.mart_view_base_odk_supervision as s
-      where s.manualMonth = @p_month and s.manualYear = @p_year and not ( s.territory_id is null )
-      group by s.territory_id
-            
-) as a
-    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
-where not ( a.territory_id is null )
-;
 
 -- 307. Percent of CHAs stocked out of Microlut
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
@@ -2217,7 +2016,7 @@ replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id
 select 325, '6_27', 1, @p_month,  @p_year,  round( count( * ) / coalesce( d.number_county_report, 0 ), 3 ) as ifi_report_rate
 from (  
         select county 
-        from lastmile_report.mart_view_kobo_ifi 
+        from lastmile_report.mart_view_base_ifi 
         where `month` = @p_month and `year` = @p_year 
         group by county
 ) as n
@@ -2225,7 +2024,7 @@ from (
                 select count( * ) as number_county_report
                 from (  
                         select county 
-                        from lastmile_report.mart_view_kobo_ifi  
+                        from lastmile_report.mart_view_base_ifi  
                         where date( concat( `year`, '-', `month`,'-', '-01' ) ) <= date( concat( @p_year, '-', @p_month,'-', '-01' ) )
                         group by county
                 ) as t
@@ -2233,37 +2032,16 @@ from (
   ) as d;
 
 
-
 -- 331. CHSS restock rate
-replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
-select 331, a.territory_id, 1, @p_month, @p_year, round( coalesce( a.number_restock, 0 ) / m.num_chss, 3 ) as restock_rate
-from (
-      select r.territory_id, count( * ) as number_restock
-      from (
-            select territory_id, chss_id
-            from lastmile_report.mart_view_base_restock_chss
-            where restock_month = @p_month and restock_year = @p_year and not ( territory_id is null ) 
-            group by territory_id, chss_id
-      ) as r
-      group by r.territory_id
-) as a
-    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
-
-union all
-
-select 331, '6_16', 1, @p_month, @p_year, round( sum( coalesce( a.number_restock, 0 ) ) / sum( m.num_chss ), 3 ) as restock_rate
-from (
-      select r.territory_id, count( * ) as number_restock
-      from (
-            select territory_id, chss_id
-            from lastmile_report.mart_view_base_restock_chss
-            where restock_month = @p_month and restock_year = @p_year and not ( territory_id is null ) 
-            group by territory_id, chss_id
-      ) as r
-      group by r.territory_id
-) as a
-    left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
-;
+-- !!!!! This and certain other queries should be left-joined to a table of "expected counties" so that zeros are inserted
+-- !!!!! Note: this currently does not calculate figures for GG-UNICEF !!!!!
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+SELECT 331, a.territory_id, 1, @p_month, @p_year, ROUND(COUNT(DISTINCT chss_id)/num_chss,3)
+FROM lastmile_report.mart_view_base_restock_chss a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
+WHERE restock_month=@p_month AND restock_year=@p_year AND a.territory_id IS NOT NULL GROUP BY county
+UNION SELECT 331, '6_16', 1, @p_month, @p_year, ROUND(COUNT(DISTINCT chss_id)/num_chss,3)
+FROM lastmile_report.mart_view_base_restock_chss a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
+WHERE restock_month=@p_month AND restock_year=@p_year AND a.territory_id IS NOT NULL;
 
 
 -- 347. Number of community triggers reported
@@ -2513,30 +2291,31 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 -- 366. Number of IFI visits conducted (CHAs)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 366, territory_id, 1, @p_month, @p_year, COALESCE(numReports,0)
-FROM lastmile_report.mart_view_kobo_ifi WHERE `month`=@p_month AND `year`=@p_year
+FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year
 UNION SELECT 366, '6_27', 1, @p_month, @p_year, SUM(COALESCE(numReports,0))
-FROM lastmile_report.mart_view_kobo_ifi WHERE `month`=@p_month AND `year`=@p_year
+FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year
 UNION SELECT 366, territory_id, 2, @p_month, @p_year, SUM(COALESCE(numReports,0))
-FROM lastmile_report.mart_view_kobo_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
+FROM lastmile_report.mart_view_base_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
+
 
 -- 367. Percent of CHAs who received a restock visit in the past month (IFI)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 367, territory_id, 1, @p_month, @p_year, ROUND(SUM(COALESCE(restockedInLastMonth,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_kobo_ifi WHERE `month`=@p_month AND `year`=@p_year GROUP BY territory_id
+FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year GROUP BY territory_id
 UNION SELECT 367, '6_27', 1, @p_month, @p_year, ROUND(SUM(COALESCE(restockedInLastMonth,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_kobo_ifi WHERE `month`=@p_month AND `year`=@p_year
+FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year
 UNION SELECT 367, territory_id, 2, @p_month, @p_year, ROUND(SUM(COALESCE(restockedInLastMonth,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_kobo_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
+FROM lastmile_report.mart_view_base_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
 
 
 -- 368. Percent of CHAs who received a supervision visit in the past month (IFI)
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 368, territory_id, 1, @p_month, @p_year, ROUND(SUM(COALESCE(supervisedLastMonth,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_kobo_ifi WHERE `month`=@p_month AND `year`=@p_year GROUP BY territory_id
+FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year GROUP BY territory_id
 UNION SELECT 368, '6_27', 1, @p_month, @p_year, ROUND(SUM(COALESCE(supervisedLastMonth,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_kobo_ifi WHERE `month`=@p_month AND `year`=@p_year
+FROM lastmile_report.mart_view_base_ifi WHERE `month`=@p_month AND `year`=@p_year
 UNION SELECT 368, territory_id, 2, @p_month, @p_year, ROUND(SUM(COALESCE(supervisedLastMonth,0))/SUM(COALESCE(numReports,0)),3)
-FROM lastmile_report.mart_view_kobo_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
+FROM lastmile_report.mart_view_base_ifi WHERE ((`year`=@p_year AND `month`=@p_month) OR (`year`=@p_yearMinus1 AND `month`=@p_monthMinus1) OR (`year`=@p_yearMinus2 AND `month`=@p_monthMinus2)) GROUP BY territory_id;
 
 
 -- 368. Co-impact KPIs are reported on for March and August.  Use period_id = 38 (month 3 and month 8) to specific them.
@@ -2557,7 +2336,7 @@ if @p_date_key < 20190701 then
 
     replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
     select 368, '6_32', 1, @p_month, @p_year, round( sum( coalesce( supervisedLastMonth, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-    from lastmile_report.mart_view_kobo_ifi 
+    from lastmile_report.mart_view_base_ifi 
     where `month`=@p_month and `year`=@p_year and 
     not ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' );
 
@@ -2565,7 +2344,7 @@ else
 
     replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
     select 368, '6_32', 1, @p_month, @p_year, round( sum( coalesce( supervisedLastMonth, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-    from lastmile_report.mart_view_kobo_ifi 
+    from lastmile_report.mart_view_base_ifi 
     where `month`=@p_month and `year`=@p_year;
 
 end if;
@@ -2583,7 +2362,7 @@ select
       coalesce( round( sum( coalesce( i.receivedLastIncentiveOnTime, 0 ) ) / sum( coalesce( i.numReports, 0 ) ), 3 ), 0 ) as value
      
 from lastmile_dataportal.view_territories_active as a
-    left outer join lastmile_report.mart_view_kobo_ifi as i on  ( a.territory_id like i.territory_id  ) and
+    left outer join lastmile_report.mart_view_base_ifi as i on  ( a.territory_id like i.territory_id  ) and
                                                                 ( i.`month` = @p_month                ) and 
                                                                 ( i.`year` = @p_year                  )
                                                                 
@@ -2601,7 +2380,7 @@ select
       coalesce( round( sum( coalesce( i.receivedLastIncentiveOnTime, 0 ) ) / sum( coalesce( i.numReports, 0 ) ), 3 ), 0 ) as value
      
 from lastmile_dataportal.view_territories_active as a
-    left outer join lastmile_report.mart_view_kobo_ifi as i on  ( a.territory_id like i.territory_id  ) and
+    left outer join lastmile_report.mart_view_base_ifi as i on  ( a.territory_id like i.territory_id  ) and
                                                                 ( i.`month` = @p_month                ) and 
                                                                 ( i.`year` = @p_year                  )
                                                                 
@@ -2618,7 +2397,7 @@ select
       coalesce( round( sum( coalesce( i.receivedLastIncentiveOnTime, 0 ) ) / sum( coalesce( i.numReports, 0 ) ), 3 ), 0 ) as value
      
 from lastmile_dataportal.view_territories_active as a
-    left outer join lastmile_report.mart_view_kobo_ifi as i on  ( a.territory_id like i.territory_id  ) and
+    left outer join lastmile_report.mart_view_base_ifi as i on  ( a.territory_id like i.territory_id  ) and
                                                                 ( 
                                                                   ( ( i.`month` = @p_month        ) and ( i.`year` = @p_year       ) ) or 
                                                                   ( ( i.`month` = @p_monthMinus1  ) and ( i.`year` = @p_yearMinus1 ) ) or 
@@ -2638,7 +2417,7 @@ select
       @p_year, 
       round( sum( coalesce( receivedLastIncentiveOnTime, 0 ) )/sum( coalesce( numReports, 0 ) ), 3)
       
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month` = @p_month and `year`=@p_year and 
       ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
 
@@ -2652,7 +2431,7 @@ select
       @p_year, 
       round( sum( coalesce( receivedLastIncentiveOnTime, 0 ) )/sum( coalesce( numReports, 0 ) ), 3)
       
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month AND `year`=@p_year and 
       not ( territory_id like '1\\_4' or territory_id like '1\\_6' or territory_id like '1\\_14' )
 ;
@@ -2669,43 +2448,6 @@ where ind_id = 369 and period_id = 1 and `month` = @p_month and `year` = @p_year
 ;
 
 end if;
-
-
--- 372.  Number of MUAC test (red + yellow + green) per CHA.  CHA is number of active CHAs in territory_id
-REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-select 
-      372 as ind_id, 
-      m.territory_id, 
-      1 as period_id, 
-      @p_month, 
-      @p_year, 
-      round( ( 
-              ( coalesce( m.num_muac_green, 0 ) + coalesce( m.num_muac_yellow, 0 ) + coalesce( m.num_muac_red, 0 ) ) 
-              / coalesce( s.num_cha, 0 ) ), 1 ) as muac_per_cha
-          
-from lastmile_report.mart_view_base_msr_county as m
-    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
-    
-where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
-
-union all
-
-select 
-      372 as ind_id,
-      '6_16',
-      1 as period_id, 
-      @p_month, 
-      @p_year, 
-      round( ( 
-              sum( ( coalesce( m.num_muac_green, 0 ) + coalesce( m.num_muac_yellow, 0 ) + coalesce( m.num_muac_red, 0 ) ) ) 
-              / sum( coalesce( s.num_cha, 0 ) ) ), 1 ) as muac_per_cha
-
-from lastmile_report.mart_view_base_msr_county as m
-    left outer join lastmile_report.mart_program_scale as s on m.territory_id like s.territory_id
-
-where m.month_reported = @p_month and m.year_reported = @p_year and not( m.county_id is null )
-;
-
 
 
 -- 381. NCHA Outputs: Number of CHA monthly service reports (MSRs) received by MOH
@@ -3664,40 +3406,81 @@ WHERE month_reported = @p_month AND
       county_id IS NOT NULL
 ;
 
+/*  418. Percent of CHAs who received a supervision visit in the past month. 
+    Notes:  For Grand Gedeh, the UNICEF CHAs are not being counted in the denominator.  To add them in, remove the
+            the "cohort is null" from the where clause (two places) below.
 
--- 418. Percent of CHAs who received a supervision visit in the past month.
-replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
-select 418, a.territory_id, 1, @p_month, @p_year, round( coalesce( a.number_visit, 0 ) / coalesce( m.num_cha, 0 ), 3 ) as report_rate
-from (
-      select b.territory_id, count( * ) as number_visit
-      from (
-              -- Filter the reports based on year and month and territory_id being not null
-              select s.territory_id, s.supervisedCHAID as cha_id
-              from lastmile_report.mart_view_base_odk_supervision as s
-              where s.manualMonth = @p_month and s.manualYear = @p_year and not ( s.territory_id is null )
-              group by s.territory_id, s.supervisedCHAID
- 
-      ) as b
-    group by b.territory_id
+*/
+replace into lastmile_dataportal.tbl_values ( ind_id , territory_id, period_id, `month`, `year`, value )
+select
+      418,
+      case 
+          when a.county like 'Rivercess'    then '1_14'
+          when a.county like 'Grand Gedeh'  then '6_31'
+          when a.county like 'Grand Bassa'  then '1_4'
+          else null
+      end  as territory_id, 
+      1, 
+      @p_month, 
+      @p_year,
+      round( count( a.position_id_supervision ) / count( a.position_id), 2 ) as supervision_rate 
+from ( 
+        select c.county, c.position_id, s.position_id_supervision
+        from lastmile_report.data_mart_snapshot_position_cha as c
+            left outer join ( 
+                              select supervisedCHAID   as position_id_supervision
+                              from lastmile_upload.odk_supervisionVisitLog
+                              where                          
+                                    ( meta_fabricated = 0 )           and
+                                    ( supervisionAttendance = 1 )     and -- only count record if this flag is set.
+                                    ( month( manualDate ) = @p_month  and year( manualDate ) = @p_year ) 
+                              group by supervisedCHAID 
+                              
+                            ) as s on c.position_id like s.position_id_supervision                   
+        where 
+              (       
+                ( c.county like 'Rivercess'   ) or
+                ( c.county like 'Grand Bassa' ) or
+                ( c.county like 'Grand Gedeh' and c.cohort is null  )
+              ) 
+              or
+              ( ( month( c.snapshot_date ) =  @p_month ) and ( year( c.snapshot_date ) = @p_year ) ) 
+      
 ) as a
-left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
+group by a.county
 
 union all
 
-select 418, '6_16', 1, @p_month, @p_year, round( sum( coalesce( a.number_visit, 0 ) ) / sum( coalesce( m.num_cha, 0 ) ), 3 ) as report_rate
-from (
-      select b.territory_id, count( * ) as number_visit
-      from (
-              -- Filter the reports based on year and month and territory_id being not null
-              select s.territory_id, s.supervisedCHAID as cha_id
-              from lastmile_report.mart_view_base_odk_supervision as s
-              where s.manualMonth = @p_month and s.manualYear = @p_year and not ( s.territory_id is null )
-              group by s.territory_id, s.supervisedCHAID
- 
-      ) as b
-    group by b.territory_id
+select
+      418,
+      '6_16' as territory_id,
+      1, 
+      @p_month, 
+      @p_year,
+      round( count( a.position_id_supervision ) / count( a.position_id ), 2 ) as supervision_rate 
+from ( 
+        select c.county, c.position_id, s.position_id_supervision
+        from lastmile_report.data_mart_snapshot_position_cha as c
+            left outer join ( 
+                              select supervisedCHAID   as position_id_supervision
+                              from lastmile_upload.odk_supervisionVisitLog
+                              where                          
+                                    ( meta_fabricated = 0 )           and
+                                    ( supervisionAttendance = 1 )     and -- only count record if this flag is set.
+                                    ( month( manualDate ) = @p_month  and year( manualDate ) = @p_year ) 
+                              group by supervisedCHAID 
+                              
+                            ) as s on c.position_id like s.position_id_supervision                   
+        where
+              (       
+                ( c.county like 'Rivercess'   ) or
+                ( c.county like 'Grand Bassa' ) or
+                ( c.county like 'Grand Gedeh' and c.cohort is null  )
+              ) 
+              or
+              ( ( month( c.snapshot_date ) =  @p_month ) and ( year( c.snapshot_date ) = @p_year ) ) 
+      
 ) as a
-left outer join lastmile_report.mart_program_scale as m on a.territory_id like m.territory_id 
 ;
 
 
@@ -4126,7 +3909,7 @@ from (
  * the denominator is the number of CHAs sampled during the month.  We could suppress is number of CHAs is too low.
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 430, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_life_saving_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year and NOT ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' );
 */
 
@@ -4185,7 +3968,7 @@ from (
 /* Note: moved to code 465-469
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 431, '6_32', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year and NOT ( county like '%Grand%Bassa%' or county like '%Grand%Gedeh%' or county like '%Rivercess%' );
 */
 
@@ -4355,46 +4138,47 @@ where (
  * the denominator is the number of CHAs sampled during the month.  We could suppress if number of CHAs is too low.
 */
 
+
 -- Beginning of code for ifi database
 replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 select 476, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_life_saving_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 477, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 )
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 478, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 479, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 480, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all 
 
 select 481, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 482, '6_27', 1, @p_month, @p_year, round( sum( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
@@ -4402,13 +4186,13 @@ union all
 -- For graph, generate period 2 quarterly totals for everything below
 
 select 477, territory_id, 1, @p_month, @p_year, round( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 477, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_act_25_67_5_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where ( ( `year` = @p_year and `month` = @p_month             ) or 
         ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
         ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
@@ -4417,13 +4201,13 @@ group by territory_id
 union all
 
 select 478, territory_id, 1, @p_month, @p_year, round( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 478, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_act_50_135_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where ( ( `year` = @p_year and `month` = @p_month             ) or 
         ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
         ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
@@ -4432,13 +4216,13 @@ group by territory_id
 union all
 
 select 479, territory_id, 1, @p_month, @p_year, round( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 479, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_act_25_or_50_mg_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where ( ( `year` = @p_year and `month` = @p_month             ) or 
         ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
         ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
@@ -4447,13 +4231,13 @@ group by territory_id
 union all
 
 select 480, territory_id, 1, @p_month, @p_year, round( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 480, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_amox_250_mg_dispersible_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where ( ( `year` = @p_year and `month` = @p_month             ) or 
         ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
         ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
@@ -4462,13 +4246,13 @@ group by territory_id
 union all 
 
 select 481, territory_id, 1, @p_month, @p_year, round( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value 
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 481, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_ors_20_6_1l_sachet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where ( ( `year` = @p_year and `month` = @p_month             ) or 
         ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
         ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
@@ -4477,13 +4261,13 @@ group by territory_id
 union all
 
 select 482, territory_id, 1, @p_month, @p_year, round( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) / coalesce( numReports, 0 ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `month`=@p_month and `year`=@p_year 
 
 union all
 
 select 482, territory_id, 2, @p_month, @p_year, round( sum( coalesce( number_zinc_sulfate_20_mg_scored_tablet_in_stock, 0 ) ) / sum( coalesce( numReports, 0 ) ), 3 ) as value
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where ( ( `year` = @p_year and `month` = @p_month             ) or 
         ( `year` = @p_yearMinus1 and `month` = @p_monthMinus1 ) or 
         ( `year` = @p_yearMinus2 and `month` = @p_monthMinus2 ) )
@@ -4504,7 +4288,6 @@ where ind_id = 477 and period_id = 1 and `month` = @p_month and `year` = @p_year
 ;
 
 end if;
-
 
 
 /* 
@@ -4921,7 +4704,7 @@ select  484, '6_35' as territory_id, 1 as period_id, @p_month, @p_year,
         round( sum( coalesce( number_service_delivery_question_correct_1_4, 0 ) ) / 
                sum( coalesce( numReports, 0 ) ), 3 ) as value
       
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where 
       @isEndOfQuarter and 
       (
@@ -4930,7 +4713,6 @@ where
         ( `year`=@p_yearMinus2  and `month`=@p_monthMinus2  )
       )
 ;
-
 
 
 /*
@@ -5085,6 +4867,7 @@ from (
 ;
 
 
+
 -- 805. Co-impact KPIs are reported for March and August.  Use period_id = 38 (month 3 and month 8) to specific them.
 if ( @p_month = 3 ) or ( @p_month = 8 ) then 
 
@@ -5095,46 +4878,14 @@ select  805, '6_27' as territory_id, 38 as period_id, @p_month, @p_year,
         round( sum( coalesce( number_correct_treatment, 0 ) ) / 
                sum( coalesce( numReports, 0 ) ), 3 ) as value
       
-from lastmile_report.mart_view_kobo_ifi 
+from lastmile_report.mart_view_base_ifi 
 where `year`=@p_year and `month`=@p_month
 ;
 
 end if;
 
 
--- 819. Number of in-home births
 
-replace into lastmile_dataportal.tbl_values ( ind_id , territory_id , period_id,`month`,`year`,`value`)
-select 819, territory_id, 1, @p_month, @p_year, coalesce( num_births_home, 0 ) as num_births_home
-
-from lastmile_report.mart_view_base_msr_county
-where year_reported = @p_year and month_reported = @p_month and 
-      ( territory_id like '1_4' or territory_id like '1_14' or territory_id like '6_31' )
-
-union all 
-
-select 819, '6_16', 1, @p_month, @p_year, sum( coalesce( num_births_home, 0 ) ) as num_births_home
-from lastmile_report.mart_view_base_msr_county
-where year_reported = @p_year and month_reported = @p_month and 
-      ( territory_id like '1_4' or territory_id like '1_14' or territory_id like '6_31' )
-;
-
--- 820. Number of in-facility births
-
-replace into lastmile_dataportal.tbl_values ( ind_id , territory_id , period_id,`month`,`year`,`value`)
-select 820, territory_id, 1, @p_month, @p_year, coalesce( num_births_facility, 0 ) as num_births_facility
-
-from lastmile_report.mart_view_base_msr_county
-where year_reported = @p_year and month_reported = @p_month and 
-      ( territory_id like '1_4' or territory_id like '1_14' or territory_id like '6_31' )
-
-union all 
-
-select 820, '6_16', 1, @p_month, @p_year, sum( coalesce( num_births_facility, 0 ) ) as num_births_facility
-from lastmile_report.mart_view_base_msr_county
-where year_reported = @p_year and month_reported = @p_month and 
-      ( territory_id like '1_4' or territory_id like '1_14' or territory_id like '6_31' )
-;
 
 
 -- ------ --

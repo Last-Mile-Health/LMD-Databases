@@ -6,6 +6,8 @@ create view lastmile_report.view_restock_level_chss as
 select
       restock_year,
       restock_month,
+      restock_date_year,
+      restock_date_month,
       restock_date,
       chss_id,
       

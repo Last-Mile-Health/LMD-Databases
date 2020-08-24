@@ -1,8 +1,8 @@
 use lastmile_datamart;
 
-drop table if exists dimension_position;
+drop table if exists dimension_position_hhr;
 
-create table dimension_position (
+create table dimension_position_hhr (
 
   -- CHA position
  
@@ -35,6 +35,8 @@ create table dimension_position (
   position_person_end_date              date                        null,
   reason_left                           varchar( 255 )              null,
   reason_left_description               varchar( 255 )              null,
+  
+  household_registration_total          int( 10 ) unsigned          null,
  
 -- CHSS 
   chss_position_id_pk                   int( 10 ) unsigned          null,
@@ -77,11 +79,9 @@ create table dimension_position (
  
   primary key ( date_key, position_id )
 
-
 ) engine = InnoDB default charset = utf8;
 
-alter table lastmile_datamart.dimension_position add index index_dimension_chss_position_id_begin_end_date_key  ( date_key, chss_position_id );
-alter table lastmile_datamart.dimension_position add index index_dimension_qao_position_id_begin_end_date_key   ( date_key, qao_position_id );
+alter table lastmile_datamart.dimension_position_hhr add index index_dimension_position_hhr_chss_position_id_date_key  ( date_key, chss_position_id );
+alter table lastmile_datamart.dimension_position_hhr add index index_dimension_position_hhr_qao_position_id_date_key   ( date_key, qao_position_id );
 
--- alter table lastmile_datamart.dimension_position add index index_dimension_date_key   ( date_key );
 

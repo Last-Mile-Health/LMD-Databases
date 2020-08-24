@@ -51,7 +51,8 @@ select
       position_count,
       
       person_id_list,
-      person_count
+      person_count,
+      cha_list
 
 from lastmile_ncha.view_geo_community_cha_population
 ;

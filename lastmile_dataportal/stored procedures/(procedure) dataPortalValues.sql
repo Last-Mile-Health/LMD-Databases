@@ -5137,6 +5137,258 @@ where year_reported = @p_year and month_reported = @p_month and
 ;
 
 
+-- 821. Percent of CHSSs with PPE surgical mask in stock
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select  821, a.territory_id, 1 as period_id, @p_month, @p_year, 
+        round( sum( if( a.value > 0, 1, 0 ) ) / s.num_chss, 3 ) as value  
+from ( 
+        select territory_id, chss_id, min( coalesce( mask_covid_initial_stock_on_hand, 0 ) ) as value
+        from lastmile_report.mart_view_base_restock_chss as r
+        where not ( territory_id is null ) and ( restock_month = @p_month ) and ( restock_year = @p_year )
+        group by territory_id, chss_id       
+) as a
+    left outer join lastmile_report.mart_program_scale as s on a.territory_id like s.territory_id
+group by a.territory_id
+
+union all
+
+select  821, '6_16', 1 as period_id, @p_month, @p_year, 
+
+        round( sum( if( a.value > 0, 1, 0 ) ) / sum( distinct s.num_chss ), 3 ) as value  
+from ( 
+        select territory_id, chss_id, min( coalesce( mask_covid_initial_stock_on_hand, 0 ) ) as value
+        from lastmile_report.mart_view_base_restock_chss as r
+        where not ( territory_id is null ) and ( restock_month = @p_month ) and ( restock_year = @p_year )
+        group by chss_id       
+) as a
+    left outer join lastmile_report.mart_program_scale as s on a.territory_id like s.territory_id
+;
+
+
+-- 822. Percent of CHAs stocked out of PPE surgical mask
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
+select 822, a.territory_id, 1, @p_month, @p_year, 
+       if(
+          ( coalesce( number_cha_restock, 0 ) / b.num_cha ) >= 0.25, 
+          round( ( coalesce( a.number_stockouts, 0 ) ) / coalesce( a.number_cha_restock, 0 ), 3 ),
+          null
+       )
+       as value
+from (
+        select
+              territory_id, 
+              sum( stockout_surgicalMask )  as number_stockouts,
+              count( * )                    as number_cha_restock
+        -- from lastmile_report.view_base_restock_cha
+        from lastmile_report.mart_view_base_restock_cha
+        where `month`=@p_month and `year`=@p_year and not ( territory_id is null )
+        group by territory_id
+      ) as a
+    left outer join lastmile_report.mart_program_scale b on a.territory_id = b.territory_id 
+
+union all
+
+select 822, '6_16', 1, @p_month, @p_year, 
+       if(
+          ( coalesce( number_cha_restock, 0 ) / b.num_cha ) >= 0.25, 
+          round( ( coalesce( a.number_stockouts, 0 ) ) / coalesce( a.number_cha_restock, 0 ), 3 ),
+          null
+       )
+       as value
+from (
+        select
+              sum( stockout_surgicalMask )  as number_stockouts,
+              count( * )                    as number_cha_restock
+        -- from lastmile_report.view_base_restock_cha  -- use mart_ version of view
+        from lastmile_report.mart_view_base_restock_cha
+        where `month`=@p_month and `year`=@p_year and not ( territory_id is null )
+      ) as a
+    left outer join lastmile_report.mart_program_scale b on b.territory_id like '6_16'
+;
+
+
+-- 823. Percent of CHSSs with extra (PPE) disposable gloves in stock
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select  823, a.territory_id, 1 as period_id, @p_month, @p_year, 
+        round( sum( if( a.value > 0, 1, 0 ) ) / s.num_chss, 3 ) as value  
+from ( 
+        select territory_id, chss_id, min( coalesce( disposable_glove_covid_initial_stock_on_hand, 0 ) ) as value
+        from lastmile_report.mart_view_base_restock_chss as r
+        where not ( territory_id is null ) and ( restock_month = @p_month ) and ( restock_year = @p_year )
+        group by territory_id, chss_id       
+) as a
+    left outer join lastmile_report.mart_program_scale as s on a.territory_id like s.territory_id
+group by a.territory_id
+
+union all
+
+select  823, '6_16', 1 as period_id, @p_month, @p_year, 
+
+        round( sum( if( a.value > 0, 1, 0 ) ) / sum( distinct s.num_chss ), 3 ) as value  
+from ( 
+        select territory_id, chss_id, min( coalesce( disposable_glove_covid_initial_stock_on_hand, 0 ) ) as value
+        from lastmile_report.mart_view_base_restock_chss as r
+        where not ( territory_id is null ) and ( restock_month = @p_month ) and ( restock_year = @p_year )
+        group by chss_id       
+) as a
+    left outer join lastmile_report.mart_program_scale as s on a.territory_id like s.territory_id
+;
+
+
+-- 824. Percent of CHAs stocked out of extra (PPE) disposable gloves
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
+select 824, a.territory_id, 1, @p_month, @p_year, 
+       if(
+          ( coalesce( number_cha_restock, 0 ) / b.num_cha ) >= 0.25, 
+          round( ( coalesce( a.number_stockouts, 0 ) ) / coalesce( a.number_cha_restock, 0 ), 3 ),
+          null
+       )
+       as value
+from (
+        select
+              territory_id, 
+              sum( stockout_glovesCovid19 ) as number_stockouts,
+              count( * )                    as number_cha_restock
+        -- from lastmile_report.view_base_restock_cha
+        from lastmile_report.mart_view_base_restock_cha
+        where `month`=@p_month and `year`=@p_year and not ( territory_id is null )
+        group by territory_id
+      ) as a
+    left outer join lastmile_report.mart_program_scale b on a.territory_id = b.territory_id 
+
+union all
+
+select 824, '6_16', 1, @p_month, @p_year, 
+       if(
+          ( coalesce( number_cha_restock, 0 ) / b.num_cha ) >= 0.25, 
+          round( ( coalesce( a.number_stockouts, 0 ) ) / coalesce( a.number_cha_restock, 0 ), 3 ),
+          null
+       )
+       as value
+from (
+        select
+              sum( stockout_glovesCovid19 ) as number_stockouts,
+              count( * )                    as number_cha_restock
+        -- from lastmile_report.view_base_restock_cha  -- use mart_ version of view
+        from lastmile_report.mart_view_base_restock_cha
+        where `month`=@p_month and `year`=@p_year and not ( territory_id is null )
+      ) as a
+    left outer join lastmile_report.mart_program_scale b on b.territory_id like '6_16'
+;
+
+
+-- 825. Percent of CHSSs with regular and extra (PPE) disposable gloves in stock 
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select  825, a.territory_id, 1 as period_id, @p_month, @p_year, 
+        round( sum( if( a.value > 0, 1, 0 ) ) / s.num_chss, 3 ) as value  
+from ( 
+        select 
+              territory_id, 
+              chss_id,
+              min(  if( coalesce( disposable_glove_initial_stock_on_hand,       0 ) > 0 and 
+                        coalesce( disposable_glove_covid_initial_stock_on_hand, 0 ) > 0,
+                        1, 0 )
+              ) as value
+              
+        from lastmile_report.mart_view_base_restock_chss as r
+        where not ( territory_id is null ) and ( restock_month = @p_month ) and ( restock_year = @p_year )
+        group by territory_id, chss_id       
+) as a
+    left outer join lastmile_report.mart_program_scale as s on a.territory_id like s.territory_id
+group by a.territory_id
+
+union all
+
+select  825, '6_16', 1 as period_id, @p_month, @p_year, 
+
+        round( sum( if( a.value > 0, 1, 0 ) ) / sum( distinct s.num_chss ), 3 ) as value  
+from ( 
+        select 
+              territory_id, 
+              chss_id,
+              min(  if( coalesce( disposable_glove_initial_stock_on_hand,       0 ) > 0 and 
+                        coalesce( disposable_glove_covid_initial_stock_on_hand, 0 ) > 0,
+                        1, 0 )
+              ) as value
+        from lastmile_report.mart_view_base_restock_chss as r
+        where not ( territory_id is null ) and ( restock_month = @p_month ) and ( restock_year = @p_year )
+        group by chss_id       
+) as a
+    left outer join lastmile_report.mart_program_scale as s on a.territory_id like s.territory_id
+;
+
+
+-- 826. Percent of CHAs stocked out of regular and extra (PPE) disposable gloves
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, `value` )
+select 826, a.territory_id, 1, @p_month, @p_year, 
+       if(
+          ( coalesce( number_cha_restock, 0 ) / b.num_cha ) >= 0.25, 
+          round( ( coalesce( a.number_stockouts, 0 ) ) / coalesce( a.number_cha_restock, 0 ), 3 ),
+          null
+       )
+       as value
+from (
+        select
+              territory_id, 
+              sum( if( stockout_glovesCovid19 = 1 and stockout_disposableGloves = 1, 1, 0 ) ) as number_stockouts,
+              count( * )                    as number_cha_restock
+        -- from lastmile_report.view_base_restock_cha
+        from lastmile_report.mart_view_base_restock_cha
+        where `month`=@p_month and `year`=@p_year and not ( territory_id is null )
+        group by territory_id
+      ) as a
+    left outer join lastmile_report.mart_program_scale b on a.territory_id = b.territory_id 
+
+union all
+
+select 826, '6_16', 1, @p_month, @p_year, 
+       if(
+          ( coalesce( number_cha_restock, 0 ) / b.num_cha ) >= 0.25, 
+          round( ( coalesce( a.number_stockouts, 0 ) ) / coalesce( a.number_cha_restock, 0 ), 3 ),
+          null
+       )
+       as value
+from (
+        select
+              sum( if( stockout_glovesCovid19 = 1 and stockout_disposableGloves = 1, 1, 0 ) ) as number_stockouts,
+              count( * )                    as number_cha_restock
+        -- from lastmile_report.view_base_restock_cha  -- use mart_ version of view
+        from lastmile_report.mart_view_base_restock_cha
+        where `month`=@p_month and `year`=@p_year and not ( territory_id is null )
+      ) as a
+    left outer join lastmile_report.mart_program_scale b on b.territory_id like '6_16'
+;
+
+
+-- 827. Percent of CHSSs with disposable gloves in stock
+replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
+select  827, a.territory_id, 1 as period_id, @p_month, @p_year, 
+        round( sum( if( a.value > 0, 1, 0 ) ) / s.num_chss, 3 ) as value  
+from ( 
+        select territory_id, chss_id, min( coalesce( disposable_glove_initial_stock_on_hand, 0 ) ) as value
+        from lastmile_report.mart_view_base_restock_chss as r
+        where not ( territory_id is null ) and ( restock_month = @p_month ) and ( restock_year = @p_year )
+        group by territory_id, chss_id       
+) as a
+    left outer join lastmile_report.mart_program_scale as s on a.territory_id like s.territory_id
+group by a.territory_id
+
+union all
+
+select  827, '6_16', 1 as period_id, @p_month, @p_year, 
+
+        round( sum( if( a.value > 0, 1, 0 ) ) / sum( distinct s.num_chss ), 3 ) as value  
+from ( 
+        select territory_id, chss_id, min( coalesce( disposable_glove_initial_stock_on_hand, 0 ) ) as value
+        from lastmile_report.mart_view_base_restock_chss as r
+        where not ( territory_id is null ) and ( restock_month = @p_month ) and ( restock_year = @p_year )
+        group by chss_id       
+) as a
+    left outer join lastmile_report.mart_program_scale as s on a.territory_id like s.territory_id
+;
+
+
+
 -- ------ --
 -- Finish --
 -- ------ --

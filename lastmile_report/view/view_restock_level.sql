@@ -98,7 +98,15 @@ select
       'NA' as gasoline_top_off,
       'NA' as gasoline_initial_stock_on_hand,	
       'NA' as gasoline_amount_restocked,
-
+      
+      r.surgical_mask_restock_type,
+      r.surgical_mask_stock_on_hand,
+      r.surgical_mask_quantity_restock,
+      
+      r.disposable_gloves_covid19_restock_type,
+      r.disposable_gloves_covid19_stock_on_hand,
+      r.disposable_gloves_covid19_quantity_restock,
+  
       -- geographical and ID data
       c.health_district,
       c.health_facility,
@@ -106,7 +114,6 @@ select
       c.position_id,
       c.community_id_list, 
       c.community_list
-
 
 from lastmile_report.mart_view_base_position_cha as c
     cross join  lastmile_report.view_restock_level_year_month as d
@@ -212,9 +219,16 @@ select
       
       '12 Gallons'                                                  as gasoline_top_off,
       r.gasoline_initial_stock_on_hand,	
-      r.gasoline_amount_restocked,																				
-
+      r.gasoline_amount_restocked,						
       
+      '15 Packs of 50'                                              as mask_covid_restock_type,
+      r.mask_covid_initial_stock_on_hand,    
+      r.mask_covid_amount_restocked,
+      
+      '12 boxes of 100'                                             as disposable_glove_covid_restock_type,
+      r.disposable_glove_covid_initial_stock_on_hand,      
+      r.disposable_glove_covid_amount_restocked,
+
       -- geographical and ID data
       c.health_district,
       c.health_facility,
@@ -227,8 +241,8 @@ select
 from lastmile_report.mart_view_base_position_chss as c
     cross join lastmile_report.view_restock_level_year_month as d
         left outer join lastmile_report.view_restock_level_chss as r on c.position_id like r.chss_id            and 
-                                                                        d.year_report   = r.restock_year   and 
-                                                                        d.month_report  = r.restock_month 
+                                                                        d.year_report   = r.restock_date_year   and 
+                                                                        d.month_report  = r.restock_date_month                                                                
 where ( c.cohort is null ) or not ( c.cohort like 'UNICEF' )
 
 -- order by clause orders resultset of the union of the two select statements.

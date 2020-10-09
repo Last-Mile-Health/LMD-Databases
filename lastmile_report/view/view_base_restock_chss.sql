@@ -191,6 +191,19 @@ select
         a.gasoline_amount_restocked,
         a.gasoline_ending_balance,
         a.gasoline_stock_returned,
+        
+        a.mask_covid_initial_stock_on_hand,
+        a.mask_covid_stock_damaged_expiring,
+        a.mask_covid_amount_restocked,
+        a.mask_covid_ending_balance,
+        a.mask_covid_stock_returned,
+              
+        a.disposable_glove_covid_initial_stock_on_hand,
+        a.disposable_glove_covid_stock_damaged_expiring,
+        a.disposable_glove_covid_amount_restocked,
+        a.disposable_glove_covid_ending_balance,
+        a.disposable_glove_covid_stock_returned,
+  
         a.chss_signature,
         a.oic_signature,
         a.comment

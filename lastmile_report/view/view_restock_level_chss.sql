@@ -89,7 +89,14 @@ select
       safety_box_amount_restocked,
 
       gasoline_initial_stock_on_hand,
-      gasoline_amount_restocked
+      gasoline_amount_restocked,
+      
+      mask_covid_initial_stock_on_hand,    
+      mask_covid_amount_restocked,
+        
+      disposable_glove_covid_initial_stock_on_hand,      
+      disposable_glove_covid_amount_restocked
+        
 
 from lastmile_report.view_base_restock_chss
 ;

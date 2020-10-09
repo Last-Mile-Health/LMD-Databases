@@ -38,7 +38,12 @@ select
       stockOnHand_dispensingBags,
       stockOnHand_femaleCondom,
       stockOnHand_microlut,
-      stockOnHand_safetyBox
+      stockOnHand_safetyBox,
+      
+      -- COVID-19 PPE 
+      stockOnHand_surgicalMask,
+      stockOnHand_glovesCovid19
+      
 from lastmile_upload.odk_chaRestock
 where (
         ( 
@@ -107,7 +112,11 @@ select
       null as stockOnHand_dispensingBags,
       null as stockOnHand_femaleCondom,
       null as stockOnHand_microlut,
-      null as stockOnHand_safetyBox
+      null as stockOnHand_safetyBox,
+      
+      -- COVID-19 PPE stubs
+      null as stockOnHand_surgicalMask,
+      null as stockOnHand_glovesCovid19
 
 from lastmile_archive.chwdb_odk_chw_restock
 ;

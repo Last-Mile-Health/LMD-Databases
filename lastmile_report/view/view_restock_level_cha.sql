@@ -327,11 +327,39 @@ select
           when 'full'       then coalesce( fullStock_safetyBox, 0 ) - coalesce( stockOnHand_safetyBox, 0 )
           when 'none'       then 0
           else 0
-      end as safety_box_quantity_restock
+      end as safety_box_quantity_restock,
+      
+       
+      -- stockOnHand_surgicalMask, restockType_surgicalMask, overstockRestock_surgicalMask, stockOutReason_surgicalMask, fullStock_surgicalMask
+    
+      restockType_surgicalMask      as surgical_mask_restock_type,
+      stockOnHand_surgicalMask      as surgical_mask_stock_on_hand,
+      
+      case trim( restockType_surgicalMask )
+          when null or ''   then 0
+          -- when 'partial'    then partialRestock_disposableGloves
+          when 'overstock'  then overstockRestock_surgicalMask
+          when 'full'       then coalesce( fullStock_surgicalMask, 0 ) - coalesce( stockOnHand_surgicalMask, 0 )
+          when 'none'       then 0
+          else 0
+      end as surgical_mask_quantity_restock,
+  
+      -- stockOnHand_glovesCovid19, restockType_glovesCovid19, overstockRestock_glovesCovid19, stockOutReason_glovesCovid19, fullStock_glovesCovid19
+   
+      restockType_glovesCovid19      as disposable_gloves_covid19_restock_type,
+      stockOnHand_glovesCovid19      as disposable_gloves_covid19_stock_on_hand,
+      
+      case trim( restockType_glovesCovid19 )
+          when null or ''   then 0
+          -- when 'partial'    then partialRestock_disposableGloves
+          when 'overstock'  then overstockRestock_glovesCovid19
+          when 'full'       then coalesce( fullStock_glovesCovid19, 0 ) - coalesce( stockOnHand_glovesCovid19, 0 )
+          when 'none'       then 0
+          else 0
+      end as disposable_gloves_covid19_quantity_restock
       
       -- formRestockNeeded, formRestockType_module1, formRestockType_module2, formRestockType_module3, formRestockType_module4, formRestockType_HouseholdRegistration, formRestockType_routineVisit, formRestockType_Referral
-        
-                   
+          
 from lastmile_upload.odk_chaRestock
 where not ( ( ( supervisedChaID is null ) or ( trim( supervisedChaID ) like ''  ) ) and 
             ( ( chaID is null           ) or ( trim( chaID ) like ''            ) )

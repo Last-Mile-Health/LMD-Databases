@@ -32,7 +32,11 @@ select
         min( a.stockOnHand_Paracetamol100mg_suspension )      as stockOnHand_Paracetamol100mg_suspension,
         min( a.stockOnHand_safetyBox )                        as stockOnHand_safetyBox,
         min( a.stockOnHand_ZincSulfate )                      as stockOnHand_ZincSulfate,
-        min( a.stockOnHand_ZincSulfate_Infidelity )           as stockOnHand_ZincSulfate_Infidelity
+        min( a.stockOnHand_ZincSulfate_Infidelity )           as stockOnHand_ZincSulfate_Infidelity,
+        
+        -- PPE Covid-19
+        min( a.stockOnHand_surgicalMask )                     as stockOnHand_surgicalMask,
+        min( a.stockOnHand_glovesCovid19 )                    as stockOnHand_glovesCovid19
         
 from lastmile_report.view_restock_union as a
         left outer join lastmile_report.mart_view_history_position_geo as b on trim( a.supervisedChaID ) like b.position_id 

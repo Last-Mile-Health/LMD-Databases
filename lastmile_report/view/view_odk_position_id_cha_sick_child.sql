@@ -11,5 +11,6 @@ select
         
 from lastmile_upload.odk_sickChildForm a
     left outer join lastmile_report.mart_view_base_history_position b on trim( a.chwID ) like b.position_id
+where a.manualDate >= date_sub( current_date(), INTERVAL 6 month )
 group by year( a.manualDate ), month( a.manualDate ), trim( a.chwID )
 ;

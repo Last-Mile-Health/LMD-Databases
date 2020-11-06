@@ -20,7 +20,8 @@ select
       cha,
       community_id_list,
       community_list,
-      number_sick_child_record
+      number_sick_child_record,
+      number_routine_visit_record
       
 from lastmile_report.view_odk_position_id_cha
 
@@ -39,11 +40,12 @@ select
       chss_position_id,
       chss,
        
-      null as position_id,
-      null as cha,
-      null as community_id_list,
-      null as community_list,
-      number_sick_child_record
+      '------------'                as position_id,
+      '------------'                as cha,
+      '------------'                as community_id_list,
+      '------------'                as community_list,
+      number_sick_child_record,
+      number_routine_visit_record
       
 from lastmile_report.view_odk_position_id_cha_chss
 

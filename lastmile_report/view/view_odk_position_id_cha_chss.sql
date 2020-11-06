@@ -15,7 +15,8 @@ select
       qao,
       chss_position_id,
       chss,
-      sum( number_sick_child_record ) as number_sick_child_record
+      sum( number_sick_child_record )     as number_sick_child_record,
+      sum( number_routine_visit_record )  as number_routine_visit_record
       
 from lastmile_report.view_odk_position_id_cha as d
 group by year_report, month_report, county, health_district, health_facility, qao, chss_position_id

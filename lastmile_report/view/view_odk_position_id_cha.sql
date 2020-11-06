@@ -4,6 +4,7 @@ drop view if exists lastmile_report.view_odk_position_id_cha;
 
 create view lastmile_report.view_odk_position_id_cha as
 select 
+      'CHA'           as job,
       d.year_report, 
       d.month_report, 
 
@@ -21,7 +22,7 @@ select
       
       v.community_id_list,
       v.community_list,
-      s.number_record as number_sick_child_record
+      coalesce( s.number_record, 0 ) as number_sick_child_record
       
 from lastmile_report.view_twelve_month as d
     cross join lastmile_report.mart_view_base_position_cha as v
@@ -29,7 +30,7 @@ from lastmile_report.view_twelve_month as d
                                                                                     ( cast( d.year_report   as unsigned ) = cast( s.year_report   as unsigned ) ) and
                                                                                     ( cast( d.month_report  as unsigned ) = cast( s.month_report  as unsigned ) )
 where ( v.cohort is null or  not ( v.cohort like '%UNICEF%' ) ) and 
-      ( d.sequence_number between 1 and 3 ) -- sequence number zero is current month
+      ( d.month_minus between 1 and 3 ) -- zero is current month
 
-order by cast( d.year_report as unsigned ) desc, cast( d.month_report as unsigned ) desc, v.county asc, v.health_district asc, v.health_facility asc, v.chss_position_id asc, v.position_id
+-- order by cast( d.year_report as unsigned ) desc, cast( d.month_report as unsigned ) desc, v.county asc, v.health_district asc, v.health_facility asc, v.chss_position_id asc, v.position_id
 ;

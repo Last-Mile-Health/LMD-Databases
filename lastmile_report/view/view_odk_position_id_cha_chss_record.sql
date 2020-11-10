@@ -49,5 +49,5 @@ select
       
 from lastmile_report.view_odk_position_id_cha_chss
 
-order by cast( year_report as unsigned ) desc, cast( month_report as unsigned ) desc, county asc, health_district asc, health_facility asc, chss_position_id asc, job asc, position_id
+order by county asc, health_district asc, health_facility asc, chss_position_id asc, job asc, position_id, cast( year_report as unsigned ) desc, cast( month_report as unsigned ) desc
 ;

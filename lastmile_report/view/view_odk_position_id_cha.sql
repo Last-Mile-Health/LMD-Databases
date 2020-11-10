@@ -38,6 +38,5 @@ from lastmile_report.view_twelve_month as d
 
 where ( v.cohort is null or  not ( v.cohort like '%UNICEF%' ) ) and 
       ( d.month_minus between 1 and 4 ) -- zero is current month
-
--- order by cast( d.year_report as unsigned ) desc, cast( d.month_report as unsigned ) desc, v.county asc, v.health_district asc, v.health_facility asc, v.chss_position_id asc, v.position_id
+order by v.county asc, v.health_district asc, v.health_facility asc, v.chss_position_id asc, v.position_id, cast( d.year_report as unsigned ) desc, cast( d.month_report as unsigned ) desc
 ;

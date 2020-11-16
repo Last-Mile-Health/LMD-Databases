@@ -14,6 +14,7 @@ select
       
 from lastmile_report.view_diagnostic_device_id_unfiltered as a
 -- where not ( a.id_value is null or a.id_value like '' )
+where a.date_form >= date_sub( current_date(), INTERVAL 12 month )
 group by 
           a.id_type, 
           a.meta_device_id, 

@@ -60,6 +60,6 @@ select
           , 1, 0  
       ) as correct_treatment
              
-    from lastmile_upload.kobo_ifi_community as a
+    from lastmile_report.view_kobo_ifi_community as a
         left outer join lastmile_ncha.county as b on a.county = b.county_id
 ;

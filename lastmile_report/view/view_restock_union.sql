@@ -42,7 +42,13 @@ select
       
       -- COVID-19 PPE 
       stockOnHand_surgicalMask,
-      stockOnHand_glovesCovid19
+      stockOnHand_glovesCovid19,
+      -- Add regular disposable glove and Covid19 extra glove to come up with cumlative gloves in stock.  The conditional functions
+      -- are to accomodate nulls and empty strings in the fields because the value for regular and covid gloves were not filled in. 
+      if( stockOnHand_disposableGloves is null or trim( stockOnHand_disposableGloves like '' ), 0, stockOnHand_disposableGloves ) +
+      if( stockOnHand_glovesCovid19 is null or trim( stockOnHand_glovesCovid19 like '' ), 0, stockOnHand_glovesCovid19 )
+      as stockOnHand_disposable_gloves_regular_covid19
+      
       
 from lastmile_upload.odk_chaRestock
 where (
@@ -116,7 +122,8 @@ select
       
       -- COVID-19 PPE stubs
       null as stockOnHand_surgicalMask,
-      null as stockOnHand_glovesCovid19
+      null as stockOnHand_glovesCovid19,
+      null as stockOnHand_disposable_gloves_regular_covid19
 
 from lastmile_archive.chwdb_odk_chw_restock
 ;

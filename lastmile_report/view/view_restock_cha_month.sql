@@ -4,16 +4,20 @@ drop view if exists lastmile_report.view_restock_cha_month;
 
 create view lastmile_report.view_restock_cha_month as
 select
-        a.chaRestockID,
+        -- a.chaRestockID,
         trim( a.supervisedChaID )                             as cha_id,
         b.county,
         b.county_id,
         
         lastmile_report.territory_id( b.county_id, 1 )        as territory_id,     
-        month( a.manualDate )                                 as `month`,
+        month(  a.manualDate )                                as `month`,
         year( a.manualDate )                                  as `year`,
-        a.manualDate,
+        min( a.manualDate )                                   as manualDate,
         
+        group_concat( distinct meta_deviceID order by meta_deviceID separator ',' ) as meta_deviceID_list,
+        count( * )                                            as number_record,
+        sum( if( meta_formVersion like '4.0.0', 1, 0 ) )      as number_record_ppe,
+       
         min( a.stockOnHand_ACT25mg )                          as stockOnHand_ACT25mg,
         min( a.stockOnHand_ACT50mg )                          as stockOnHand_ACT50mg,
         min( a.stockOnHand_Amoxicillin250mg )                 as stockOnHand_Amoxicillin250mg,
@@ -35,8 +39,11 @@ select
         min( a.stockOnHand_ZincSulfate_Infidelity )           as stockOnHand_ZincSulfate_Infidelity,
         
         -- PPE Covid-19
-        min( a.stockOnHand_surgicalMask )                     as stockOnHand_surgicalMask,
-        min( a.stockOnHand_glovesCovid19 )                    as stockOnHand_glovesCovid19
+        min( a.stockOnHand_surgicalMask )                       as stockOnHand_surgicalMask,
+        min( a.stockOnHand_glovesCovid19 )                      as stockOnHand_glovesCovid19,
+        min( a.stockOnHand_disposable_gloves_regular_covid19 )  as stockOnHand_disposable_gloves_regular_covid19
+        
+        
         
 from lastmile_report.view_restock_union as a
         left outer join lastmile_report.mart_view_history_position_geo as b on trim( a.supervisedChaID ) like b.position_id 

@@ -5,7 +5,7 @@ drop view if exists lastmile_report.view_base_restock_cha;
 create view lastmile_report.view_base_restock_cha as
 
 select 
-      a.chaRestockID,
+      -- a.chaRestockID,
       a.cha_id,
       a.county,
       a.county_id,
@@ -13,7 +13,7 @@ select
       a.`month`,
       a.`year`,
       
-      ( year( a.manualDate ) * 10000 ) + ( month( a.manualDate ) * 100 ) + 1 as date_key,
+      ( a.`year` * 10000 ) + ( a.`month` * 100 ) + 1 as date_key,
       
       if( ( ( a.stockOnHand_ACT25mg = 0 ) 
             or         
@@ -41,9 +41,7 @@ select
           ( a.stockOnHand_muacStrap           = 0 ) or 
           ( a.stockOnHand_MalariaRDT          = 0 ) or 
           ( a.stockOnHand_MalariaRDT          = 0 ) or 
-          ( a.stockOnHand_disposableGloves    = 0 ) or 
-          ( a.stockOnHand_glovesCovid19       = 0 ) or  -- PPE Covid-19
-          ( a.stockOnHand_surgicalMask        = 0 )     -- PPE Covid-19       
+          ( a.stockOnHand_disposableGloves    = 0 )     
           , 1, 0
         ) as any_stockouts_essentials,
       
@@ -56,11 +54,47 @@ select
       if( ( a.stockOnHand_ORS               = 0 ), 1, 0 ) + 
       if( ( a.stockOnHand_muacStrap         = 0 ), 1, 0 ) + 
       if( ( a.stockOnHand_MalariaRDT        = 0 ), 1, 0 ) + 
-      if( ( a.stockOnHand_disposableGloves  = 0 ), 1, 0 ) +
-      if( ( a.stockOnHand_glovesCovid19     = 0 ), 1, 0 ) + -- PPE Covid-19
-      if( ( a.stockOnHand_surgicalMask      = 0 ), 1, 0 )   -- PPE Covid-19
+      if( ( a.stockOnHand_disposableGloves  = 0 ), 1, 0 )
       as num_stockouts_essentials,
-            
+      
+      -- stockout essentials, including PPE
+      -- any_stockouts_essentials_ppe
+      if( ( ( a.stockOnHand_ZincSulfate       = 0 ) and ( ( a.stockOnHand_ZincSulfate_Infidelity      = 0 ) or isnull( a.stockOnHand_ZincSulfate_Infidelity       ) ) ) or            
+          ( ( a.stockOnHand_Amoxicillin250mg  = 0 ) and ( ( a.stockOnHand_Amoxicillin250mg_suspension = 0 ) or isnull( a.stockOnHand_Amoxicillin250mg_suspension  ) ) ) or              
+          ( ( a.stockOnHand_Paracetamol100mg  = 0 ) and ( ( a.stockOnHand_Paracetamol100mg_suspension = 0 ) or isnull( a.stockOnHand_Paracetamol100mg_suspension  ) ) ) or            
+          ( a.stockOnHand_ACT25mg             = 0 ) or 
+          ( a.stockOnHand_ACT50mg             = 0 ) or  
+          ( a.stockOnHand_ORS                 = 0 ) or  
+          ( a.stockOnHand_muacStrap           = 0 ) or 
+          ( a.stockOnHand_MalariaRDT          = 0 ) or 
+          ( a.stockOnHand_MalariaRDT          = 0 ) or
+          
+          -- ( a.stockOnHand_disposableGloves    = 0 ) or
+          -- ( a.stockOnHand_glovesCovid19       = 0 ) or    -- PPE Covid-19
+          
+          -- Only count gloves as stocked out if both regular and covid19 extra sum to zero
+          ( a.stockOnHand_disposable_gloves_regular_covid19 = 0 ) or
+          ( a.stockOnHand_surgicalMask                      = 0 )       -- PPE Covid-19       
+          , 1, 0
+        ) as any_stockouts_essentials_ppe,
+      
+      -- num_stockouts_essentials_ppe
+      if( ( a.stockOnHand_Paracetamol100mg  = 0 ) and ( ( a.stockOnHand_Paracetamol100mg_suspension = 0 ) or isnull( a.stockOnHand_Paracetamol100mg_suspension  ) ), 1, 0 ) +        
+      if( ( a.stockOnHand_ZincSulfate       = 0 ) and ( ( a.stockOnHand_ZincSulfate_Infidelity      = 0 ) or isnull( a.stockOnHand_ZincSulfate_Infidelity       ) ), 1, 0 ) +  
+      if( ( a.stockOnHand_Amoxicillin250mg  = 0 ) and ( ( a.stockOnHand_Amoxicillin250mg_suspension = 0 ) or isnull( a.stockOnHand_Amoxicillin250mg_suspension  ) ), 1, 0 ) + 
+      if( ( a.stockOnHand_ACT25mg           = 0 ), 1, 0 ) + 
+      if( ( a.stockOnHand_ACT50mg           = 0 ), 1, 0 ) +            
+      if( ( a.stockOnHand_ORS               = 0 ), 1, 0 ) + 
+      if( ( a.stockOnHand_muacStrap         = 0 ), 1, 0 ) + 
+      if( ( a.stockOnHand_MalariaRDT        = 0 ), 1, 0 ) + 
+      -- if( ( a.stockOnHand_disposableGloves  = 0 ), 1, 0 ) +
+      -- if( ( a.stockOnHand_glovesCovid19     = 0 ), 1, 0 ) + -- PPE Covid-19
+      
+      -- Only count gloves as stocked out if both regular and covid19 extra sum to zero
+      if( ( a.stockOnHand_disposable_gloves_regular_covid19   = 0 ), 1, 0 ) +
+      if( ( a.stockOnHand_surgicalMask                        = 0 ), 1, 0 )   -- PPE Covid-19
+      as num_stockouts_essentials_ppe,
+  
       if( a.stockOnHand_microlut            = 0, 1, 0 ) as stockout_microlut,
       if( a.stockOnHand_microgynon          = 0, 1, 0 ) as stockout_microgynon,
       if( a.stockOnHand_maleCondom          = 0, 1, 0 ) as stockout_maleCondom,
@@ -106,8 +140,10 @@ select
       
       -- PPE Covid-19
       -- For restock form verisions before 4.0.0 these two fields will be null.  
-      if( a.stockOnHand_surgicalMask    = 0, 1, 0 ) as stockout_surgicalMask,
-      if( a.stockOnHand_glovesCovid19   = 0, 1, 0 ) as stockout_glovesCovid19
+      if( a.stockOnHand_surgicalMask    = 0, 1, 0 )                     as stockout_surgicalMask,
+      if( a.stockOnHand_glovesCovid19   = 0, 1, 0 )                     as stockout_glovesCovid19,
+      if( a.stockOnHand_disposable_gloves_regular_covid19   = 0, 1, 0 ) as stockout_disposable_gloves_regular_covid19
+      
      
             
 from lastmile_report.view_restock_cha_month a

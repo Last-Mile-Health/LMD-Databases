@@ -15,8 +15,10 @@ select
       sum( coalesce( r.number_record,     0 ) ) as `#Records`,
       sum( coalesce( r.number_record_ppe, 0 ) ) as `#Records PPE`,
       
-      concat( coalesce( round( ( sum( coalesce( r.number_record_ppe, 0 ) ) / sum( coalesce( r.number_record, 0 ) ) ) * 100, 0 ), 0 ), '%' ) 
-      as `%Records PPE`,
+      if( sum( coalesce( r.number_record, 0 ) ) = 0, 'NA', 
+          concat( coalesce( round( ( sum( coalesce( r.number_record_ppe, 0 ) ) / sum( coalesce( r.number_record, 0 ) ) ) * 100, 0 ), 0 ), '%' ) 
+      ) as `%Records PPE`,
+
       
       if( sum( coalesce( r.number_record, 0 ) ) = 0, 'NA', 
           if( group_concat( distinct r.meta_deviceID_list order by r.meta_deviceID_list separator ',' ) like '%,%', 'N', 'Y' )   

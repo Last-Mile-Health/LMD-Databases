@@ -86,6 +86,11 @@ drop table if exists lastmile_report.mart_view_base_restock_chss;
 create table lastmile_report.mart_view_base_restock_chss as 
 select * from lastmile_report.view_base_restock_chss;
 
+drop table if exists lastmile_report.mart_view_restock_cha_ppe_form;
+create table lastmile_report.mart_view_restock_cha_ppe_form as
+select * from lastmile_report.view_restock_cha_ppe_form
+;
+
 drop table if exists lastmile_report.mart_view_base_odk_supervision;
 create table lastmile_report.mart_view_base_odk_supervision as 
 select * from lastmile_report.view_base_odk_supervision;

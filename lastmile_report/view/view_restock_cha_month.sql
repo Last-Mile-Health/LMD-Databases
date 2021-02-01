@@ -20,8 +20,11 @@ select
        
         min( a.stockOnHand_ACT25mg )                          as stockOnHand_ACT25mg,
         min( a.stockOnHand_ACT50mg )                          as stockOnHand_ACT50mg,
+        
         min( a.stockOnHand_Amoxicillin250mg )                 as stockOnHand_Amoxicillin250mg,
         min( a.stockOnHand_Amoxicillin250mg_suspension )      as stockOnHand_Amoxicillin250mg_suspension,
+        min( a.stockOnHand_Amoxicillin250mg_strips )          as stockOnHand_Amoxicillin250mg_strips,
+        
         min( a.stockOnHand_artesunateSuppository )            as stockOnHand_artesunateSuppository,
         min( a.stockOnHand_dispensingBags )                   as stockOnHand_dispensingBags,
         min( a.stockOnHand_disposableGloves )                 as stockOnHand_disposableGloves,

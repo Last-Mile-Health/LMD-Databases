@@ -103,23 +103,19 @@ delete from  lastmile_dataportal.tbl_values where trim( value ) like '';
     
 */
 
--- Bring  all the CHSS MSR indicators that that have been mapped to a ind_id in tbl_values
+
+-- dhis2 moh cbis data:  See lastmile_dataportal.tbl_moh_dhis2_chss_msr_map_indicator_id for list of indicator being
+-- uploaded every month from dhis2
+-- 
+-- Currently, these are the indicator values being brought into into tbl_values every month: 
+-- 19, 21, 119, 347, 349, 356, 357, 358, 381, 382, 383, 432, 459, 460, 461, 462, 463	
+
 replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
 select ind_id, territory_id, 1 as period_id, month_report, year_report, value   
 from lastmile_dataportal.view_moh_dhis2_chss_msr
 where not ( ind_id is null ) and  month_report = @p_month and year_report = @p_year 
 ;
 
-
--- ind_id 18, 23, 235 were all being summed in the Excel spread sheet before we run this stored procedure,
--- so they are being summed here at the top of the stored procedure.
--- 18. Number of births tracked.
-replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
-select 18, territory_id, 1 as period_id, month_report, year_report, sum( value ) as value   
-from lastmile_dataportal.view_moh_dhis2_chss_msr
-where ind_id in ( 459, 460 ) and  month_report = @p_month and year_report = @p_year 
-group by territory_id
-;
 
 -- 23. Number of child cases of malaria treated.
 replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
@@ -876,27 +872,74 @@ UNION SELECT 17, '6_16', 1, @p_month, @p_year, SUM(1)
 FROM lastmile_report.mart_view_base_odk_supervision WHERE manualMonth=@p_month AND manualYear=@p_year AND county_id IS NOT NULL;
 
 
--- 18. Number of births tracked
-REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-SELECT 18, territory_id, 1, @p_month, @p_year, COALESCE(num_births,0)
-FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL
-UNION SELECT 18, '6_16', 1, @p_month, @p_year, SUM(COALESCE(num_births,0))
-FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND year_reported=@p_year AND county_id IS NOT NULL;
+-- Number of births tracked
 
--- 18. 	NCHA Outputs: Number of births tracked
--- The 15 county values are manually uploaded monthly from dhis2 by downloading the indicators (381, 357, 358, 19, 21, 347, 349, 119, 356, 18, 23, 235) in excel and uploading  
--- them into tbl_values using Avi's excel/sql spreadsheet.  We need to calculate the Liberia totals (6_27) for the 15 counties.
+-- 459. Community births
+--      Overwrite the dhis2 values for Rivercess and Grand Bassa
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 459 as ind_id, territory_id, 1 as period_id, @p_month, @p_year, num_births_home as value
+from lastmile_report.mart_view_base_msr_county
+where (  month_reported = @p_month and  year_reported = @p_year ) and
+      ( territory_id like '1_4' or  territory_id like '1_14'  )
+;
+--      sum the values for all 1_%, mix of dhis2 CHSS MSRs for non-managed and LMH collected CHA MSRs for managed counties
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 459 as ind_id, '6_27' as terrrority_id, 1 as period_id, @p_month, @p_year, sum( coalesce( value, 0 ) ) as value   
+from lastmile_dataportal.tbl_values
+where ind_id = 459  and 
+      period_id = 1 and 
+      territory_id like '1_%' and 
+      ( `month` = @p_month and `year` = @p_year )    
+;
 
-set @liberia_total = (  select sum( value ) from tbl_values 
-                        where ( ind_id = 18                       ) and 
-                              ( `month` = @p_month                ) and 
-                              ( `year` = @p_year                  ) and                          
-                              ( period_id = 1                     ) and
-                              ( territory_id like '1_%'           ) 
-);
+-- 460. facility births
+--      Overwrite the dhis2 values for Rivercess and Grand Bassa
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 460 as ind_id, territory_id, 1 as period_id, @p_month, @p_year, num_births_facility as value
+from lastmile_report.mart_view_base_msr_county
+where (  month_reported = @p_month and  year_reported = @p_year ) and
+      ( territory_id like '1_4' or  territory_id like '1_14'  )
+;
+--      sum the values for all 1_%, mix of dhis2 CHSS MSRs for non-managed and LMH collected CHA MSRs for managed counties
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 460 as ind_id, '6_27' as terrrority_id, 1 as period_id, @p_month, @p_year, sum( coalesce( value, 0 ) ) as value   
+from lastmile_dataportal.tbl_values
+where ind_id = 460  and 
+      period_id = 1 and 
+      territory_id like '1_%' and 
+      ( `month` = @p_month and `year` = @p_year )    
+;
 
-replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
-SELECT                                        18,       '6_27',         1,            @p_month, @p_year,  @liberia_total;
+-- 18. #births = #community births + facility births 
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 18, territory_id, 1 as period_id, `month`, `year`, sum( value ) as value   
+from lastmile_dataportal.tbl_values
+where ind_id in ( 459, 460 )    and  
+      period_id = 1             and 
+      territory_id like '1_%'   and 
+      ( `month` = @p_month and `year` = @p_year )
+group by territory_id
+;
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 18 as ind_id, '6_27' as terrrority_id, 1 as period_id, @p_month, @p_year, sum( coalesce( value, 0 ) ) as value   
+from lastmile_dataportal.tbl_values
+where ind_id in ( 459, 460 ) and 
+      period_id = 1 and 
+      territory_id like '6_27' and 
+      ( `month` = @p_month and `year` = @p_year )    
+;
+
+replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+select 18, '6_31' as territory_id, 1 as period_id, @p_month, @p_year, coalesce( num_births, 0 )
+from lastmile_report.mart_view_base_msr_county 
+where ( month_reported=@p_month and year_reported=@p_year ) and territory_id like '6_31'
+
+union all
+
+select 18, '6_16' as territory_id, 1 as period_id, @p_month, @p_year, sum( coalesce( num_births, 0 ) )
+from lastmile_report.mart_view_base_msr_county 
+where ( month_reported = @p_month and year_reported = @p_year ) and not ( county_id is null )
+;
 
 
 -- 19. Number of child cases of ARI treated
@@ -4316,6 +4359,22 @@ from (
 ) as a
 ;
 
+
+-- 459. Community births
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 459 as ind_id, '6_27' as terrrority_id, 1 as period_id, month_report, year_report, sum( coalesce( value, 0 ) ) as value   
+from lastmile_dataportal.view_moh_dhis2_chss_msr
+where ind_id in ( 459 ) and  ( month_report = @p_month and year_report = @p_year )
+;
+
+-- 460. Facility births
+replace into lastmile_dataportal.tbl_values (`ind_id`, `territory_id`,`period_id`, `month`,`year`,`value`)
+select 460 as ind_id, '6_27' as terrrority_id, 1 as period_id, month_report, year_report, sum( coalesce( value, 0 ) ) as value   
+from lastmile_dataportal.view_moh_dhis2_chss_msr
+where ind_id in ( 460 ) and  month_report = @p_month and year_report = @p_year 
+;
+
+
 -- 464. # of community clinics supported by community and frontline health workers in Anchor Country Programs
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 select
@@ -5277,22 +5336,21 @@ from (
 ;
 
 
--- 825. Percent of CHSSs with regular and extra (PPE) disposable gloves in stock 
+-- 825. Percent of CHSSs with disposable gloves in stock: regular or extra (PPE)
 replace into lastmile_dataportal.tbl_values ( ind_id, territory_id, period_id, `month`, `year`, value )
 select  825, a.territory_id, 1 as period_id, @p_month, @p_year, 
         round( sum( if( a.value > 0, 1, 0 ) ) / s.num_chss, 3 ) as value  
-from ( 
+        
+from (  
         select 
               territory_id, 
               chss_id,
-              min(  if( coalesce( disposable_glove_initial_stock_on_hand,       0 ) > 0 and 
-                        coalesce( disposable_glove_covid_initial_stock_on_hand, 0 ) > 0,
-                        1, 0 )
-              ) as value
+              min( disposable_glove_regular_covid_initial_stock_on_hand ) as value
               
         from lastmile_report.mart_view_base_restock_chss as r
         where not ( territory_id is null ) and ( restock_month = @p_month ) and ( restock_year = @p_year )
         group by territory_id, chss_id       
+    
 ) as a
     left outer join lastmile_report.mart_program_scale as s on a.territory_id like s.territory_id
 group by a.territory_id
@@ -5306,10 +5364,7 @@ from (
         select 
               territory_id, 
               chss_id,
-              min(  if( coalesce( disposable_glove_initial_stock_on_hand,       0 ) > 0 and 
-                        coalesce( disposable_glove_covid_initial_stock_on_hand, 0 ) > 0,
-                        1, 0 )
-              ) as value
+              min( disposable_glove_regular_covid_initial_stock_on_hand ) as value
         from lastmile_report.mart_view_base_restock_chss as r
         where not ( territory_id is null ) and ( restock_month = @p_month ) and ( restock_year = @p_year )
         group by chss_id       
@@ -5330,8 +5385,8 @@ select 826, a.territory_id, 1, @p_month, @p_year,
 from (
         select
               territory_id, 
-              sum( if( stockout_glovesCovid19 = 1 and stockout_disposableGloves = 1, 1, 0 ) ) as number_stockouts,
-              count( * )                    as number_cha_restock
+              sum( stockout_disposable_gloves_regular_covid19 ) as number_stockouts,
+              count( * )                                        as number_cha_restock
         -- from lastmile_report.view_base_restock_cha
         from lastmile_report.mart_view_base_restock_cha
         where `month`=@p_month and `year`=@p_year and not ( territory_id is null )
@@ -5350,8 +5405,8 @@ select 826, '6_16', 1, @p_month, @p_year,
        as value
 from (
         select
-              sum( if( stockout_glovesCovid19 = 1 and stockout_disposableGloves = 1, 1, 0 ) ) as number_stockouts,
-              count( * )                    as number_cha_restock
+              sum( stockout_disposable_gloves_regular_covid19 ) as number_stockouts,
+              count( * )                                        as number_cha_restock
         -- from lastmile_report.view_base_restock_cha  -- use mart_ version of view
         from lastmile_report.mart_view_base_restock_cha
         where `month`=@p_month and `year`=@p_year and not ( territory_id is null )
@@ -5387,6 +5442,25 @@ from (
     left outer join lastmile_report.mart_program_scale as s on a.territory_id like s.territory_id
 ;
 
+-- Recode 828 and 829 like 827...
+-- 828. Percent of CHAs with all essential commodities in stock, including PPE
+-- The if-clause suppresses the results if the reporting rate is below 25% (here and below)
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+SELECT 828, a.territory_id, 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND((COALESCE(COUNT(1),0) - COALESCE(SUM(any_stockouts_essentials_ppe),0))/COALESCE(COUNT(1),0),3),NULL)
+FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
+WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL GROUP BY county_id
+UNION SELECT 828, '6_16', 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND((COALESCE(COUNT(1),0) - COALESCE(SUM(any_stockouts_essentials_ppe),0))/COALESCE(COUNT(1),0),3),NULL)
+FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
+WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
+
+-- 829. Average number of essential commodity stock-outs per CHA, including PPE
+REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+SELECT 829, a.territory_id, 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND(COALESCE(SUM(num_stockouts_essentials_ppe),0)/COALESCE(COUNT(1),0),1),NULL)
+FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
+WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL GROUP BY county_id
+UNION SELECT 829, '6_16', 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND(COALESCE(SUM(num_stockouts_essentials_ppe),0)/COALESCE(COUNT(1),0),1),NULL)
+FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
+WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
 
 
 -- ------ --

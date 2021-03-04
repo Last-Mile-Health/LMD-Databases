@@ -136,7 +136,12 @@ group by territory_id
 /* end of dhis2 upload code */
 
 
--- Create table
+--  -----------------------------------------------------------------------------------------------------------------------------------
+--
+--  begin: create and load data into mart_program_scale and mart_program_scale tables
+--
+--  -----------------------------------------------------------------------------------------------------------------------------------
+
 -- Note: num_communities and num_people currently only used to populate scale indicators (#45 and #50); num_households not used at all
 DROP TABLE IF EXISTS lastmile_report.mart_program_scale;
 CREATE TABLE lastmile_report.mart_program_scale (`territory_id` VARCHAR(20) NOT NULL, `num_cha` INT NULL, `num_chss` INT NULL, `num_communities` INT NULL, `num_households` INT NULL, `num_people` INT NULL, PRIMARY KEY (`territory_id`)) DEFAULT CHARACTER SET = utf8mb4;
@@ -684,11 +689,12 @@ update lastmile_report.mart_program_scale_qao q
   set q.num_people = s.population
 ;
 
-/*
- *
- * End QAO progam scale mart build
- *
-*/
+--  -----------------------------------------------------------------------------------------------------------------------------------
+--
+--  end: create and load data into mart_program_scale and mart_program_scale tables
+--
+--  -----------------------------------------------------------------------------------------------------------------------------------
+
 
 -- ------------ --
 -- Core updates --
@@ -1563,6 +1569,8 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 
 -- 147. Percent of CHAs with all essential commodities in stock
 -- The if-clause suppresses the results if the reporting rate is below 25% (here and below)
+-- Note: the denominator here is the number of CHAs per territory_id who are reporting one or more restock and NOT the
+-- number of CHAs in the territory.
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 147, a.territory_id, 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND((COALESCE(COUNT(1),0) - COALESCE(SUM(any_stockouts_essentials),0))/COALESCE(COUNT(1),0),3),NULL)
 FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
@@ -5445,6 +5453,9 @@ from (
 -- Recode 828 and 829 like 827...
 -- 828. Percent of CHAs with all essential commodities in stock, including PPE
 -- The if-clause suppresses the results if the reporting rate is below 25% (here and below)
+
+if @p_date_key >= 20200801 then
+
 REPLACE INTO lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
 SELECT 828, a.territory_id, 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha)>=0.25,ROUND((COALESCE(COUNT(1),0) - COALESCE(SUM(any_stockouts_essentials_ppe),0))/COALESCE(COUNT(1),0),3),NULL)
 FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON a.territory_id = b.territory_id 
@@ -5462,6 +5473,7 @@ UNION SELECT 829, '6_16', 1, @p_month, @p_year, IF((COALESCE(COUNT(1),0)/num_cha
 FROM lastmile_report.mart_view_base_restock_cha a LEFT JOIN `lastmile_report`.`mart_program_scale` b ON '6_16' = b.territory_id
 WHERE `month`=@p_month AND `year`=@p_year AND county_id IS NOT NULL;
 
+end if;
 
 -- ------ --
 -- Finish --

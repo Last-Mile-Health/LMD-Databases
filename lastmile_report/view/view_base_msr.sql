@@ -84,7 +84,7 @@ select
         a.num_ltfu_hiv_clients_traced,
         a.num_ltfu_tb_clients_traced
         
-  from lastmile_report.view_msr_union as a
+from lastmile_report.view_msr_union as a
       left outer join lastmile_ncha.health_district b on a.district = convert( b.health_district using UTF8 )
           left outer join lastmile_ncha.county c ON b.county_id = c.county_id
         
@@ -92,4 +92,8 @@ select
                                                                             ( ( cast( concat( trim( a.year_reported ), '-', trim( a.month_reported ), '-01' ) as date ) ) = d.snapshot_date )
         
       left outer join lastmile_report.mart_view_base_position_cha as e on a.cha_id like e.position_id
+      
+ -- Owen (2021-08-17): temp hack for allowing UNICEF MSRs to be uploaded to the de_cha_monthly_service_report table but still filtered out until we scale up in GG
+ -- b.cohort is anachronistic.  Use e.cohort
+ where ( e.cohort is null or trim( e.cohort like '' ) ) or not ( e.cohort like 'UNICEF' )
 ;

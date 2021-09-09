@@ -354,14 +354,6 @@ update lastmile_report.mart_program_scale s
 where territory_id like '1\\_14'
 ;
 
--- Note: 5/6/2020 This is a temp hack to make the Rivercess numbers look better.
--- Rivercess 1_14
-update lastmile_report.mart_program_scale s
-    set s.num_people = 51186
-where territory_id like '1\\_14'
-;
-
-
 -- Grand Bassa 1_4
 
 update lastmile_report.mart_program_scale s
@@ -379,6 +371,14 @@ update lastmile_report.mart_program_scale s
 where territory_id like '1\\_4'
 ;
 
+
+-- Note: 5/6/2020 This is a temp hack to make the Rivercess numbers look better.
+-- Rivercess code is above.  Just delete this update statement for 1_14 and comment out the Rivercess code in 6_16
+-- See 6_16 below for ind_id 45 as well
+update lastmile_report.mart_program_scale s
+    set s.num_people = 51186
+where territory_id like '1\\_14'
+;
 -- Total (LMH) 6_16
 update lastmile_report.mart_program_scale s
     set s.num_people = (
@@ -407,7 +407,10 @@ update lastmile_report.mart_program_scale s
                                         ( trim( c.cohort ) like '%Grand%Gedeh%UNICEF%' )         
                                 
                                   union all
-                          
+                                  
+                                  -- Hard code Rivercess for now.
+                                  select 51186 as population
+                                  /*
                                   select 
                                         if( min( coalesce( c.population, 0 ) ) = 0, 
                                             min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
@@ -417,7 +420,7 @@ update lastmile_report.mart_program_scale s
                                   where ( year( c.snapshot_date   ) = @p_year   )       and 
                                         ( month( c.snapshot_date  ) = @p_month  )       and
                                         ( trim( c.cohort ) like '%Rivercess%' ) 
-                                        
+                                  */    
                                   union all 
                                  
                                   select 
@@ -433,14 +436,6 @@ update lastmile_report.mart_program_scale s
 
                               ) as a
                        )
-where territory_id like '6\\_16'
-;
-
-
--- Note: 5/6/2020 This is a temp hack to make the Rivercess numbers look better.
--- all managed ares 6_16
-update lastmile_report.mart_program_scale s
-    set s.num_people = 146605
 where territory_id like '6\\_16'
 ;
 
@@ -2188,14 +2183,23 @@ FROM lastmile_report.mart_view_base_msr_county WHERE month_reported=@p_month AND
 
 -- 322. Number of people served by LMH Primary Health Center activities
 -- Before 1/2019 we manually entered these values.
-if @p_year >= 2019 then
-  replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
-  select 322, '1_4',  1, @p_month, @p_year, 26418 union all
-  select 322, '1_6',  1, @p_month, @p_year, 50000 union all
-  select 322, '1_14', 1, @p_month, @p_year, 25246 union all
-  select 322, '6_16', 1, @p_month, @p_year, 101664 
+if @p_date_key between 20190101 and 20210301 then
+    replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+    select 322, '1_4',  1, @p_month, @p_year, 26418 union all
+    select 322, '1_6',  1, @p_month, @p_year, 50000 union all
+    select 322, '1_14', 1, @p_month, @p_year, 25246 union all
+    select 322, '6_16', 1, @p_month, @p_year, 101664
+    ;
+elseif @p_date_key >= 20210401 then -- GB cohort 3 goes online
+
+    replace into lastmile_dataportal.tbl_values (`ind_id`,`territory_id`,`period_id`,`month`,`year`,`value`)
+    select 322, '1_4',  1, @p_month, @p_year, 34326 union all
+    select 322, '1_6',  1, @p_month, @p_year, 50000 union all
+    select 322, '1_14', 1, @p_month, @p_year, 25246 union all
+    select 322, '6_16', 1, @p_month, @p_year, 101664
+    ;
+end if
 ;
-end if;
 
 
 -- 323. Number of child cases treated per 1,000 population

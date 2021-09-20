@@ -273,6 +273,11 @@ UPDATE lastmile_report.mart_program_scale SET num_people = 98035 WHERE territory
 
 -- Pull these from the snapshot data mart for the year/month.
 
+/* Owen's note 9/20/2021: When we merge these two 6_31 and 6_26 into one 1_6, we'll need a conditional to calculate these
+  values, depending on whether we are supporting the whole county or not.  At some month, 6_31 will equal 1_6, and the previous
+  month 6_31 not equal 6_26.
+*/
+
 -- GG LMH 6_31
 update lastmile_report.mart_program_scale s
     set s.num_people = ( 
@@ -289,14 +294,17 @@ update lastmile_report.mart_program_scale s
 where territory_id like '6\\_31'
 ;
 
--- GG LMH 6_26
+-- GG UNICEF 6_26
 update lastmile_report.mart_program_scale s
     set s.num_people = ( 
-                          select 
+                          select
+                                 c.population_estimate as population
+                                  /* Temporary workaround for UNICEF until we begin reporting the whole county as Managed county.
                                   if( min( coalesce( c.population, 0 ) ) = 0, 
                                       min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
                                       min( coalesce( c.population, 0 ) )     
                                   )  as population
+                                  */
                           from lastmile_report.view_snapshot_position_cha as c
                           where ( year( c.snapshot_date   ) = @p_year   )       and 
                                 ( month( c.snapshot_date  ) = @p_month  )       and
@@ -324,10 +332,13 @@ update lastmile_report.mart_program_scale s
                                   union all
                           
                                   select 
+                                        c.population_estimate as population
+                                        /* Temporary workaround for UNICEF until we begin reporting the whole county as Managed county.
                                         if( min( coalesce( c.population, 0 ) ) = 0, 
                                             min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
                                             min( coalesce( c.population, 0 ) )     
-                                        ) as population
+                                        )  as population
+                                        */
                                   from lastmile_report.view_snapshot_position_cha as c
                                   where ( year( c.snapshot_date   ) = @p_year   )       and 
                                         ( month( c.snapshot_date  ) = @p_month  )       and
@@ -397,10 +408,13 @@ update lastmile_report.mart_program_scale s
                                   union all
                           
                                   select 
+                                        c.population_estimate as population
+                                        /* Temporary workaround for UNICEF until we begin reporting the whole county as Managed county.
                                         if( min( coalesce( c.population, 0 ) ) = 0, 
                                             min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
                                             min( coalesce( c.population, 0 ) )     
-                                        ) as population
+                                        )  as population
+                                        */
                                   from lastmile_report.view_snapshot_position_cha as c
                                   where ( year( c.snapshot_date   ) = @p_year   )       and 
                                         ( month( c.snapshot_date  ) = @p_month  )       and

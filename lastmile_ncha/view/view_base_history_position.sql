@@ -19,6 +19,7 @@ select
       
       f.health_district_id,
       trim( h.health_district )       as health_district,
+      pid.cohort,
       h.county_id,
       trim( c.county )                as county
         

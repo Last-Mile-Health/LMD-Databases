@@ -203,6 +203,10 @@ select
         a.disposable_glove_covid_amount_restocked,
         a.disposable_glove_covid_ending_balance,
         a.disposable_glove_covid_stock_returned,
+        
+        -- PPE gloves and regular added together
+        a.disposable_glove_initial_stock_on_hand + coalesce( a.disposable_glove_covid_initial_stock_on_hand, 0 )
+        as disposable_glove_regular_covid_initial_stock_on_hand,
   
         a.chss_signature,
         a.oic_signature,
@@ -211,7 +215,7 @@ select
 from lastmile_upload.de_chss_commodity_distribution a
 where trim( a.chss_id ) in (  select  position_id
                               from lastmile_ncha.view_base_history_position
-                              where job like 'CHSS'
+                              where ( job like 'CHSS' ) and ( cohort is null or not ( cohort like 'UNICEF' ) )
                             )
 ;
 

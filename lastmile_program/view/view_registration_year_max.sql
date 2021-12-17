@@ -1,8 +1,8 @@
 use lastmile_program;
 
-drop view if exists view_registration_year_max;
+drop view if exists lastmile_program.view_registration_year_max;
 
-create view view_registration_year_max as 
+create view lastmile_program.view_registration_year_max as 
 
 select
       g1.community_id, 

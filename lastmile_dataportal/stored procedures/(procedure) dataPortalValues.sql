@@ -382,14 +382,6 @@ update lastmile_report.mart_program_scale s
 where territory_id like '1\\_4'
 ;
 
-
--- Note: 5/6/2020 This is a temp hack to make the Rivercess numbers look better.
--- Rivercess code is above.  Just delete this update statement for 1_14 and comment out the Rivercess code in 6_16
--- See 6_16 below for ind_id 45 as well
-update lastmile_report.mart_program_scale s
-    set s.num_people = 51186
-where territory_id like '1\\_14'
-;
 -- Total (LMH) 6_16
 update lastmile_report.mart_program_scale s
     set s.num_people = (
@@ -421,10 +413,7 @@ update lastmile_report.mart_program_scale s
                                         ( trim( c.cohort ) like '%Grand%Gedeh%UNICEF%' )         
                                 
                                   union all
-                                  
-                                  -- Hard code Rivercess for now.
-                                  select 51186 as population
-                                  /*
+                                                                                    
                                   select 
                                         if( min( coalesce( c.population, 0 ) ) = 0, 
                                             min( coalesce( c.cha_count, 0 ) ) * @cha_population_ratio,                                
@@ -434,7 +423,7 @@ update lastmile_report.mart_program_scale s
                                   where ( year( c.snapshot_date   ) = @p_year   )       and 
                                         ( month( c.snapshot_date  ) = @p_month  )       and
                                         ( trim( c.cohort ) like '%Rivercess%' ) 
-                                  */    
+                                      
                                   union all 
                                  
                                   select 
@@ -452,7 +441,6 @@ update lastmile_report.mart_program_scale s
                        )
 where territory_id like '6\\_16'
 ;
-
 
 -- 50. Number of communities served
 -- Pull these from the snapshot data mart for the year/month.
@@ -1025,6 +1013,22 @@ set @liberia_total = (  select sum( value ) from tbl_values
 
 replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`,  `month`,  `year`,   `value` )
 SELECT                                        23,       '6_27',         1,            @p_month, @p_year,  @liberia_total;
+
+-- 23.Number of child cases of malaria treated.  Qtrly totals for Assisted
+replace into lastmile_dataportal.tbl_values ( `ind_id`, `territory_id`, `period_id`, `month`, `year`, `value` )
+select 23, '6_27', 2, @p_month, @p_year, sum( coalesce( `value`, 0 ) ) as `value`
+from lastmile_dataportal.tbl_values
+where ind_id = 23               and
+      territory_id like '6_27'  and
+      period_id = 1             and 
+      ( @isEndOfQuarter         and
+        ( 
+          ( `year` = @p_year    and `month` =  @p_month        )   or 
+          ( `year` = @p_year    and `month` =  @p_monthMinus1  )   or 
+          ( `year` = @p_year    and `month` =  @p_monthMinus2  ) 
+        ) 
+      )
+;
 
 
 -- 28. Number of CHAs deployed

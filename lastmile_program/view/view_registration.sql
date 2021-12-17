@@ -1,8 +1,8 @@
 use lastmile_program;
   
-drop view if exists view_registration;
+drop view if exists lastmile_program.view_registration;
 
-create view view_registration as 
+create view lastmile_program.view_registration as 
 
 select
       m.community_id, 

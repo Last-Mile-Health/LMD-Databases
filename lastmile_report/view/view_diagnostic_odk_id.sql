@@ -43,9 +43,8 @@ where
       not ( d.table_name like 'odk_chaRestock'  and d.id_type like 'chss' and d.id_name like 'user_id'          and ( d.meta_form_version like '3.1.1' or d.meta_form_version like '3.3.1' )  and d.id_original_value is null )
       and
       not ( d.table_name like 'odk_chaRestock'  and d.id_type like 'chss' and d.id_name like 'chssID'           and ( d.meta_form_version like '3.2.2' or d.meta_form_version like '4.0.0' )  and d.id_original_value is null )  
-      
       and
-      not ( d.table_name like 'odk_supervisionVisitLog'  and d.id_type like 'cha'  and d.id_name like 'supervisedCHAID'   and d.meta_form_version like '3.4.1' and d.id_original_value is null )
+      not ( d.table_name like 'odk_supervisionVisitLog'  and d.id_type like 'cha'  and d.id_name like 'supervisedCHAID'   and d.meta_form_version like '3.4.1' and d.id_original_value is null  )
       and
       not ( d.table_name like 'odk_supervisionVisitLog'  and d.id_type like 'cha'  and d.id_name like 'cha_id'            and ( d.meta_form_version like '3.2.2' or d.meta_form_version like '3.1.1' or d.meta_form_version like '3.3.1' )  and d.id_original_value is null )
       and

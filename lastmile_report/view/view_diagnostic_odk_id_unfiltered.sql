@@ -220,7 +220,8 @@ select
         null		                                as meta_health_district,
         null                                    as meta_county,
         null		                                as meta_community,
-        a.communityID		                        as meta_community_id, 
+        if( a.community_id is null, if( a.communityID is null, null, a.communityID ), a.community_id ) as meta_community_id,
+        -- a.communityID		                        as meta_community_id, 
         a.manualDate                            as meta_form_date,
  
         a.meta_insertDatetime, 
@@ -242,9 +243,72 @@ select
         a.chss_id_orig_inserted_format          as id_inserted_format_value,
         a.chssID                                as id_value, 
 
-        a.chss_name 		                        as meta_cha,
+        null 		                                as meta_cha,
         null		                                as meta_cha_id,
-        null		                                as meta_chss,
+        a.chss_name	                            as meta_chss,
+        null 	                                  as meta_chss_id,
+        null		                                as meta_facility,
+        null                                    as meta_facility_id,
+        null		                                as meta_health_district,
+        null                                    as meta_county,
+        null		                                as meta_community,
+        if( a.community_id is null, if( a.communityID is null, null, a.communityID ), a.community_id ) as meta_community_id,
+        -- a.communityID		                        as meta_community_id, 
+        a.manualDate                            as meta_form_date,
+  
+        a.meta_insertDatetime, 
+        a.meta_formVersion 
+                 
+from lastmile_upload.odk_supervisionVisitLog as a
+
+union all
+
+select  
+        'odk_supervisionVisitLog'               as table_name,
+        a.supervisionVisitLogID                 as pk_id,
+
+        'cha'                                   as id_type,
+        'cha_id'                                as id_name,
+
+        a.cha_id_original                       as id_original_value, 
+        a.cha_id_inserted                       as id_inserted_value, 
+        a.cha_id_inserted_format                as id_inserted_format_value,
+        a.cha_id                                as id_value,
+
+        null 		                                as meta_cha,
+        null		                                as meta_cha_id,
+        a.chss_name		                          as meta_chss,
+        a.chss_id_original 	                    as meta_chss_id,
+        null		                                as meta_facility,
+        null                                    as meta_facility_id,
+        null		                                as meta_health_district,
+        null                                    as meta_county,
+        null		                                as meta_community,
+        a.communityID		                        as meta_community_id, 
+        a.manualDate                            as meta_form_date,
+ 
+        a.meta_insertDatetime, 
+        a.meta_formVersion 
+                  
+from lastmile_upload.odk_supervisionVisitLog as a
+
+union all
+
+select  
+        'odk_supervisionVisitLog'               as table_name,
+        a.supervisionVisitLogID                 as pk_id,
+
+        'chss'                                  as id_type,
+        'chss_id'                               as id_name,
+
+        a.chss_id_original                      as id_original_value, 
+        a.chss_id_inserted                      as id_inserted_value, 
+        a.chss_id_inserted_format               as id_inserted_format_value,
+        a.chss_id                               as id_value, 
+
+        null 		                                as meta_cha,
+        null		                                as meta_cha_id,
+        a.chss_name		                          as meta_chss,
         null 	                                  as meta_chss_id,
         null		                                as meta_facility,
         null                                    as meta_facility_id,
@@ -260,6 +324,7 @@ select
 from lastmile_upload.odk_supervisionVisitLog as a
 
 union all
+
 
 -- 10. odk_vaccineTracker ----------------------------------------------------------------------------
 

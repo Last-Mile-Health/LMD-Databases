@@ -26,6 +26,7 @@ VALUES ('BEGIN: data_mart_other', 'none', NOW());
 -- Called daily by evt_dataMartTables. Daily updates done because some reports look directly at these tables
 -- The dataPortalValues procedure works mainly off of the data marts created here
 
+/* Obsoleted when we moved ifi to kobo
 drop table if exists lastmile_report.mart_de_integrated_supervision_tool_community;
 create table lastmile_report.mart_de_integrated_supervision_tool_community as 
 select * from lastmile_liberiamohdata.federated_de_integrated_supervision_tool_community;
@@ -41,6 +42,7 @@ select * from lastmile_liberiamohdata.federated_de_integrated_supervision_tool_f
 drop table if exists lastmile_report.mart_de_integrated_supervision_tool_facility_spot_check;
 create table lastmile_report.mart_de_integrated_supervision_tool_facility_spot_check as 
 select * from lastmile_liberiamohdata.federated_de_integrated_supervision_tool_facility_spot_check;
+*/
 
 drop table if exists lastmile_report.mart_view_base_history_person;
 create table lastmile_report.mart_view_base_history_person as 
@@ -95,9 +97,11 @@ drop table if exists lastmile_report.mart_view_base_odk_supervision;
 create table lastmile_report.mart_view_base_odk_supervision as 
 select * from lastmile_report.view_base_odk_supervision;
 
+/* Obsoleted when we moved ifi to Kobo 
 drop table if exists lastmile_report.mart_view_base_ifi;
 create table lastmile_report.mart_view_base_ifi as 
 select * from lastmile_report.view_base_ifi;
+*/
 
 drop table if exists lastmile_report.mart_view_kobo_ifi;
 create table lastmile_report.mart_view_kobo_ifi as 

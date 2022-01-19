@@ -95,7 +95,8 @@ select * from lastmile_report.view_restock_cha_ppe_form
 
 drop table if exists lastmile_report.mart_view_base_odk_supervision;
 create table lastmile_report.mart_view_base_odk_supervision as 
-select * from lastmile_report.view_base_odk_supervision;
+select * from lastmile_report.view_base_odk_supervision
+;
 
 /* Obsoleted when we moved ifi to Kobo 
 drop table if exists lastmile_report.mart_view_base_ifi;
